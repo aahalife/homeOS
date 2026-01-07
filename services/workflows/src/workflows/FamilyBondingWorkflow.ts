@@ -209,7 +209,8 @@ export async function GameNightWorkflow(input: GameNightInput): Promise<{
     title: 'Family Game Night',
     startTime: gameNightDate.toISOString(),
     endTime: new Date(gameNightDate.getTime() + duration * 60 * 1000).toISOString(),
-    attendees: members.map((m) => m.id),
+    organizer: members[0]?.id || 'family',
+    invitees: members.map((m) => m.id),
     category: 'family',
   });
 

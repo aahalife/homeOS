@@ -154,6 +154,8 @@ export async function HireHelperWorkflow(input: HireHelperInput): Promise<{
     workspaceId,
     helperId: bestQuote.helperId,
     quoteId: bestQuote.quoteId,
+    scheduledDate: input.preferredDate,
+    location: input.location,
     idempotencyKey: `booking-${workspaceId}-${bestQuote.quoteId}`,
   });
 

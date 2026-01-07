@@ -118,7 +118,7 @@ export async function FamilyAnnouncementWorkflow(input: FamilyAnnouncementWorkfl
 export interface SharedCalendarSyncWorkflowInput {
   workspaceId: string;
   syncPeriodDays?: number;
-  categories?: string[];
+  categories?: ('family' | 'school' | 'sports' | 'medical' | 'social' | 'other')[];
   createReminders?: boolean;
 }
 

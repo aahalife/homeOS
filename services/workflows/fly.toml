@@ -1,0 +1,18 @@
+# fly.toml for HomeOS Workflows Worker
+app = 'homeos-workflows'
+primary_region = 'sjc'
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  NODE_ENV = "production"
+
+# No HTTP service - this is a worker
+[processes]
+  worker = "node dist/worker.js"
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1

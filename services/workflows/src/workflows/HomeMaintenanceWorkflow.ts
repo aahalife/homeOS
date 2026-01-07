@@ -41,7 +41,7 @@ export interface ScheduleMaintenanceWorkflowInput {
   userId: string;
   taskType: string;
   description: string;
-  urgency: 'routine' | 'soon' | 'urgent';
+  urgency: 'routine' | 'urgent' | 'emergency';
   preferredDate?: string;
 }
 

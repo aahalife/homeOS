@@ -192,6 +192,8 @@ export interface RecipeSuggestionWorkflowInput {
   dietary?: {
     restrictions: string[];
     preferences: string[];
+    dislikes?: string[];
+    cuisines?: string[];
   };
 }
 
@@ -217,11 +219,19 @@ export async function RecipeSuggestionWorkflow(input: RecipeSuggestionWorkflowIn
     availableIngredients = pantryItems.map((item) => item.name);
   }
 
+  // Transform dietary input to match activity's DietaryPreferences type
+  const dietaryPrefs = dietary ? {
+    restrictions: dietary.restrictions,
+    preferences: dietary.preferences,
+    dislikes: dietary.dislikes ?? [],
+    cuisines: dietary.cuisines ?? [],
+  } : undefined;
+
   const recipes = await searchRecipes({
     workspaceId,
     query,
     ingredients: availableIngredients.length > 0 ? availableIngredients : undefined,
-    dietary,
+    dietary: dietaryPrefs,
     maxPrepTime,
     mealType,
   });

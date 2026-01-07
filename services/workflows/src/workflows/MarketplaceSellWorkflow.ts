@@ -208,6 +208,7 @@ export async function MarketplaceSellWorkflow(input: MarketplaceSellInput): Prom
 
       await sendBuyerMessage({
         workspaceId,
+        listingId: listing.listingId,
         buyerId: message.buyerId,
         message: pickup.confirmationMessage,
         idempotencyKey: `msg-${message.messageId}`,

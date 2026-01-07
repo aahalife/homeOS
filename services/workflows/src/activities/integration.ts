@@ -826,6 +826,83 @@ export async function publishTool(input: PublishToolInput): Promise<PublishedToo
 }
 
 // ============================================================================
+// WEATHER UTILITY
+// ============================================================================
+
+export interface GetWeatherInput {
+  workspaceId: string;
+  location: string;
+}
+
+export interface WeatherInfo {
+  temperature: number;
+  conditions: string;
+  humidity: number;
+  windSpeed: number;
+  description: string;
+  forecast?: {
+    day: string;
+    high: number;
+    low: number;
+    conditions: string;
+  }[];
+}
+
+export async function getWeather(input: GetWeatherInput): Promise<WeatherInfo> {
+  const { location } = input;
+
+  // In production, this would integrate with:
+  // - OpenWeatherMap API
+  // - Weather.gov API
+  // - AccuWeather API
+
+  // For now, return mock weather data
+  // This simulates seasonal/reasonable weather
+  const now = new Date();
+  const month = now.getMonth();
+
+  // Simulate temperature based on season (Northern Hemisphere)
+  let baseTemp: number;
+  let conditions: string;
+
+  if (month >= 5 && month <= 8) {
+    // Summer
+    baseTemp = 75 + Math.random() * 15;
+    conditions = Math.random() > 0.7 ? 'Partly Cloudy' : 'Sunny';
+  } else if (month >= 11 || month <= 2) {
+    // Winter
+    baseTemp = 35 + Math.random() * 20;
+    conditions = Math.random() > 0.6 ? 'Cloudy' : 'Clear';
+  } else {
+    // Spring/Fall
+    baseTemp = 55 + Math.random() * 20;
+    conditions = Math.random() > 0.5 ? 'Partly Cloudy' : 'Clear';
+  }
+
+  return {
+    temperature: Math.round(baseTemp),
+    conditions,
+    humidity: Math.round(40 + Math.random() * 40),
+    windSpeed: Math.round(5 + Math.random() * 15),
+    description: `${conditions}, ${Math.round(baseTemp)}°F`,
+    forecast: [
+      {
+        day: 'Tomorrow',
+        high: Math.round(baseTemp + Math.random() * 5),
+        low: Math.round(baseTemp - 10 - Math.random() * 5),
+        conditions,
+      },
+      {
+        day: 'Day After',
+        high: Math.round(baseTemp + Math.random() * 8),
+        low: Math.round(baseTemp - 12 - Math.random() * 5),
+        conditions: Math.random() > 0.5 ? 'Sunny' : 'Partly Cloudy',
+      },
+    ],
+  };
+}
+
+// ============================================================================
 // UTILITY: Get installed MCP servers
 // ============================================================================
 

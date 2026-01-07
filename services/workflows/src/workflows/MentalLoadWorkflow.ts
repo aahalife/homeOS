@@ -90,7 +90,7 @@ export async function MorningBriefingWorkflow(input: MorningBriefingInput): Prom
   }
 
   // Get chores due today
-  const chores = await getChores({ workspaceId, dueWithin: 1 });
+  const chores = await getChores({ workspaceId, status: 'pending' });
   if (chores.length > 0) {
     const choreList = chores.slice(0, 3).map((c) => `${c.name} (${c.assignedTo})`);
     highlights.push(`Chores today: ${choreList.join(', ')}`);
@@ -101,7 +101,7 @@ export async function MorningBriefingWorkflow(input: MorningBriefingInput): Prom
     const members = await getFamilyMembers({ workspaceId });
     for (const member of members) {
       const meds = await getMedications({ workspaceId, memberId: member.id });
-      const morningMeds = meds.filter((m) => m.schedule?.includes('morning'));
+      const morningMeds = meds.filter((m) => m.timeOfDay?.includes('morning'));
       if (morningMeds.length > 0) {
         highlights.push(`${member.name}: ${morningMeds.length} medication(s) this morning`);
       }
@@ -214,7 +214,7 @@ export async function WeeklyPlanningWorkflow(input: WeeklyPlanningInput): Promis
   }
 
   // Get chores for the week
-  const chores = await getChores({ workspaceId, dueWithin: 7 });
+  const chores = await getChores({ workspaceId, status: 'pending' });
 
   // Generate suggestions
   const suggestions: string[] = [];
@@ -436,7 +436,7 @@ export async function DecisionSimplificationWorkflow(input: DecisionSimplificati
 
     case 'chore-assignment': {
       const members = await getFamilyMembers({ workspaceId });
-      const chores = await getChores({ workspaceId, status: 'pending' });
+      const chores = await getChores({ workspaceId, status: 'pending', includeCompleted: false });
 
       // Simple round-robin assignment
       const assignments: Record<string, string[]> = {};

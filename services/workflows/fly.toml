@@ -3,7 +3,7 @@ app = 'homeos-workflows'
 primary_region = 'sjc'
 
 [build]
-  dockerfile = "Dockerfile"
+  image = "bharathsud123/homeos-workflows:latest"
 
 [env]
   NODE_ENV = "production"

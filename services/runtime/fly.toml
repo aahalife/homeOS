@@ -3,7 +3,7 @@ app = 'homeos-runtime'
 primary_region = 'sjc'
 
 [build]
-  dockerfile = "Dockerfile"
+  image = "bharathsud123/homeos-runtime:latest"
 
 [env]
   NODE_ENV = "production"

@@ -1,5 +1,5 @@
-# Build stage
-FROM node:22-alpine AS builder
+# Build stage - use Debian slim for Temporal SDK compatibility (requires glibc)
+FROM node:22-slim AS builder
 
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
@@ -24,8 +24,11 @@ RUN pnpm --filter @homeos/shared build
 # Build workflows
 RUN pnpm --filter @homeos/workflows build
 
-# Production stage
-FROM node:22-alpine AS runner
+# Production stage - must use glibc-based image for Temporal SDK
+FROM node:22-slim AS runner
+
+# Install CA certificates for TLS connections (required for Temporal Cloud)
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 

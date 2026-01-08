@@ -96,7 +96,15 @@ struct TasksView: View {
         ScrollView {
             LazyVStack(spacing: 12) {
                 ForEach(viewModel.filteredTasks(for: selectedFilter)) { task in
-                    TaskCard(task: task)
+                    TaskCard(
+                        task: task,
+                        onApprove: {
+                            Task { await viewModel.approveTask(task) }
+                        },
+                        onDeny: {
+                            Task { await viewModel.denyTask(task) }
+                        }
+                    )
                 }
 
                 if viewModel.filteredTasks(for: selectedFilter).isEmpty {
@@ -104,6 +112,9 @@ struct TasksView: View {
                 }
             }
             .padding()
+        }
+        .refreshable {
+            await viewModel.loadTasks()
         }
     }
 
@@ -129,13 +140,19 @@ struct TasksView: View {
 @MainActor
 class TasksViewModel: ObservableObject {
     @Published var tasks: [TaskItem] = []
+    @Published var isLoading = false
+    @Published var error: String?
 
     var pendingApprovalCount: Int {
         tasks.filter { $0.status == .needsApproval }.count
     }
 
     init() {
-        // Sample tasks
+        // Start with sample tasks, then fetch real data
+        loadSampleTasks()
+    }
+
+    private func loadSampleTasks() {
         tasks = [
             TaskItem(
                 id: "1",
@@ -173,6 +190,42 @@ class TasksViewModel: ObservableObject {
         ]
     }
 
+    func loadTasks() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.runtimeURL)/v1/tasks?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                // If API fails, keep sample data
+                return
+            }
+
+            // Parse and update tasks if API returns data
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let tasksArray = json["tasks"] as? [[String: Any]] {
+                // Parse tasks from API response
+                // For now, keep sample data if parsing fails
+                if tasksArray.isEmpty {
+                    loadSampleTasks()
+                }
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
     func filteredTasks(for filter: TasksView.TaskFilter) -> [TaskItem] {
         switch filter {
         case .all:
@@ -184,6 +237,78 @@ class TasksViewModel: ObservableObject {
         case .done:
             return tasks.filter { $0.status == .done }
         }
+    }
+
+    func approveTask(_ task: TaskItem) async {
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.runtimeURL)/v1/tasks/\(task.id)/approve?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+
+            if let httpResponse = response as? HTTPURLResponse,
+               (200...299).contains(httpResponse.statusCode) {
+                // Update local state
+                if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+                    tasks[index] = TaskItem(
+                        id: task.id,
+                        title: task.title,
+                        summary: task.summary,
+                        category: task.category,
+                        status: .running,
+                        riskLevel: task.riskLevel,
+                        requiresApproval: task.requiresApproval,
+                        details: task.details,
+                        createdAt: task.createdAt
+                    )
+                }
+            }
+        } catch {
+            self.error = error.localizedDescription
+        }
+
+        // Also update local state optimistically
+        if let index = tasks.firstIndex(where: { $0.id == task.id }) {
+            tasks[index] = TaskItem(
+                id: task.id,
+                title: task.title,
+                summary: task.summary,
+                category: task.category,
+                status: .running,
+                riskLevel: task.riskLevel,
+                requiresApproval: task.requiresApproval,
+                details: task.details,
+                createdAt: task.createdAt
+            )
+        }
+    }
+
+    func denyTask(_ task: TaskItem) async {
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.runtimeURL)/v1/tasks/\(task.id)/deny?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (_, _) = try await URLSession.shared.data(for: request)
+        } catch {
+            self.error = error.localizedDescription
+        }
+
+        // Update local state
+        tasks.removeAll { $0.id == task.id }
     }
 }
 

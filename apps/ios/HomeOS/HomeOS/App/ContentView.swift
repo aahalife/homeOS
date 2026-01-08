@@ -3,6 +3,8 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var authManager: AuthManager
     @State private var selectedTab: Tab = .chat
+    @State private var showSetupFlow = false
+    @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
     enum Tab: String, CaseIterable {
         case chat = "Chat"
@@ -25,9 +27,21 @@ struct ContentView: View {
     var body: some View {
         Group {
             if authManager.isAuthenticated {
-                mainContent
+                if !onboardingCompleted && showSetupFlow {
+                    SetupFlowView {
+                        onboardingCompleted = true
+                        showSetupFlow = false
+                    }
+                } else {
+                    mainContent
+                }
             } else {
                 OnboardingView()
+            }
+        }
+        .onChange(of: authManager.isAuthenticated) { _, isAuthenticated in
+            if isAuthenticated && !onboardingCompleted {
+                showSetupFlow = true
             }
         }
     }

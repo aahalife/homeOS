@@ -1,4 +1,11 @@
-# fly.toml for HomeOS Workflows Worker
+# fly.toml for HomeOS Workflows Worker (Temporal)
+#
+# This is a background worker that polls Temporal for tasks.
+# It must stay running to process workflows.
+#
+# Development: Single small instance
+# Production: Scale with: fly scale count 2 --app homeos-workflows
+#
 app = 'homeos-workflows'
 primary_region = 'sjc'
 
@@ -7,12 +14,13 @@ primary_region = 'sjc'
 
 [env]
   NODE_ENV = "production"
+  TASK_QUEUE = "homeos-workflows"
 
-# No HTTP service - this is a worker
+# No HTTP service - this is a background worker
 [processes]
   worker = "node dist/worker.js"
 
 [[vm]]
-  memory = '1gb'
+  memory = '512mb'              # Reduced for dev (1gb for prod)
   cpu_kind = 'shared'
   cpus = 1

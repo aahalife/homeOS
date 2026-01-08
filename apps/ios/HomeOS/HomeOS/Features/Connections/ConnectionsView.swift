@@ -576,14 +576,55 @@ struct OAuthWebView: View {
     private func startOAuthFlow() {
         isLoading = true
 
-        // Simulate OAuth flow - in production, this would:
-        // 1. Call backend to get OAuth URL from Composio
-        // 2. Open ASWebAuthenticationSession
-        // 3. Handle callback and exchange code for tokens
+        Task {
+            do {
+                // 1. Get OAuth URL from backend
+                guard let token = AuthManager.shared.token,
+                      let workspaceId = AuthManager.shared.workspaceId,
+                      let url = URL(string: "\(Configuration.controlPlaneURL)/v1/integrations/\(integration.id)/auth-url?workspaceId=\(workspaceId)") else {
+                    await MainActor.run {
+                        isLoading = false
+                        onComplete(false)
+                    }
+                    return
+                }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            isLoading = false
-            onComplete(true)
+                var request = URLRequest(url: url)
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+                let (data, response) = try await URLSession.shared.data(for: request)
+
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    await MainActor.run {
+                        isLoading = false
+                        onComplete(false)
+                    }
+                    return
+                }
+
+                // 2. Parse OAuth URL and open in browser
+                if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let authUrlString = json["authUrl"] as? String,
+                   let authUrl = URL(string: authUrlString) {
+                    await MainActor.run {
+                        UIApplication.shared.open(authUrl)
+                        isLoading = false
+                        // Note: In production, use ASWebAuthenticationSession for proper OAuth callback handling
+                        onComplete(true)
+                    }
+                } else {
+                    await MainActor.run {
+                        isLoading = false
+                        onComplete(false)
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    isLoading = false
+                    onComplete(false)
+                }
+            }
         }
     }
 }
@@ -637,9 +678,46 @@ class ConnectionsViewModel: ObservableObject {
 
     func loadIntegrations() async {
         isLoading = true
-        // In production, fetch connected status from backend
+        defer { isLoading = false }
+
+        // Start with all available integrations
         allIntegrations = availableIntegrations
-        isLoading = false
+
+        // Fetch connected status from backend
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.controlPlaneURL)/v1/integrations/connected?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                return
+            }
+
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let connections = json["connections"] as? [[String: Any]] {
+                // Update integration status based on connected apps
+                for connection in connections {
+                    if let appId = connection["appId"] as? String,
+                       let index = allIntegrations.firstIndex(where: { $0.id == appId }) {
+                        allIntegrations[index].isConnected = true
+                        if let connectedAtString = connection["connectedAt"] as? String {
+                            let formatter = ISO8601DateFormatter()
+                            allIntegrations[index].connectedAt = formatter.date(from: connectedAtString)
+                        }
+                    }
+                }
+            }
+        } catch {
+            print("Error loading integrations: \(error)")
+        }
     }
 
     func refreshIntegrations() async {
@@ -655,29 +733,113 @@ class ConnectionsViewModel: ObservableObject {
     }
 
     func disconnect(_ integration: Integration) async {
+        // Update local state optimistically
         if let index = allIntegrations.firstIndex(where: { $0.id == integration.id }) {
             allIntegrations[index].isConnected = false
             allIntegrations[index].connectedAt = nil
         }
+
+        // Call backend to disconnect
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.controlPlaneURL)/v1/integrations/\(integration.id)?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        do {
+            let (_, _) = try await URLSession.shared.data(for: request)
+        } catch {
+            print("Error disconnecting integration: \(error)")
+        }
     }
 
     func saveAPIKey(_ provider: AIProvider, key: String) async {
-        switch provider {
-        case .openai:
-            openAIConfigured = true
-        case .anthropic:
-            anthropicConfigured = true
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.controlPlaneURL)/v1/secrets?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        let secretName = provider == .openai ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY"
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = [
+            "name": secretName,
+            "value": key
+        ]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+
+            if let httpResponse = response as? HTTPURLResponse,
+               (200...299).contains(httpResponse.statusCode) {
+                switch provider {
+                case .openai:
+                    openAIConfigured = true
+                case .anthropic:
+                    anthropicConfigured = true
+                }
+            }
+        } catch {
+            print("Error saving API key: \(error)")
         }
     }
 
     func testConnection(_ provider: AIProvider) async {
-        switch provider {
-        case .openai:
-            openAILastTested = Date()
-            openAITestSuccessful = true
-        case .anthropic:
-            anthropicLastTested = Date()
-            anthropicTestSuccessful = true
+        guard let token = AuthManager.shared.token,
+              let workspaceId = AuthManager.shared.workspaceId,
+              let url = URL(string: "\(Configuration.controlPlaneURL)/v1/secrets/test?workspaceId=\(workspaceId)") else {
+            return
+        }
+
+        let secretName = provider == .openai ? "OPENAI_API_KEY" : "ANTHROPIC_API_KEY"
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let body: [String: Any] = ["name": secretName]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            let success = (response as? HTTPURLResponse).map { (200...299).contains($0.statusCode) } ?? false
+
+            // Check response for success status
+            var testResult = success
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let isValid = json["valid"] as? Bool {
+                testResult = isValid
+            }
+
+            switch provider {
+            case .openai:
+                openAILastTested = Date()
+                openAITestSuccessful = testResult
+            case .anthropic:
+                anthropicLastTested = Date()
+                anthropicTestSuccessful = testResult
+            }
+        } catch {
+            switch provider {
+            case .openai:
+                openAILastTested = Date()
+                openAITestSuccessful = false
+            case .anthropic:
+                anthropicLastTested = Date()
+                anthropicTestSuccessful = false
+            }
         }
     }
 }

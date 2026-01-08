@@ -10,11 +10,102 @@ class AuthManager: ObservableObject {
     @Published var workspaceId: String?
     @Published var userName: String?
     @Published var userEmail: String?
+    @Published var isPasscodeAuthAvailable = false
+    @Published var isLoading = false
+    @Published var errorMessage: String?
 
     private let keychain = KeychainHelper.shared
 
     init() {
         loadStoredCredentials()
+        Task {
+            await checkPasscodeAvailability()
+        }
+    }
+
+    func checkPasscodeAvailability() async {
+        guard let url = URL(string: "\(Configuration.controlPlaneURL)/v1/auth/passcode/available") else {
+            return
+        }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let response = try JSONDecoder().decode(PasscodeAvailabilityResponse.self, from: data)
+            self.isPasscodeAuthAvailable = response.available
+        } catch {
+            // Passcode not available (API error or not supported)
+            self.isPasscodeAuthAvailable = false
+        }
+    }
+
+    func signInWithPasscode(_ passcode: String) async {
+        guard let url = URL(string: "\(Configuration.controlPlaneURL)/v1/auth/passcode") else {
+            self.errorMessage = "Invalid URL"
+            return
+        }
+
+        self.isLoading = true
+        self.errorMessage = nil
+
+        defer {
+            self.isLoading = false
+        }
+
+        do {
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+            let body = PasscodeAuthRequest(
+                passcode: passcode,
+                deviceId: UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+            )
+            request.httpBody = try JSONEncoder().encode(body)
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AuthError.authenticationFailed
+            }
+
+            if httpResponse.statusCode == 403 {
+                self.errorMessage = "Passcode auth not available"
+                return
+            }
+
+            if httpResponse.statusCode == 401 {
+                self.errorMessage = "Invalid passcode"
+                return
+            }
+
+            guard (200...299).contains(httpResponse.statusCode) else {
+                throw AuthError.authenticationFailed
+            }
+
+            let authResponse = try JSONDecoder().decode(AuthResponse.self, from: data)
+
+            // Store credentials
+            keychain.save(key: "authToken", value: authResponse.token)
+            keychain.save(key: "userId", value: authResponse.user.id)
+
+            if let name = authResponse.user.name {
+                keychain.save(key: "userName", value: name)
+                self.userName = name
+            }
+            if let email = authResponse.user.email {
+                keychain.save(key: "userEmail", value: email)
+                self.userEmail = email
+            }
+
+            self.token = authResponse.token
+            self.isAuthenticated = true
+
+            // Create or get workspace
+            await setupWorkspace()
+
+        } catch {
+            self.errorMessage = "Authentication failed: \(error.localizedDescription)"
+        }
     }
 
     func loadStoredCredentials() {
@@ -235,4 +326,13 @@ struct WorkspaceInfo: Codable {
 enum AuthError: Error {
     case invalidURL
     case authenticationFailed
+}
+
+struct PasscodeAuthRequest: Codable {
+    let passcode: String
+    let deviceId: String
+}
+
+struct PasscodeAvailabilityResponse: Codable {
+    let available: Bool
 }

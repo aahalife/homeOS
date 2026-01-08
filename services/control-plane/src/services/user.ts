@@ -107,4 +107,35 @@ export class UserService {
     );
     return row ? toUser(row) : null;
   }
+
+  /**
+   * Find or create a dev user for passcode authentication.
+   * This is only used in development mode.
+   */
+  async findOrCreateDevUser(deviceId: string): Promise<{ user: User; isNewUser: boolean }> {
+    const devAppleId = `dev-user-${deviceId}`;
+    const devEmail = `dev-${deviceId}@homeos.local`;
+    const devName = 'Dev User';
+
+    // Try to find existing dev user
+    let user = await this.findByAppleId(devAppleId);
+
+    if (user) {
+      return { user, isNewUser: false };
+    }
+
+    // Create new dev user
+    const result = await queryOne<DBUser>(
+      `INSERT INTO homeos.users (apple_id, email, name)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [devAppleId, devEmail, devName]
+    );
+
+    if (!result) {
+      throw new Error('Failed to create dev user');
+    }
+
+    return { user: toUser(result), isNewUser: true };
+  }
 }

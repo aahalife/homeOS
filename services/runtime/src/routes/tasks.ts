@@ -1,6 +1,23 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { emitToWorkspace } from '../ws/stream.js';
 
+// In-memory task storage (in production, use database)
+const tasksStore = new Map<string, Map<string, TaskRecord>>();
+
+interface TaskRecord {
+  taskId: string;
+  workspaceId: string;
+  title: string;
+  category: string;
+  status: 'queued' | 'running' | 'needs_approval' | 'blocked' | 'done' | 'failed';
+  riskLevel: 'low' | 'medium' | 'high';
+  requiresApproval: boolean;
+  summaryForUser: string;
+  details?: Record<string, unknown>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const tasksRoutes: FastifyPluginAsync = async (app) => {
   app.addHook('onRequest', async (request, reply) => {
     try {
@@ -32,18 +49,24 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
         },
         response: {
           200: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                taskId: { type: 'string' },
-                title: { type: 'string' },
-                category: { type: 'string' },
-                status: { type: 'string' },
-                riskLevel: { type: 'string' },
-                summaryForUser: { type: 'string' },
-                createdAt: { type: 'string' },
-                updatedAt: { type: 'string' },
+            type: 'object',
+            properties: {
+              tasks: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    taskId: { type: 'string' },
+                    title: { type: 'string' },
+                    category: { type: 'string' },
+                    status: { type: 'string' },
+                    riskLevel: { type: 'string' },
+                    requiresApproval: { type: 'boolean' },
+                    summaryForUser: { type: 'string' },
+                    createdAt: { type: 'string' },
+                    updatedAt: { type: 'string' },
+                  },
+                },
               },
             },
           },
@@ -58,8 +81,33 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
         offset: number;
       };
 
-      // TODO: Implement task listing from database
-      return [];
+      const workspaceTasks = tasksStore.get(workspaceId) || new Map();
+      let tasks = Array.from(workspaceTasks.values());
+
+      // Filter by status if provided
+      if (status) {
+        tasks = tasks.filter((t) => t.status === status);
+      }
+
+      // Sort by creation date (newest first)
+      tasks.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+      // Apply pagination
+      const paginatedTasks = tasks.slice(offset, offset + limit);
+
+      return {
+        tasks: paginatedTasks.map((t) => ({
+          taskId: t.taskId,
+          title: t.title,
+          category: t.category,
+          status: t.status,
+          riskLevel: t.riskLevel,
+          requiresApproval: t.requiresApproval,
+          summaryForUser: t.summaryForUser,
+          createdAt: t.createdAt.toISOString(),
+          updatedAt: t.updatedAt.toISOString(),
+        })),
+      };
     }
   );
 
@@ -74,7 +122,14 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
           type: 'object',
           required: ['taskId'],
           properties: {
-            taskId: { type: 'string', format: 'uuid' },
+            taskId: { type: 'string' },
+          },
+        },
+        querystring: {
+          type: 'object',
+          required: ['workspaceId'],
+          properties: {
+            workspaceId: { type: 'string', format: 'uuid' },
           },
         },
         response: {
@@ -88,11 +143,8 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
               status: { type: 'string' },
               riskLevel: { type: 'string' },
               requiresApproval: { type: 'boolean' },
-              approvalState: { type: 'string' },
               summaryForUser: { type: 'string' },
               details: { type: 'object' },
-              auditTrail: { type: 'array' },
-              linkedWorkflowId: { type: 'string' },
               createdAt: { type: 'string' },
               updatedAt: { type: 'string' },
             },
@@ -108,9 +160,31 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { taskId } = request.params as { taskId: string };
+      const { workspaceId } = request.query as { workspaceId: string };
 
-      // TODO: Implement task retrieval from database
-      return reply.status(404).send({ error: 'Task not found' });
+      const workspaceTasks = tasksStore.get(workspaceId);
+      if (!workspaceTasks) {
+        return reply.status(404).send({ error: 'Task not found' });
+      }
+
+      const task = workspaceTasks.get(taskId);
+      if (!task) {
+        return reply.status(404).send({ error: 'Task not found' });
+      }
+
+      return {
+        taskId: task.taskId,
+        workspaceId: task.workspaceId,
+        title: task.title,
+        category: task.category,
+        status: task.status,
+        riskLevel: task.riskLevel,
+        requiresApproval: task.requiresApproval,
+        summaryForUser: task.summaryForUser,
+        details: task.details || {},
+        createdAt: task.createdAt.toISOString(),
+        updatedAt: task.updatedAt.toISOString(),
+      };
     }
   );
 
@@ -125,14 +199,14 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
           type: 'object',
           required: ['taskId'],
           properties: {
-            taskId: { type: 'string', format: 'uuid' },
+            taskId: { type: 'string' },
           },
         },
-        body: {
+        querystring: {
           type: 'object',
-          required: ['envelopeId'],
+          required: ['workspaceId'],
           properties: {
-            envelopeId: { type: 'string', format: 'uuid' },
+            workspaceId: { type: 'string', format: 'uuid' },
           },
         },
         response: {
@@ -141,9 +215,10 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
             properties: {
               success: { type: 'boolean' },
               taskId: { type: 'string' },
+              message: { type: 'string' },
             },
           },
-          501: {
+          404: {
             type: 'object',
             properties: {
               error: { type: 'string' },
@@ -154,16 +229,34 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { taskId } = request.params as { taskId: string };
-      const { envelopeId } = request.body as { envelopeId: string };
-      const userId = (request.user as { sub: string }).sub;
+      const { workspaceId } = request.query as { workspaceId: string };
 
-      // TODO: Implement approval logic
-      // 1. Verify envelope exists and matches task
-      // 2. Generate approval token
-      // 3. Signal workflow to continue
-      // 4. Update task status
+      const workspaceTasks = tasksStore.get(workspaceId);
+      if (!workspaceTasks) {
+        return reply.status(404).send({ error: 'Task not found' });
+      }
 
-      return reply.status(501).send({ error: 'Not implemented' });
+      const task = workspaceTasks.get(taskId);
+      if (!task) {
+        return reply.status(404).send({ error: 'Task not found' });
+      }
+
+      // Update task status
+      task.status = 'running';
+      task.updatedAt = new Date();
+      workspaceTasks.set(taskId, task);
+
+      // Emit WebSocket event
+      emitToWorkspace(workspaceId, {
+        type: 'task.approved',
+        payload: { taskId, status: 'running' },
+      });
+
+      return {
+        success: true,
+        taskId,
+        message: 'Task approved and running',
+      };
     }
   );
 
@@ -178,7 +271,14 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
           type: 'object',
           required: ['taskId'],
           properties: {
-            taskId: { type: 'string', format: 'uuid' },
+            taskId: { type: 'string' },
+          },
+        },
+        querystring: {
+          type: 'object',
+          required: ['workspaceId'],
+          properties: {
+            workspaceId: { type: 'string', format: 'uuid' },
           },
         },
         body: {
@@ -193,9 +293,10 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
             properties: {
               success: { type: 'boolean' },
               taskId: { type: 'string' },
+              message: { type: 'string' },
             },
           },
-          501: {
+          404: {
             type: 'object',
             properties: {
               error: { type: 'string' },
@@ -206,12 +307,120 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { taskId } = request.params as { taskId: string };
+      const { workspaceId } = request.query as { workspaceId: string };
       const { reason } = request.body as { reason?: string };
-      const userId = (request.user as { sub: string }).sub;
 
-      // TODO: Implement denial logic
+      const workspaceTasks = tasksStore.get(workspaceId);
+      if (!workspaceTasks) {
+        return reply.status(404).send({ error: 'Task not found' });
+      }
 
-      return reply.status(501).send({ error: 'Not implemented' });
+      const task = workspaceTasks.get(taskId);
+      if (!task) {
+        return reply.status(404).send({ error: 'Task not found' });
+      }
+
+      // Remove the task (denied tasks are removed)
+      workspaceTasks.delete(taskId);
+
+      // Emit WebSocket event
+      emitToWorkspace(workspaceId, {
+        type: 'task.denied',
+        payload: { taskId, reason: reason || 'Denied by user' },
+      });
+
+      return {
+        success: true,
+        taskId,
+        message: 'Task denied',
+      };
+    }
+  );
+
+  // Create a new task (for internal use by chat/workflows)
+  app.post(
+    '/',
+    {
+      schema: {
+        description: 'Create a new task',
+        tags: ['tasks'],
+        security: [{ bearerAuth: [] }],
+        body: {
+          type: 'object',
+          required: ['workspaceId', 'title', 'category'],
+          properties: {
+            workspaceId: { type: 'string', format: 'uuid' },
+            title: { type: 'string' },
+            category: { type: 'string' },
+            summaryForUser: { type: 'string' },
+            riskLevel: { type: 'string', enum: ['low', 'medium', 'high'] },
+            requiresApproval: { type: 'boolean' },
+            details: { type: 'object' },
+          },
+        },
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              taskId: { type: 'string' },
+              status: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request) => {
+      const body = request.body as {
+        workspaceId: string;
+        title: string;
+        category: string;
+        summaryForUser?: string;
+        riskLevel?: 'low' | 'medium' | 'high';
+        requiresApproval?: boolean;
+        details?: Record<string, unknown>;
+      };
+
+      const taskId = crypto.randomUUID();
+      const now = new Date();
+
+      const task: TaskRecord = {
+        taskId,
+        workspaceId: body.workspaceId,
+        title: body.title,
+        category: body.category,
+        status: body.requiresApproval ? 'needs_approval' : 'queued',
+        riskLevel: body.riskLevel || 'low',
+        requiresApproval: body.requiresApproval || false,
+        summaryForUser: body.summaryForUser || body.title,
+        details: body.details,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      // Store the task
+      if (!tasksStore.has(body.workspaceId)) {
+        tasksStore.set(body.workspaceId, new Map());
+      }
+      tasksStore.get(body.workspaceId)!.set(taskId, task);
+
+      // Emit WebSocket event
+      emitToWorkspace(body.workspaceId, {
+        type: 'task.created',
+        payload: {
+          taskId: task.taskId,
+          title: task.title,
+          category: task.category,
+          status: task.status,
+          riskLevel: task.riskLevel,
+          requiresApproval: task.requiresApproval,
+          summaryForUser: task.summaryForUser,
+        },
+      });
+
+      return {
+        taskId,
+        status: task.status,
+      };
     }
   );
 };

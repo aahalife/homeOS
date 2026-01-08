@@ -2,7 +2,11 @@ import SwiftUI
 
 struct TaskCard: View {
     let task: TaskItem
+    var onApprove: (() -> Void)?
+    var onDeny: (() -> Void)?
+
     @State private var isExpanded = false
+    @State private var isProcessing = false
     @Namespace private var animation
 
     var body: some View {
@@ -27,7 +31,12 @@ struct TaskCard: View {
 
                     Spacer()
 
-                    StatusPill(status: task.statusText, color: task.statusColor)
+                    if isProcessing {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        StatusPill(status: task.statusText, color: task.statusColor)
+                    }
                 }
 
                 if isExpanded {
@@ -55,12 +64,18 @@ struct TaskCard: View {
                     }
 
                     // Action buttons
-                    if task.requiresApproval && task.status == .needsApproval {
+                    if task.requiresApproval && task.status == .needsApproval && !isProcessing {
                         HStack(spacing: 12) {
-                            LiquidButton(title: "Approve", icon: "checkmark", action: {})
-                                .matchedGeometryEffect(id: "approve", in: animation)
+                            LiquidButton(title: "Approve", icon: "checkmark", action: {
+                                isProcessing = true
+                                onApprove?()
+                            })
+                            .matchedGeometryEffect(id: "approve", in: animation)
 
-                            LiquidButton(title: "Deny", icon: "xmark", action: {}, style: .destructive)
+                            LiquidButton(title: "Deny", icon: "xmark", action: {
+                                isProcessing = true
+                                onDeny?()
+                            }, style: .destructive)
                         }
                     }
                 }

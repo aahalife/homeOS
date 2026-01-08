@@ -51,6 +51,8 @@ export interface StreamEvent {
     | 'chat.message.final'
     | 'task.created'
     | 'task.updated'
+    | 'task.approved'
+    | 'task.denied'
     | 'approval.requested'
     | 'approval.resolved';
   payload: Record<string, unknown>;

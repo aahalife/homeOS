@@ -74,6 +74,88 @@ class ChatViewModel: ObservableObject {
         print("Started chat turn: \(response.taskId)")
     }
 
+    func sendVoiceMessage(audioData: Data) async {
+        isTyping = true
+
+        do {
+            // First, transcribe the audio
+            let transcription = try await transcribeAudio(audioData: audioData)
+
+            // Add user message with transcription
+            let userMessage = ChatMessage(
+                id: UUID().uuidString,
+                role: .user,
+                content: transcription,
+                timestamp: Date(),
+                isVoiceMessage: true
+            )
+            messages.append(userMessage)
+
+            // Send to API
+            try await sendToAPI(message: transcription)
+        } catch {
+            print("Voice message error: \(error)")
+            isTyping = false
+        }
+    }
+
+    private func transcribeAudio(audioData: Data) async throws -> String {
+        guard let url = URL(string: "\(Configuration.runtimeURL)/v1/voice/transcribe") else {
+            throw NSError(domain: "ChatViewModel", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(AuthManager.shared.token ?? "")", forHTTPHeaderField: "Authorization")
+
+        // Create multipart form data
+        let boundary = UUID().uuidString
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+
+        var body = Data()
+
+        // Add audio file
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"recording.m4a\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: audio/mp4\r\n\r\n".data(using: .utf8)!)
+        body.append(audioData)
+        body.append("\r\n".data(using: .utf8)!)
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+        request.httpBody = body
+
+        let (data, _) = try await URLSession.shared.data(for: request)
+        let response = try JSONDecoder().decode(TranscriptionResponse.self, from: data)
+
+        return response.text
+    }
+
+    func playVoiceResponse(text: String) async {
+        do {
+            guard let url = URL(string: "\(Configuration.runtimeURL)/v1/voice/synthesize") else { return }
+
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(AuthManager.shared.token ?? "")", forHTTPHeaderField: "Authorization")
+
+            let body: [String: Any] = [
+                "text": text,
+                "useDefault": true  // Use default voice, can be customized
+            ]
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+            let (data, _) = try await URLSession.shared.data(for: request)
+
+            // Play the audio response
+            await MainActor.run {
+                AudioManager.shared.playAudio(data: data)
+            }
+        } catch {
+            print("Voice synthesis error: \(error)")
+        }
+    }
+
     private func connect() async {
         guard let token = AuthManager.shared.token,
               let workspaceId = AuthManager.shared.workspaceId,
@@ -172,4 +254,9 @@ struct ChatTurnResponse: Codable {
     let sessionId: String
     let taskId: String
     let workflowId: String
+}
+
+struct TranscriptionResponse: Codable {
+    let text: String
+    let duration: Double?
 }

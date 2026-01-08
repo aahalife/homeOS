@@ -11,19 +11,35 @@ struct ChatBubble: View {
             }
 
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                Text(message.content)
-                    .font(.body)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(
-                        bubbleBackground
-                    )
-                    .overlay(rippleEffect)
+                HStack(spacing: 8) {
+                    if message.isVoiceMessage {
+                        Image(systemName: "mic.fill")
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
 
-                Text(message.formattedTime)
-                    .font(.caption2)
-                    .foregroundColor(.white.opacity(0.4))
+                    Text(message.content)
+                        .font(.body)
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(
+                    bubbleBackground
+                )
+                .overlay(rippleEffect)
+
+                HStack(spacing: 4) {
+                    if message.isVoiceMessage {
+                        Image(systemName: "waveform")
+                            .font(.caption2)
+                            .foregroundColor(.white.opacity(0.4))
+                    }
+
+                    Text(message.formattedTime)
+                        .font(.caption2)
+                        .foregroundColor(.white.opacity(0.4))
+                }
             }
 
             if message.role == .assistant {
@@ -150,6 +166,7 @@ struct ChatMessage: Identifiable {
     let content: String
     let timestamp: Date
     var isNew: Bool = false
+    var isVoiceMessage: Bool = false
 
     enum Role {
         case user, assistant, system

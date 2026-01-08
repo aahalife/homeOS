@@ -9,6 +9,9 @@ import { workspacesRoutes } from './routes/workspaces.js';
 import { devicesRoutes } from './routes/devices.js';
 import { secretsRoutes } from './routes/secrets.js';
 import { runtimeRoutes } from './routes/runtime.js';
+import { preferencesRoutes } from './routes/preferences.js';
+import { twilioRoutes } from './routes/twilio.js';
+import { integrationsRoutes } from './routes/integrations.js';
 
 const PORT = parseInt(process.env['PORT'] ?? '3001', 10);
 const HOST = process.env['HOST'] ?? '0.0.0.0';
@@ -69,6 +72,9 @@ async function buildApp() {
   await app.register(devicesRoutes, { prefix: '/v1/devices' });
   await app.register(secretsRoutes, { prefix: '/v1/workspaces' });
   await app.register(runtimeRoutes, { prefix: '/v1/runtime' });
+  await app.register(preferencesRoutes, { prefix: '/v1/preferences' });
+  await app.register(twilioRoutes, { prefix: '/v1/twilio' });
+  await app.register(integrationsRoutes, { prefix: '/v1/integrations' });
 
   return app;
 }

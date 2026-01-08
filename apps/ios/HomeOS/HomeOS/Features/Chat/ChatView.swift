@@ -2,7 +2,9 @@ import SwiftUI
 
 struct ChatView: View {
     @StateObject private var viewModel = ChatViewModel()
+    @StateObject private var audioManager = AudioManager.shared
     @FocusState private var isInputFocused: Bool
+    @State private var showVoiceMode = false
 
     var body: some View {
         ZStack {
@@ -24,7 +26,40 @@ struct ChatView: View {
                 // Input
                 inputBar
             }
+
+            // Voice Mode Overlay
+            if showVoiceMode {
+                VoiceModeOverlay(
+                    isRecording: audioManager.isRecording,
+                    audioLevel: audioManager.audioLevel,
+                    duration: audioManager.recordingDuration,
+                    onCancel: {
+                        audioManager.cancelRecording()
+                        showVoiceMode = false
+                    },
+                    onSend: {
+                        Task {
+                            await handleVoiceMessage()
+                        }
+                    }
+                )
+                .transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.2), value: showVoiceMode)
+    }
+
+    private func handleVoiceMessage() async {
+        guard let url = audioManager.stopRecording(),
+              let audioData = audioManager.getRecordingData() else {
+            showVoiceMode = false
+            return
+        }
+
+        showVoiceMode = false
+
+        // Send audio for transcription and processing
+        await viewModel.sendVoiceMessage(audioData: audioData)
     }
 
     private var header: some View {
@@ -87,6 +122,18 @@ struct ChatView: View {
 
     private var inputBar: some View {
         HStack(spacing: 12) {
+            // Microphone button
+            Button {
+                showVoiceMode = true
+                audioManager.startRecording()
+            } label: {
+                Image(systemName: "mic.fill")
+                    .font(.system(size: 20))
+                    .foregroundColor(.white.opacity(0.8))
+                    .frame(width: 44, height: 44)
+                    .background(GlassSurface(cornerRadius: 22))
+            }
+
             TextField("Message", text: $viewModel.inputText, axis: .vertical)
                 .textFieldStyle(.plain)
                 .foregroundColor(.white)
@@ -122,6 +169,107 @@ struct ChatView: View {
                 .fill(.ultraThinMaterial)
                 .ignoresSafeArea()
         )
+    }
+}
+
+// MARK: - Voice Mode Overlay
+
+struct VoiceModeOverlay: View {
+    let isRecording: Bool
+    let audioLevel: Float
+    let duration: TimeInterval
+    let onCancel: () -> Void
+    let onSend: () -> Void
+
+    var body: some View {
+        ZStack {
+            // Background
+            Color.black.opacity(0.85)
+                .ignoresSafeArea()
+
+            VStack(spacing: 40) {
+                Spacer()
+
+                // Recording indicator
+                ZStack {
+                    // Pulse animation
+                    Circle()
+                        .fill(Color.red.opacity(0.3))
+                        .frame(width: 120 + CGFloat(audioLevel) * 60, height: 120 + CGFloat(audioLevel) * 60)
+                        .animation(.easeInOut(duration: 0.1), value: audioLevel)
+
+                    Circle()
+                        .fill(Color.red.opacity(0.5))
+                        .frame(width: 100, height: 100)
+
+                    Image(systemName: "mic.fill")
+                        .font(.system(size: 40))
+                        .foregroundColor(.white)
+                }
+
+                // Duration
+                Text(formatDuration(duration))
+                    .font(.system(size: 48, weight: .light, design: .monospaced))
+                    .foregroundColor(.white)
+
+                Text(isRecording ? "Recording..." : "Processing...")
+                    .font(.headline)
+                    .foregroundColor(.white.opacity(0.7))
+
+                Spacer()
+
+                // Buttons
+                HStack(spacing: 60) {
+                    // Cancel
+                    Button(action: onCancel) {
+                        VStack(spacing: 8) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 24))
+                                .foregroundColor(.white)
+                                .frame(width: 60, height: 60)
+                                .background(Color.white.opacity(0.2))
+                                .clipShape(Circle())
+
+                            Text("Cancel")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    }
+
+                    // Send
+                    Button(action: onSend) {
+                        VStack(spacing: 8) {
+                            Image(systemName: "arrow.up")
+                                .font(.system(size: 24))
+                                .foregroundColor(.white)
+                                .frame(width: 60, height: 60)
+                                .background(
+                                    LinearGradient(
+                                        colors: [Color(hex: "4361ee"), Color(hex: "3a0ca3")],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .clipShape(Circle())
+
+                            Text("Send")
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                    }
+                    .disabled(!isRecording || duration < 1)
+                    .opacity(!isRecording || duration < 1 ? 0.5 : 1)
+                }
+                .padding(.bottom, 60)
+            }
+        }
+    }
+
+    private func formatDuration(_ duration: TimeInterval) -> String {
+        let minutes = Int(duration) / 60
+        let seconds = Int(duration) % 60
+        let tenths = Int((duration.truncatingRemainder(dividingBy: 1)) * 10)
+        return String(format: "%d:%02d.%d", minutes, seconds, tenths)
     }
 }
 

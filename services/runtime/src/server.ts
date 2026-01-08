@@ -3,12 +3,14 @@ import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
+import multipart from '@fastify/multipart';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
 import { chatRoutes } from './routes/chat.js';
 import { tasksRoutes } from './routes/tasks.js';
 import { approvalsRoutes } from './routes/approvals.js';
 import { ingestRoutes } from './routes/ingest.js';
+import { voiceRoutes } from './routes/voice.js';
 import { streamHandler } from './ws/stream.js';
 import { GatewayManager } from './gateway/manager.js';
 
@@ -45,6 +47,12 @@ async function buildApp() {
 
   await app.register(websocket);
 
+  await app.register(multipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB max file size
+    },
+  });
+
   await app.register(swagger, {
     openapi: {
       info: {
@@ -79,6 +87,7 @@ async function buildApp() {
   await app.register(tasksRoutes, { prefix: '/v1/tasks' });
   await app.register(approvalsRoutes, { prefix: '/v1/approvals' });
   await app.register(ingestRoutes, { prefix: '/v1/ingest' });
+  await app.register(voiceRoutes, { prefix: '/v1/voice' });
 
   // WebSocket stream
   app.register(async (fastify) => {

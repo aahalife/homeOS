@@ -1,4 +1,8 @@
 # fly.toml for HomeOS Runtime
+#
+# Development: Services auto-stop when idle (cost-efficient)
+# Production: Set min_machines_running = 1 via: fly scale count 1 --app homeos-runtime
+#
 app = 'homeos-runtime'
 primary_region = 'sjc'
 
@@ -9,24 +13,25 @@ primary_region = 'sjc'
   NODE_ENV = "production"
   PORT = "3002"
   HOST = "0.0.0.0"
+  CONTROL_PLANE_URL = "https://homeos-control-plane.fly.dev"
 
 [http_service]
   internal_port = 3002
   force_https = true
-  auto_stop_machines = 'stop'
-  auto_start_machines = true
-  min_machines_running = 1
+  auto_stop_machines = 'stop'      # Stop when idle (saves costs in dev)
+  auto_start_machines = true        # Auto-start on traffic
+  min_machines_running = 0          # Dev: 0, Prod: 1
   processes = ['app']
 
 [[http_service.checks]]
-  grace_period = "10s"
-  interval = "30s"
+  grace_period = "30s"
+  interval = "60s"
   method = "GET"
   path = "/health"
   protocol = "http"
-  timeout = "5s"
+  timeout = "10s"
 
-# WebSocket support
+# WebSocket support for real-time chat
 [http_service.concurrency]
   type = "connections"
   hard_limit = 1000

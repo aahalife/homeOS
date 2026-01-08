@@ -21,14 +21,54 @@ import { getRedis } from '../utils/redis.js';
 const COMPOSIO_API_URL = process.env.COMPOSIO_API_URL || 'https://backend.composio.dev/api/v3';
 const COMPOSIO_API_KEY = process.env.COMPOSIO_API_KEY;
 
+// Mapping from app ID to Composio auth_config_id
+export const AUTH_CONFIG_IDS: Record<string, string> = {
+  google_calendar: 'ac_PCvwGWaKXTW7',
+  gmail: 'ac_YIGIdhQ6fNVo',
+  notion: 'ac_LBD6QLpEdMnH',
+  google_drive: 'ac_x64GDTbTGyEe',
+  google_docs: 'ac_b7sj7rfqTf4t',
+  google_maps: 'ac_DoyW5lfmd7if',
+  google_meet: 'ac_BYjQy9auZZF8',
+  google_tasks: 'ac_tVWgRMSfmqeF',
+  google_photos: 'ac_cDmX-hgzYWpw',
+  linkedin: 'ac_aLuIO0XeeJMH',
+  microsoft_teams: 'ac_hwfwDFKIrWbP',
+  outlook: 'ac_7yyhU36fhP3M',
+  retelle: 'ac_8ckX_0TTfo7s',
+  sharepoint: 'ac_ctgbgjaCQokR',
+  slackbot: 'ac_GodpFnIaqA0v',
+  slack: 'ac_GodpFnIaqA0v', // alias
+  telegram: 'ac_n0pJj1i8anp4',
+  todoist: 'ac_UKjNQ-OTmr_2',
+};
+
+// Helper to get auth_config_id for an app
+export function getAuthConfigId(appId: string): string | undefined {
+  return AUTH_CONFIG_IDS[appId];
+}
+
 // Supported app integrations grouped by category
 export const SUPPORTED_INTEGRATIONS = {
   productivity: [
     { id: 'google_calendar', name: 'Google Calendar', icon: 'calendar', scopes: ['calendar.readonly', 'calendar.events'] },
     { id: 'gmail', name: 'Gmail', icon: 'mail', scopes: ['gmail.readonly', 'gmail.send'] },
     { id: 'notion', name: 'Notion', icon: 'file-text', scopes: ['read', 'write'] },
-    { id: 'slack', name: 'Slack', icon: 'message-square', scopes: ['channels:read', 'chat:write'] },
+    { id: 'slackbot', name: 'Slack', icon: 'message-square', scopes: ['channels:read', 'chat:write'] },
     { id: 'todoist', name: 'Todoist', icon: 'check-square', scopes: ['data:read_write'] },
+    { id: 'google_drive', name: 'Google Drive', icon: 'folder', scopes: ['drive.readonly', 'drive.file'] },
+    { id: 'google_docs', name: 'Google Docs', icon: 'file-text', scopes: ['documents.readonly'] },
+    { id: 'google_tasks', name: 'Google Tasks', icon: 'check-square', scopes: ['tasks'] },
+  ],
+  communication: [
+    { id: 'telegram', name: 'Telegram', icon: 'send', scopes: ['messages'] },
+    { id: 'microsoft_teams', name: 'Microsoft Teams', icon: 'users', scopes: ['chat', 'meetings'] },
+    { id: 'outlook', name: 'Outlook', icon: 'mail', scopes: ['mail.read', 'mail.send'] },
+    { id: 'google_meet', name: 'Google Meet', icon: 'video', scopes: ['meetings'] },
+  ],
+  professional: [
+    { id: 'linkedin', name: 'LinkedIn', icon: 'briefcase', scopes: ['profile', 'messages'] },
+    { id: 'sharepoint', name: 'SharePoint', icon: 'folder', scopes: ['sites.read', 'files.read'] },
   ],
   health: [
     { id: 'apple_health', name: 'Apple Health', icon: 'heart', scopes: ['read'] },
@@ -39,6 +79,7 @@ export const SUPPORTED_INTEGRATIONS = {
   entertainment: [
     { id: 'spotify', name: 'Spotify', icon: 'music', scopes: ['user-read-playback-state', 'user-modify-playback-state'] },
     { id: 'youtube', name: 'YouTube', icon: 'play-circle', scopes: ['youtube.readonly'] },
+    { id: 'google_photos', name: 'Google Photos', icon: 'image', scopes: ['photos.readonly'] },
   ],
   shopping: [
     { id: 'instacart', name: 'Instacart', icon: 'shopping-cart', scopes: ['orders', 'lists'] },
@@ -602,4 +643,209 @@ function getMockActions(appId: string): Array<{ name: string; description: strin
   };
 
   return mockActions[appId] || [];
+}
+
+// ============================================================================
+// JUST-IN-TIME OAUTH FLOW
+// ============================================================================
+
+// Mapping from tool categories to required integrations
+const TOOL_INTEGRATION_REQUIREMENTS: Record<string, string[]> = {
+  calendar: ['google_calendar'],
+  gmail: ['gmail'],
+  email: ['gmail', 'outlook'],
+  drive: ['google_drive'],
+  docs: ['google_docs'],
+  meet: ['google_meet'],
+  tasks: ['google_tasks', 'todoist'],
+  photos: ['google_photos'],
+  notion: ['notion'],
+  slack: ['slackbot'],
+  teams: ['microsoft_teams'],
+  outlook: ['outlook'],
+  sharepoint: ['sharepoint'],
+  linkedin: ['linkedin'],
+  telegram: ['telegram'],
+  maps: ['google_maps'],
+  navigation: ['google_maps'],
+};
+
+export interface IntegrationRequirement {
+  toolCategory: string;
+  requiredIntegrations: string[];
+  message: string;
+}
+
+export interface OAuthRequiredResponse {
+  success: false;
+  requiresOAuth: true;
+  integrationId: string;
+  integrationName: string;
+  authConfigId: string;
+  message: string;
+  toolName: string;
+}
+
+export interface CheckIntegrationInput {
+  workspaceId: string;
+  userId: string;
+  toolName: string;
+}
+
+/**
+ * Check if a tool requires an integration and whether that integration is connected.
+ * Returns null if no OAuth is required, or an OAuthRequiredResponse if OAuth is needed.
+ */
+export async function checkIntegrationRequirements(input: CheckIntegrationInput): Promise<OAuthRequiredResponse | null> {
+  const { workspaceId, userId, toolName } = input;
+
+  // Parse tool name to get category
+  const parts = toolName.split('.');
+  const category = parts[0].toLowerCase();
+
+  // Check if this tool category requires an integration
+  const requiredIntegrations = TOOL_INTEGRATION_REQUIREMENTS[category];
+  if (!requiredIntegrations || requiredIntegrations.length === 0) {
+    // Tool doesn't require any integration
+    return null;
+  }
+
+  // Check if any of the required integrations are connected
+  const connections = await getConnectedApps({ workspaceId, userId });
+  const connectedAppIds = new Set(connections.filter(c => c.status === 'active').map(c => c.appId));
+
+  // Find the first required integration that the user has connected
+  const connectedIntegration = requiredIntegrations.find(id => connectedAppIds.has(id));
+  if (connectedIntegration) {
+    // User has a required integration connected
+    return null;
+  }
+
+  // No required integration is connected - request OAuth
+  const preferredIntegration = requiredIntegrations[0];
+  const authConfigId = getAuthConfigId(preferredIntegration);
+
+  // Get display name for the integration
+  const integrationInfo = getIntegrationInfo(preferredIntegration);
+
+  return {
+    success: false,
+    requiresOAuth: true,
+    integrationId: preferredIntegration,
+    integrationName: integrationInfo.name,
+    authConfigId: authConfigId || preferredIntegration,
+    message: `To ${getActionDescription(toolName)}, I need to connect to your ${integrationInfo.name} account. Would you like to connect it now?`,
+    toolName,
+  };
+}
+
+function getIntegrationInfo(integrationId: string): { name: string; icon: string } {
+  const integrations: Record<string, { name: string; icon: string }> = {
+    google_calendar: { name: 'Google Calendar', icon: 'calendar' },
+    gmail: { name: 'Gmail', icon: 'mail' },
+    google_drive: { name: 'Google Drive', icon: 'folder' },
+    google_docs: { name: 'Google Docs', icon: 'file-text' },
+    google_meet: { name: 'Google Meet', icon: 'video' },
+    google_tasks: { name: 'Google Tasks', icon: 'check-square' },
+    google_photos: { name: 'Google Photos', icon: 'image' },
+    google_maps: { name: 'Google Maps', icon: 'map' },
+    notion: { name: 'Notion', icon: 'file-text' },
+    slackbot: { name: 'Slack', icon: 'message-square' },
+    todoist: { name: 'Todoist', icon: 'check-square' },
+    microsoft_teams: { name: 'Microsoft Teams', icon: 'users' },
+    outlook: { name: 'Outlook', icon: 'mail' },
+    sharepoint: { name: 'SharePoint', icon: 'folder' },
+    linkedin: { name: 'LinkedIn', icon: 'briefcase' },
+    telegram: { name: 'Telegram', icon: 'send' },
+  };
+
+  return integrations[integrationId] || { name: integrationId, icon: 'link' };
+}
+
+function getActionDescription(toolName: string): string {
+  const parts = toolName.split('.');
+  const category = parts[0];
+  const action = parts[1] || 'default';
+
+  const descriptions: Record<string, Record<string, string>> = {
+    calendar: {
+      create_event: 'create a calendar event',
+      list_events: 'view your calendar events',
+      update_event: 'update a calendar event',
+      delete_event: 'delete a calendar event',
+      default: 'access your calendar',
+    },
+    gmail: {
+      send: 'send an email',
+      read: 'read your emails',
+      search: 'search your emails',
+      default: 'access your email',
+    },
+    drive: {
+      list: 'view your files',
+      upload: 'upload a file',
+      download: 'download a file',
+      default: 'access your Google Drive',
+    },
+    notion: {
+      create_page: 'create a Notion page',
+      search: 'search Notion',
+      default: 'access your Notion workspace',
+    },
+    slack: {
+      send_message: 'send a Slack message',
+      default: 'access Slack',
+    },
+    telegram: {
+      send_message: 'send a Telegram message',
+      default: 'access Telegram',
+    },
+  };
+
+  const categoryDescs = descriptions[category];
+  if (categoryDescs) {
+    return categoryDescs[action] || categoryDescs['default'] || `use ${category}`;
+  }
+
+  return `use ${category}`;
+}
+
+/**
+ * Execute an action through Composio with just-in-time OAuth check.
+ * If the integration is not connected, returns an OAuthRequiredResponse.
+ */
+export async function executeWithOAuthCheck(input: {
+  workspaceId: string;
+  userId: string;
+  appId: string;
+  action: string;
+  params: Record<string, unknown>;
+}): Promise<ComposioToolResponse | OAuthRequiredResponse> {
+  const { workspaceId, userId, appId, action, params } = input;
+
+  // Check if OAuth is required
+  const oauthCheck = await checkIntegrationRequirements({
+    workspaceId,
+    userId,
+    toolName: `${appId}.${action}`,
+  });
+
+  if (oauthCheck) {
+    return oauthCheck;
+  }
+
+  // OAuth not required or already connected - execute the action
+  return executeAction(input);
+}
+
+/**
+ * Check if a response indicates OAuth is required
+ */
+export function isOAuthRequired(response: unknown): response is OAuthRequiredResponse {
+  return (
+    typeof response === 'object' &&
+    response !== null &&
+    'requiresOAuth' in response &&
+    (response as OAuthRequiredResponse).requiresOAuth === true
+  );
 }

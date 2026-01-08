@@ -11,6 +11,8 @@ import { tasksRoutes } from './routes/tasks.js';
 import { approvalsRoutes } from './routes/approvals.js';
 import { ingestRoutes } from './routes/ingest.js';
 import { voiceRoutes } from './routes/voice.js';
+import { telegramRoutes } from './routes/telegram.js';
+import { whatsappRoutes } from './routes/whatsapp.js';
 import { streamHandler } from './ws/stream.js';
 import { GatewayManager } from './gateway/manager.js';
 
@@ -88,6 +90,8 @@ async function buildApp() {
   await app.register(approvalsRoutes, { prefix: '/v1/approvals' });
   await app.register(ingestRoutes, { prefix: '/v1/ingest' });
   await app.register(voiceRoutes, { prefix: '/v1/voice' });
+  await app.register(telegramRoutes, { prefix: '/v1/telegram' });
+  await app.register(whatsappRoutes, { prefix: '/v1/whatsapp' });
 
   // WebSocket stream
   app.register(async (fastify) => {

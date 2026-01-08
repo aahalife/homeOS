@@ -11,8 +11,30 @@ function sendError(reply: FastifyReply, status: number, message: string) {
 const COMPOSIO_API_KEY = process.env['COMPOSIO_API_KEY'] ?? '';
 const COMPOSIO_API_URL = process.env['COMPOSIO_API_URL'] ?? 'https://backend.composio.dev/api/v2';
 
+// Mapping from app ID to Composio auth_config_id
+const AUTH_CONFIG_IDS: Record<string, string> = {
+  google_calendar: 'ac_PCvwGWaKXTW7',
+  gmail: 'ac_YIGIdhQ6fNVo',
+  notion: 'ac_LBD6QLpEdMnH',
+  google_drive: 'ac_x64GDTbTGyEe',
+  google_docs: 'ac_b7sj7rfqTf4t',
+  google_maps: 'ac_DoyW5lfmd7if',
+  google_meet: 'ac_BYjQy9auZZF8',
+  google_tasks: 'ac_tVWgRMSfmqeF',
+  google_photos: 'ac_cDmX-hgzYWpw',
+  linkedin: 'ac_aLuIO0XeeJMH',
+  microsoft_teams: 'ac_hwfwDFKIrWbP',
+  outlook: 'ac_7yyhU36fhP3M',
+  retelle: 'ac_8ckX_0TTfo7s',
+  sharepoint: 'ac_ctgbgjaCQokR',
+  slackbot: 'ac_GodpFnIaqA0v',
+  telegram: 'ac_n0pJj1i8anp4',
+  todoist: 'ac_UKjNQ-OTmr_2',
+};
+
 // Available integrations with their metadata
 const AVAILABLE_INTEGRATIONS = [
+  // Productivity
   {
     id: 'google_calendar',
     name: 'Google Calendar',
@@ -27,6 +49,110 @@ const AVAILABLE_INTEGRATIONS = [
     description: 'Send and read emails',
     icon: 'envelope',
   },
+  {
+    id: 'notion',
+    name: 'Notion',
+    category: 'productivity',
+    description: 'Manage notes and databases',
+    icon: 'doc.text',
+  },
+  {
+    id: 'todoist',
+    name: 'Todoist',
+    category: 'productivity',
+    description: 'Manage tasks and projects',
+    icon: 'checkmark.circle',
+  },
+  {
+    id: 'slackbot',
+    name: 'Slack',
+    category: 'productivity',
+    description: 'Team messaging and collaboration',
+    icon: 'message',
+  },
+  // Google Workspace
+  {
+    id: 'google_drive',
+    name: 'Google Drive',
+    category: 'productivity',
+    description: 'Store and share files',
+    icon: 'folder',
+  },
+  {
+    id: 'google_docs',
+    name: 'Google Docs',
+    category: 'productivity',
+    description: 'Create and edit documents',
+    icon: 'doc',
+  },
+  {
+    id: 'google_meet',
+    name: 'Google Meet',
+    category: 'productivity',
+    description: 'Video meetings and calls',
+    icon: 'video',
+  },
+  {
+    id: 'google_tasks',
+    name: 'Google Tasks',
+    category: 'productivity',
+    description: 'Task management',
+    icon: 'checklist',
+  },
+  {
+    id: 'google_photos',
+    name: 'Google Photos',
+    category: 'productivity',
+    description: 'Photo storage and sharing',
+    icon: 'photo',
+  },
+  // Microsoft
+  {
+    id: 'microsoft_teams',
+    name: 'Microsoft Teams',
+    category: 'productivity',
+    description: 'Team collaboration and meetings',
+    icon: 'person.2',
+  },
+  {
+    id: 'outlook',
+    name: 'Outlook',
+    category: 'productivity',
+    description: 'Email and calendar',
+    icon: 'envelope',
+  },
+  {
+    id: 'sharepoint',
+    name: 'SharePoint',
+    category: 'productivity',
+    description: 'Document management and intranet',
+    icon: 'folder',
+  },
+  // Professional
+  {
+    id: 'linkedin',
+    name: 'LinkedIn',
+    category: 'professional',
+    description: 'Professional networking',
+    icon: 'briefcase',
+  },
+  // Messaging
+  {
+    id: 'telegram',
+    name: 'Telegram',
+    category: 'messaging',
+    description: 'Secure messaging',
+    icon: 'paperplane',
+  },
+  // Transportation
+  {
+    id: 'google_maps',
+    name: 'Google Maps',
+    category: 'transportation',
+    description: 'Navigation and places',
+    icon: 'map',
+  },
+  // Other services (without auth_config_id yet)
   {
     id: 'instacart',
     name: 'Instacart',
@@ -68,20 +194,6 @@ const AVAILABLE_INTEGRATIONS = [
     category: 'smart_home',
     description: 'Control smart home devices',
     icon: 'house',
-  },
-  {
-    id: 'notion',
-    name: 'Notion',
-    category: 'productivity',
-    description: 'Manage notes and databases',
-    icon: 'doc.text',
-  },
-  {
-    id: 'todoist',
-    name: 'Todoist',
-    category: 'productivity',
-    description: 'Manage tasks and projects',
-    icon: 'checkmark.circle',
   },
 ];
 
@@ -324,20 +436,35 @@ export const integrationsRoutes: FastifyPluginAsync = async (app) => {
       );
 
       try {
-        // Get auth URL from Composio
+        // Get the Composio auth_config_id for this app
+        const authConfigId = AUTH_CONFIG_IDS[appId];
+        if (!authConfigId) {
+          app.log.warn({ appId }, 'No auth_config_id configured for app');
+          return sendError(reply, 400, `Integration ${appId} is not configured for OAuth yet`);
+        }
+
+        // Get auth URL from Composio using the auth_config_id
         const result = await composioRequest('POST', '/connectedAccounts', {
-          integrationId: appId,
+          integrationId: authConfigId,
           redirectUri: `${process.env['CONTROL_PLANE_URL'] ?? 'http://localhost:3001'}/v1/integrations/callback`,
           data: { state: stateToken },
         }) as { url?: string; redirectUrl?: string };
 
+        app.log.info({ appId, authConfigId, hasUrl: !!result.url || !!result.redirectUrl }, 'Composio auth URL response');
+
+        const authUrl = result.url ?? result.redirectUrl;
+        if (!authUrl) {
+          app.log.error({ result }, 'Composio did not return auth URL');
+          return sendError(reply, 500, 'Failed to get auth URL from Composio');
+        }
+
         return {
-          authUrl: result.url ?? result.redirectUrl,
+          authUrl,
           state: stateToken,
           expiresIn: 600, // 10 minutes
         };
       } catch (error) {
-        app.log.error({ err: error }, 'Composio auth URL error');
+        app.log.error({ err: error, appId }, 'Composio auth URL error');
         return sendError(reply, 500, 'Failed to get auth URL');
       }
     }

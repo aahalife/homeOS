@@ -12,6 +12,7 @@ import { runtimeRoutes } from './routes/runtime.js';
 import { preferencesRoutes } from './routes/preferences.js';
 import { twilioRoutes } from './routes/twilio.js';
 import { integrationsRoutes } from './routes/integrations.js';
+import { runMigrations } from './db.js';
 
 const PORT = parseInt(process.env['PORT'] ?? '3001', 10);
 const HOST = process.env['HOST'] ?? '0.0.0.0';
@@ -83,6 +84,10 @@ async function start() {
   const app = await buildApp();
 
   try {
+    // Run database migrations
+    app.log.info('Running database migrations...');
+    await runMigrations();
+
     await app.listen({ port: PORT, host: HOST });
     app.log.info(`Control plane listening on ${HOST}:${PORT}`);
     app.log.info(`API docs available at http://localhost:${PORT}/docs`);

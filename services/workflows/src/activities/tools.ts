@@ -11,6 +11,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { google } from 'googleapis';
+import { checkIntegrationRequirements, isOAuthRequired, type OAuthRequiredResponse } from './composio.js';
 
 // ============================================================================
 // CONFIGURATION
@@ -55,6 +56,7 @@ async function getInstacartConfig(workspaceId: string): Promise<InstacartConfig 
 
 export interface ExecuteToolInput {
   workspaceId: string;
+  userId?: string;
   toolName: string;
   inputs: Record<string, unknown>;
   idempotencyKey: string;
@@ -66,6 +68,20 @@ export async function executeToolCall(input: ExecuteToolInput): Promise<unknown>
   const parts = input.toolName.split('.');
   const category = parts[0];
   const action = parts[1] || 'default';
+
+  // Check if this tool requires OAuth (just-in-time OAuth flow)
+  if (input.userId) {
+    const oauthCheck = await checkIntegrationRequirements({
+      workspaceId: input.workspaceId,
+      userId: input.userId,
+      toolName: input.toolName,
+    });
+
+    if (oauthCheck) {
+      // OAuth is required - return the OAuth prompt instead of executing the tool
+      return oauthCheck;
+    }
+  }
 
   switch (category) {
     case 'telephony':

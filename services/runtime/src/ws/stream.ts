@@ -34,20 +34,20 @@ export async function streamHandler(
   try {
     const decoded = fastify.jwt.verify<{
       sub: string;
-      workspaceId: string;
-      type: string;
+      workspaceId?: string;
+      type?: string;
     }>(token);
 
-    if (decoded.type !== 'runtime') {
-      socket.close(4001, 'Invalid token type');
-      return;
-    }
+    // Accept both runtime tokens and regular auth tokens
+    // For regular auth tokens, workspaceId may not be in token, get from query
+    const workspaceId = decoded.workspaceId ??
+      (request.query as Record<string, string>)['workspaceId'] ?? '';
 
     const connection: ClientConnection = {
       ws: socket,
-      workspaceId: decoded.workspaceId,
+      workspaceId,
       userId: decoded.sub,
-      subscriptions: new Set(['task.created', 'task.updated', 'approval.requested', 'approval.resolved']),
+      subscriptions: new Set(['task.created', 'task.updated', 'approval.requested', 'approval.resolved', 'chat.message.delta', 'chat.message.final']),
     };
 
     connections.set(socket, connection);

@@ -114,10 +114,35 @@ export async function ChatTurnWorkflow(input: ChatTurnInput): Promise<{
     try {
       const result = await executeToolCall({
         workspaceId,
+        userId,
         toolName: step.toolName,
         inputs: step.inputs,
         idempotencyKey: `${workspaceId}-${Date.now()}-${step.toolName}`,
       });
+
+      // Check if OAuth is required (just-in-time OAuth flow)
+      if (result && typeof result === 'object' && 'requiresOAuth' in result && (result as Record<string, unknown>).requiresOAuth === true) {
+        const oauthResult = result as {
+          requiresOAuth: true;
+          integrationId: string;
+          integrationName: string;
+          authConfigId: string;
+          message: string;
+          toolName: string;
+        };
+
+        // Emit an event to notify the client that OAuth is required
+        await emitTaskEvent(workspaceId, 'oauth.required', {
+          integrationId: oauthResult.integrationId,
+          integrationName: oauthResult.integrationName,
+          authConfigId: oauthResult.authConfigId,
+          message: oauthResult.message,
+          toolName: oauthResult.toolName,
+        });
+
+        executedActions.push(`OAuth required: ${oauthResult.integrationName} - ${oauthResult.message}`);
+        continue; // Skip to next step, the workflow response will include the OAuth prompt
+      }
 
       executedActions.push(`Completed: ${step.intent}`);
 

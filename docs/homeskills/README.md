@@ -20,36 +20,91 @@ mkdir -p ~/clawd/homeos/{memory/{conversations,preferences,entities,learnings},d
 
 ## Available Skills
 
+### Core Infrastructure
 | Skill | Description | Use When |
 |-------|-------------|----------|
 | [_infrastructure](./_infrastructure/SKILL.md) | Core systems: storage, approvals, calendar | Included with all skills |
 | [chat-turn](./chat-turn/SKILL.md) | Conversational AI with 6-phase processing | Processing any user message |
-| [restaurant-reservation](./restaurant-reservation/SKILL.md) | Help find and book restaurants | User wants to book a table |
-| [marketplace-sell](./marketplace-sell/SKILL.md) | Sell items on FB Marketplace/eBay | User wants to sell something |
-| [meal-planning](./meal-planning/SKILL.md) | Weekly meal plans with grocery lists | User needs meal/food planning |
-| [home-maintenance](./home-maintenance/SKILL.md) | Repairs, contractors, emergencies | User has home repair needs |
-| [hire-helper](./hire-helper/SKILL.md) | Find babysitters, cleaners, tutors | User needs household help |
-| [family-bonding](./family-bonding/SKILL.md) | Activity ideas and outing planning | User wants family activity ideas |
+| [tools](./tools/SKILL.md) | Calendar, reminders, weather, groceries, search | Utility operations |
+
+### Family Management
+| Skill | Description | Use When |
+|-------|-------------|----------|
+| [family-comms](./family-comms/SKILL.md) | Announcements, calendar, chores, check-ins | Family coordination |
+| [family-bonding](./family-bonding/SKILL.md) | Activity ideas and outing planning | Family activity suggestions |
+| [mental-load](./mental-load/SKILL.md) | Reduce cognitive burden with automation | Feeling overwhelmed, need planning |
+| [elder-care](./elder-care/SKILL.md) | Check-in on elderly parents, medication, engagement | Caring for aging parents |
+
+### Education
+| Skill | Description | Use When |
+|-------|-------------|----------|
+| [education](./education/SKILL.md) | Homework, grades, LMS integration | School tasks for children |
+| [school](./school/SKILL.md) | Orchestrate full school management | Comprehensive school monitoring |
+
+### Health & Wellness
+| Skill | Description | Use When |
+|-------|-------------|----------|
+| [healthcare](./healthcare/SKILL.md) | Doctors, medications, appointments, symptoms | Health management |
+| [wellness](./wellness/SKILL.md) | Hydration, movement, sleep, screen time | Daily wellness tracking |
+| [habits](./habits/SKILL.md) | Habit tracking with behavioral science | Building new habits |
+
+### Personal Growth
+| Skill | Description | Use When |
+|-------|-------------|----------|
+| [psy-rich](./psy-rich/SKILL.md) | Psychologically rich experience suggestions | Want meaningful activities |
+| [note-to-actions](./note-to-actions/SKILL.md) | Turn content into atomic habits | Applying what you learn |
+
+### Services & Booking
+| Skill | Description | Use When |
+|-------|-------------|----------|
+| [restaurant-reservation](./restaurant-reservation/SKILL.md) | Restaurant search and booking | Book a table |
+| [marketplace-sell](./marketplace-sell/SKILL.md) | Sell items on FB Marketplace/eBay | Sell something |
+| [hire-helper](./hire-helper/SKILL.md) | Find babysitters, cleaners, tutors | Need household help |
+| [telephony](./telephony/SKILL.md) | AI voice calls for reservations, appointments | Phone-based tasks |
+
+### Home Management
+| Skill | Description | Use When |
+|-------|-------------|----------|
+| [home-maintenance](./home-maintenance/SKILL.md) | Repairs, contractors, emergencies | Home repair needs |
+| [meal-planning](./meal-planning/SKILL.md) | Weekly meals with grocery lists | Food planning |
+| [transportation](./transportation/SKILL.md) | Rides, commute, carpools, parking | Getting around |
 
 ## Skill Categories
 
 ### Core
 - **_infrastructure** - Storage, approvals, calendar, error handling (included with all skills)
-
-### Conversational
 - **chat-turn** - Core conversation handling with memory, planning, and execution
+- **tools** - Utility functions: calendar, reminders, weather, search
 
-### Services & Booking
-- **restaurant-reservation** - Restaurant search and booking assistance
-- **marketplace-sell** - Online marketplace listing and selling
-- **hire-helper** - Household help recruitment
-
-### Family Management
-- **meal-planning** - Food planning and grocery coordination
+### Family Life
+- **family-comms** - Family coordination, announcements, chores
 - **family-bonding** - Activity planning and quality time
+- **mental-load** - Reduce cognitive burden, automate planning
+- **elder-care** - Care for aging parents
 
-### Home Management
-- **home-maintenance** - Repairs, maintenance, and emergencies
+### Education
+- **education** - School task management
+- **school** - Comprehensive school workflow orchestration
+
+### Health & Wellness
+- **healthcare** - Medical appointments, medications, symptoms
+- **wellness** - Daily health habits and tracking
+- **habits** - Behavior change with psychological insights
+
+### Personal Development
+- **psy-rich** - Psychologically rich experiences
+- **note-to-actions** - Content to atomic habits
+
+### Services
+- **restaurant-reservation** - Restaurant booking
+- **marketplace-sell** - Online selling
+- **hire-helper** - Household help recruitment
+- **telephony** - AI voice calling
+
+### Home
+- **home-maintenance** - Repairs and emergencies
+- **meal-planning** - Food planning and groceries
+- **transportation** - Rides and commute management
 
 ## Storage Structure
 
@@ -68,7 +123,12 @@ All skills share a common storage structure:
 │   ├── providers.json     # Service providers (plumbers, sitters)
 │   ├── pantry.json        # Kitchen inventory
 │   ├── recipes.json       # Saved recipes
-│   └── calendar.json      # Local calendar cache
+│   ├── calendar.json      # Local calendar cache
+│   ├── education/         # School data
+│   ├── health/            # Healthcare data
+│   ├── habits/            # Habit tracking
+│   ├── wellness/          # Wellness logs
+│   └── elder_care/        # Elder care profiles
 ├── tasks/
 │   ├── active/            # Currently running tasks
 │   ├── pending/           # Awaiting user input
@@ -105,6 +165,9 @@ These skills are designed to be:
 3. **Safe** - Approval gates, risk classification, safety reminders
 4. **Persistent** - Save preferences, learn from interactions
 5. **Interruptible** - Can pause, resume, or cancel gracefully
+6. **Conversational** - Natural dialogue, not forms
+7. **Context-Aware** - Use known preferences, adapt to situation
+8. **Stress-Aware** - Gentle when needed, challenging when appropriate
 
 ## Using These Skills
 

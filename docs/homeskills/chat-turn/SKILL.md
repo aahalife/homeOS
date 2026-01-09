@@ -5,166 +5,298 @@ description: Handle conversational AI interactions with multi-phase processing i
 
 # Chat Turn Skill
 
-Process user messages through a sophisticated 6-phase pipeline that understands intent, recalls relevant context, plans actions, executes with appropriate approval gates, and learns from interactions.
+Process user messages through a 6-phase pipeline that understands intent, recalls context, plans actions, executes with approval gates, and learns from interactions.
 
 ## When to Use
 
-- User sends any chat message or question
-- User requests an action (e.g., "book a restaurant", "order groceries")
-- User asks for information or recommendations
-- Any conversational interaction requiring understanding and response
+This is the core conversational skill - use it for ANY user interaction.
 
-## Processing Phases
+## Storage Setup
 
-### Phase 1: Understand
+Ensure the HomeOS directory structure exists:
 
-Analyze the user's message to extract:
-
-- **Intent**: What the user wants to accomplish
-- **Entities**: People, places, dates, items mentioned
-- **Sentiment**: Emotional tone and urgency
-- **Context Requirements**: What additional information is needed
-
-```typescript
-interface UnderstandResult {
-  intent: string;
-  entities: Entity[];
-  sentiment: 'positive' | 'neutral' | 'negative' | 'urgent';
-  confidence: number;
-  clarificationNeeded?: string[];
-}
+```bash
+mkdir -p ~/clawd/homeos/{memory/{conversations,preferences,entities,learnings},data,tasks/{active,pending,completed},logs}
 ```
 
-### Phase 2: Recall
+## Phase 1: Understand
 
-Query the memory system to retrieve relevant context:
+**Goal:** Parse what the user wants.
 
-- Recent conversation history
-- User preferences and past interactions
-- Family member information
-- Related tasks and their outcomes
-- Workspace-specific knowledge
+**Steps:**
+1. Identify the primary intent (question, request, action, chat)
+2. Extract entities (people, places, dates, items)
+3. Assess urgency (urgent, normal, low priority)
+4. Determine if clarification is needed
 
-### Phase 3: Plan
+**If unclear, ask for clarification:**
+```
+I want to make sure I understand correctly. Are you asking me to:
+1. [Interpretation A]
+2. [Interpretation B]
 
-Generate an execution plan based on understanding and context:
-
-```typescript
-interface ActionPlan {
-  steps: PlanStep[];
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
-  estimatedDuration: string;
-  requiredApprovals: string[];
-  fallbackStrategy?: string;
-}
-
-interface PlanStep {
-  id: string;
-  action: string;
-  tool?: string;
-  parameters?: Record<string, unknown>;
-  dependsOn?: string[];
-}
+Or did you mean something else?
 ```
 
-### Phase 4: Execute
+**Log the understanding:**
+```bash
+echo "$(date -Iseconds) | UNDERSTAND | intent: [intent] | entities: [entities]" >> ~/clawd/homeos/logs/actions.log
+```
 
-Execute the plan with appropriate approval gates:
+## Phase 2: Recall
 
-**Risk Levels:**
+**Goal:** Gather relevant context.
 
-| Level | Description | Approval Required |
-|-------|-------------|-------------------|
-| LOW | Read-only, informational | No |
-| MEDIUM | Limited impact, reversible | User preference |
-| HIGH | Financial, external calls, irreversible | Always |
+**Steps:**
 
-**HIGH Risk Actions (Always Require Approval):**
-- Phone calls to external parties
-- Financial transactions > $50
-- Posting to social media
-- Sending messages on user's behalf
-- Modifying calendar events
-- Purchasing items
+1. **Check family profiles:**
+```bash
+cat ~/clawd/homeos/data/family.json 2>/dev/null
+```
 
-### Phase 5: Reflect
+2. **Check relevant preferences:**
+```bash
+# For dining requests
+cat ~/clawd/homeos/memory/preferences/dining.json 2>/dev/null
 
-After execution, analyze the outcome:
+# For activity requests  
+cat ~/clawd/homeos/memory/preferences/activities.json 2>/dev/null
+```
 
-- Was the user's intent satisfied?
-- What worked well or poorly?
-- Should any preferences be updated?
-- Are follow-up actions needed?
+3. **Check recent related tasks:**
+```bash
+ls -la ~/clawd/homeos/tasks/completed/ | tail -10
+```
 
-### Phase 6: Writeback
+4. **Check calendar for conflicts:**
+```bash
+cat ~/clawd/homeos/data/calendar.json 2>/dev/null | grep -A5 "$(date +%Y-%m-%d)"
+```
 
-Persist learnings to the memory system:
+**Use recalled information to personalize response.**
 
-- Update user preferences based on choices
-- Store successful interaction patterns
-- Record task outcomes for future reference
-- Update entity relationships
+## Phase 3: Plan
+
+**Goal:** Create an execution plan with risk assessment.
+
+**Risk Classification:**
+
+| Risk Level | Actions | Approval |
+|------------|---------|----------|
+| **LOW** | Search, lookup, generate suggestions, read files | No approval needed |
+| **MEDIUM** | Save preferences, set reminders, update data | Ask once, remember |
+| **HIGH** | Make calls, spend money, post publicly, send messages | ALWAYS ask |
+
+**Plan Format:**
+```
+PLAN:
+1. [Action] - [Risk Level]
+2. [Action] - [Risk Level]
+3. [Action] - [Risk Level]
+
+Approval needed for: [list HIGH risk steps]
+```
+
+**Save complex plans:**
+```bash
+cat > ~/clawd/homeos/tasks/active/task-$(date +%s).json << 'EOF'
+{
+  "created": "TIMESTAMP",
+  "intent": "USER_INTENT",
+  "steps": [
+    {"action": "step1", "risk": "LOW", "status": "pending"},
+    {"action": "step2", "risk": "HIGH", "status": "pending"}
+  ],
+  "current_step": 0
+}
+EOF
+```
+
+## Phase 4: Execute
+
+**Goal:** Carry out the plan with appropriate gates.
+
+### For LOW Risk Actions
+Proceed immediately. Examples:
+- Search for information
+- Generate suggestions
+- Read stored data
+- Provide recommendations
+
+### For MEDIUM Risk Actions
+Check if previously approved:
+```bash
+grep "action_name" ~/clawd/homeos/memory/preferences/approvals.json 2>/dev/null
+```
+
+If not previously approved, ask once:
+```
+I'll need to [action]. Is that okay? 
+(I'll remember your preference for next time)
+```
+
+### For HIGH Risk Actions
+**ALWAYS request explicit approval:**
+
+```
+⚠️ APPROVAL REQUIRED
+
+I'm about to: [specific action]
+
+Details:
+- [Detail 1]
+- [Detail 2]
+- [Cost/Impact if applicable]
+
+Reply "yes" to proceed, or "no" to cancel.
+```
+
+**Wait for explicit confirmation.** Valid approvals:
+- "yes", "yeah", "yep"
+- "approved", "approve"
+- "go ahead", "proceed"
+- "do it"
+
+**Do NOT proceed on:**
+- "maybe", "I guess"
+- "sure" (ambiguous - ask to confirm)
+- No response
+- Anything unclear
+
+### Execution Logging
+
+```bash
+echo "$(date -Iseconds) | EXECUTE | [action] | [result]" >> ~/clawd/homeos/logs/actions.log
+```
+
+## Phase 5: Reflect
+
+**Goal:** Assess the outcome.
+
+**Questions to consider:**
+1. Did the action complete successfully?
+2. Was the user satisfied? (Check their response)
+3. Were there any issues or errors?
+4. What could be improved next time?
+
+**If something failed:**
+```
+❌ That didn't work as expected.
+
+What happened: [explanation]
+
+Options:
+1. [Alternative approach]
+2. [Try again with different parameters]
+3. [Manual workaround]
+
+What would you like to do?
+```
+
+**If successful, confirm:**
+```
+✅ Done! [Brief summary of what was accomplished]
+
+[Any relevant details or next steps]
+```
+
+## Phase 6: Writeback
+
+**Goal:** Persist learnings for future interactions.
+
+**What to save:**
+
+1. **User preferences discovered:**
+```bash
+# Example: User prefers Italian restaurants
+cat > ~/clawd/homeos/memory/preferences/dining.json << 'EOF'
+{
+  "favorite_cuisines": ["Italian"],
+  "price_preference": "$$$",
+  "updated": "2024-01-15"
+}
+EOF
+```
+
+2. **Successful patterns:**
+```bash
+echo '{"pattern": "anniversary_dinner", "approach": "romantic_italian", "success": true}' >> ~/clawd/homeos/memory/learnings/patterns.json
+```
+
+3. **Entity relationships:**
+```bash
+# Example: Learned spouse's name
+cat ~/clawd/homeos/data/family.json | jq '.members += [{"name": "Sarah", "role": "spouse"}]' > /tmp/family.json && mv /tmp/family.json ~/clawd/homeos/data/family.json
+```
 
 ## Response Format
 
-Always respond with:
+Every response should include:
 
-1. **Acknowledgment**: Confirm understanding of the request
-2. **Status**: Current progress or completion state
-3. **Details**: Relevant information or results
-4. **Next Steps**: What happens next or what the user can do
+1. **Acknowledgment** - Show you understood
+2. **Status** - What's happening/happened
+3. **Details** - Relevant information
+4. **Next Steps** - What happens next or options
 
-## Multi-Tenant Considerations
+**Example Good Response:**
+```
+Got it - you want to book a romantic dinner for your anniversary next Friday.
 
-- All data is scoped to the workspace
-- Never expose data from other workspaces
-- Respect user-specific preferences within the workspace
-- Handle family member context appropriately
+I found 3 great options:
+1. 🍽️ Osteria Romana - $$$ - 4.8★
+2. 🍽️ Bella Vista - $$$$ - 4.6★  
+3. 🍽️ Trattoria Milano - $$ - 4.5★
+
+Which one interests you? Once you choose, I'll help make the reservation.
+```
 
 ## Error Handling
 
-When errors occur:
+**When something goes wrong:**
 
-1. Provide a clear, non-technical explanation
-2. Suggest alternative approaches if available
-3. Offer to retry or escalate as appropriate
-4. Log errors for system improvement
+1. Don't panic or over-apologize
+2. Explain clearly what happened
+3. Offer alternatives
+4. Log for debugging
 
-## Example Interaction
+```bash
+echo "$(date -Iseconds) | ERROR | [context] | [error]" >> ~/clawd/homeos/logs/actions.log
+```
 
-**User**: "Can you make a dinner reservation for my anniversary next Friday?"
+**Recovery response:**
+```
+I ran into an issue: [brief explanation]
 
-**Phase 1 (Understand)**:
-- Intent: Restaurant reservation
-- Entities: Occasion (anniversary), Date (next Friday)
-- Sentiment: Positive, planning ahead
+Here's what we can do:
+1. [Option A]
+2. [Option B]
 
-**Phase 2 (Recall)**:
-- User's favorite cuisine preferences
-- Past anniversary restaurant choices
-- Partner's dietary restrictions
-- Preferred reservation times
+Which would you prefer?
+```
 
-**Phase 3 (Plan)**:
-1. Search for romantic restaurants
-2. Filter by dietary requirements
-3. Present options to user
-4. Get approval for selection
-5. Make reservation call
-6. Add to calendar
+## Multi-Turn Conversations
 
-**Phase 4 (Execute)**:
-- Present restaurant options (LOW risk)
-- Await user selection
-- Request approval for call (HIGH risk)
-- Execute reservation workflow
+For conversations spanning multiple messages:
 
-**Phase 5 (Reflect)**:
-- Reservation successful
-- User chose Italian restaurant
-- Update preference weights
+1. **Maintain context** - Remember what was discussed
+2. **Track progress** - Know where you are in a task
+3. **Handle interruptions** - If user changes topic, acknowledge and offer to resume later
 
-**Phase 6 (Writeback)**:
-- Store restaurant preference
-- Link to anniversary occasion type
-- Record successful interaction pattern
+```
+I notice we were in the middle of [previous task]. Would you like to:
+1. Continue with that
+2. Start fresh with [new request]
+```
+
+## Handoff to Other Skills
+
+When a request matches a specific skill:
+
+1. **Restaurant booking** → Use restaurant-reservation skill
+2. **Selling items** → Use marketplace-sell skill
+3. **Meal planning** → Use meal-planning skill
+4. **Home repairs** → Use home-maintenance skill
+5. **Finding helpers** → Use hire-helper skill
+6. **Family activities** → Use family-bonding skill
+
+These skills have specialized workflows - invoke them for best results.

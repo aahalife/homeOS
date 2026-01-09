@@ -16,372 +16,517 @@ Suggest and plan meaningful family activities, outings, and experiences that bri
 - User asks about local events for kids/family
 - User wants indoor/outdoor activity suggestions
 
-## Activity Categories
+## Step 1: Understand the Context
 
-| Category | Examples |
-|----------|----------|
-| Outdoor | Parks, hiking, beach, camping, sports |
-| Indoor | Games, crafts, cooking, movies, museums |
-| Educational | Science centers, zoos, historic sites |
-| Active | Swimming, biking, sports, playground |
-| Creative | Art projects, music, building, gardening |
-| Social | Playdates, parties, community events |
-| Relaxation | Spa day, picnic, stargazing, reading |
-
-## Workflow Steps
-
-### Step 1: Understand Context
-
-Gather activity requirements:
-
-```typescript
-interface ActivityRequest {
-  participants: {
-    adults: number;
-    children: { age: number; interests?: string[] }[];
-  };
-  constraints: {
-    date?: Date;
-    timeAvailable: number;    // Hours
-    budget?: number;
-    travelRadius: number;     // Miles
-    mobility?: string[];      // Restrictions
-  };
-  preferences: {
-    indoorOutdoor: 'indoor' | 'outdoor' | 'either';
-    activityLevel: 'relaxed' | 'moderate' | 'active';
-    category?: string;
-    avoid?: string[];
-  };
-  weather?: {
-    temperature: number;
-    conditions: string;
-  };
-}
+**Check family info:**
+```bash
+cat ~/clawd/homeos/data/family.json 2>/dev/null | jq '.members[] | {name, age, interests: .preferences.activities}'
 ```
 
-### Step 2: Generate Suggestions
-
-Create personalized activity list:
-
-```typescript
-interface ActivitySuggestion {
-  name: string;
-  category: string;
-  description: string;
-  ageAppropriate: { min: number; max: number };
-  duration: string;
-  cost: {
-    estimate: string;         // "Free", "$", "$$", "$$$"
-    breakdown?: string;
-  };
-  location?: {
-    name: string;
-    address: string;
-    distance: number;
-  };
-  bestTime: string;
-  whatYouNeed: string[];
-  tips: string[];
-  weatherDependent: boolean;
-  matchScore: number;         // How well it fits the request
-}
+**Check weather:**
+```bash
+curl -s "wttr.in/?format=%C+%t" 2>/dev/null
 ```
 
-### Step 3: Present Options
-
-Show activity options with details:
-
+**Gather activity requirements:**
 ```
-🎯 Weekend Activity Ideas for Your Family
+🎨 Let's find something fun! Quick questions:
 
-Based on: 2 adults, kids ages 5 & 9, budget ~$50, nice weather
-
-1. 🌳 Explore Riverside Nature Trail
-   Duration: 2-3 hours | Cost: Free
-   Distance: 4.2 miles from home
-
-   Easy hiking trail with playground at midpoint.
-   Great for bikes or walking. Pack a picnic!
-
-   Perfect for: Getting outdoors, active fun
-
-2. 🎨 Family Art Workshop at Creative Studio
-   Duration: 2 hours | Cost: $45 (family of 4)
-   Distance: 2.8 miles from home
-
-   Paint your own ceramics - everyone makes something!
-   Saturday sessions: 10am, 2pm, 4pm
-
-   Perfect for: Rainy day backup, keepsakes
-
-3. 🎳 Cosmic Bowling Night
-   Duration: 2 hours | Cost: $40-50
-   Distance: 3.5 miles from home
-
-   Saturday night glow bowling with music.
-   Bumpers available for kids. Arcade games too.
-
-   Perfect for: Active fun, all ages enjoy
-
-[Plan This Activity] [More Ideas] [Filter Options]
+1. 👥 Who's participating? (ages help a lot)
+2. 📅 When? (today, this weekend, specific date)
+3. ⏰ How much time? (few hours, half day, full day)
+4. 🏘️ Indoor or outdoor? (or either?)
+5. 💰 Budget? (free, $, $$, $$$)
+6. 🌟 Any themes? (active, creative, educational, relaxed)
 ```
 
-### Step 4: Plan the Activity
+## Step 2: Generate Activity Ideas
 
-Create detailed activity plan:
+**Format activity suggestions:**
+```
+🌟 ACTIVITY IDEAS for [Context]
 
-```typescript
-interface ActivityPlan {
-  activity: ActivitySuggestion;
-  schedule: {
-    departureTime: string;
-    activityStart: string;
-    activityEnd: string;
-    mealPlan?: string;
-  };
-  preparation: string[];      // What to bring/do
-  reservations?: {
-    required: boolean;
-    booked: boolean;
-    confirmationNumber?: string;
-  };
-  backup: {
-    activity: string;
-    reason: string;           // If weather changes, etc.
-  };
-  reminders: {
-    time: Date;
-    message: string;
-  }[];
-}
+Based on: [Family composition, weather, preferences]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏠 AT HOME:
+
+1. [Activity Name]
+   ⏱️ [Duration] | 💰 [Cost: Free/$/$$/] 
+   👶 Best for ages: [range]
+   📝 [Brief description and why it's fun]
+
+2. [Activity Name]
+   ⏱️ [Duration] | 💰 [Cost]
+   👶 Best for ages: [range]
+   📝 [Description]
+
+🚗 OUT & ABOUT:
+
+3. [Activity/Venue Name]
+   ⏱️ [Duration] | 💰 [Cost] | 📍 [Distance]
+   👶 Best for ages: [range]
+   📝 [Description]
+   🔗 [Website if applicable]
+
+4. [Activity/Venue Name]
+   ⏱️ [Duration] | 💰 [Cost] | 📍 [Distance]
+   👶 Best for ages: [range]
+   📝 [Description]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Which sounds fun? I can help plan the details!
 ```
 
-### Step 5: Calendar Integration
+## Activity Ideas Library
 
-Add to family calendar:
+### By Age Group
 
-- Event with location and time
-- Preparation reminders
-- Pack list notification
-- Weather check reminder (morning of)
+**Toddlers (1-3):**
+- Sensory bins (rice, water, play dough)
+- Bubble play
+- Dance party
+- Playground visits
+- Petting zoo
+- Library story time
+- Splash pad
+- Nature walks with wagon
 
-## Age-Appropriate Activities
-
-### Toddlers (1-3)
-- Sensory play activities
-- Short playground visits
-- Story time at library
-- Petting zoos
-- Splash pads
-- Simple crafts
-
-### Preschool (3-5)
-- Children's museums
-- Easy nature walks
-- Cooking simple recipes
-- Building forts
-- Backyard camping
-- Dance parties
-
-### School Age (6-10)
-- Board game tournaments
-- Bike rides
-- Swimming
-- Science experiments
+**Preschool (3-5):**
+- Craft projects (simple painting, collage)
+- Baking cookies together
 - Scavenger hunts
-- Sports activities
+- Children's museums
+- Swimming lessons
+- Building forts
+- Bug hunting
+- Puppet shows
 
-### Tweens (11-13)
-- Escape rooms
+**School Age (6-10):**
+- Board game tournaments
+- Science experiments
+- Bike rides
+- Geocaching
+- Cooking together
 - Mini golf
+- Bowling
 - Movie marathons
+- Camping (backyard counts!)
+
+**Tweens (11-13):**
+- Escape rooms
+- Laser tag
+- Rock climbing
+- Cooking competitions
 - DIY projects
+- Video game tournaments
 - Volunteer activities
-- Learning new skills
+- Learning new skills together
 
-### Mixed Ages
-- Family movie nights
-- Picnics in the park
-- Baking together
+**All Ages:**
+- Family game night
+- Picnics
 - Stargazing
-- Family photos
-- Holiday traditions
+- Photo walks
+- Karaoke night
+- Puzzle nights
+- Family movie night
+- Cooking/baking together
 
-## Seasonal Ideas
+### By Weather
+
+**Rainy Day / Indoor:**
+```
+☔ RAINY DAY IDEAS
+
+🏠 At Home:
+• Fort building + movie marathon
+• Board game tournament
+• Baking project (cookies, pizza from scratch)
+• Indoor scavenger hunt
+• Arts & crafts station
+• Dance party / Just Dance video game
+• Science experiments
+• Puzzle challenge
+
+🚗 Out:
+• Children's museum
+• Indoor playground
+• Bowling alley
+• Trampoline park
+• Library visit
+• Movie theater
+• Aquarium
+• Indoor mini golf
+```
+
+**Nice Weather / Outdoor:**
+```
+☀️ OUTDOOR IDEAS
+
+🌳 Free/Cheap:
+• Park + picnic
+• Nature hike
+• Beach or lake day
+• Bike ride
+• Playground hopping
+• Backyard camping
+• Stargazing
+• Kite flying
+
+🎫 Activities:
+• Zoo or wildlife park
+• Botanical gardens
+• Mini golf
+• Batting cages
+• Farmers market
+• Pick-your-own farm
+• Outdoor concert
+• Sports event
+```
+
+### By Budget
+
+**Free:**
+- Parks and playgrounds
+- Library events
+- Hiking trails
+- Beach/lake (public)
+- Free museum days
+- Community events
+- Backyard activities
+- Nature walks
+
+**Budget-Friendly ($0-25):**
+- Bowling (especially with deals)
+- Dollar store craft supplies
+- Baking at home
+- Matinee movies
+- Picnic at the park
+- Dollar theater
+- City events
+
+**Mid-Range ($25-75):**
+- Mini golf + ice cream
+- Trampoline parks
+- Children's museums
+- Movie + popcorn
+- Bowling + pizza
+- Skating rink
+
+**Splurge ($75+):**
+- Theme parks
+- Escape rooms (family)
+- Professional sports game
+- Special shows/concerts
+- Day trips
+- Resort day passes
+
+## Date Night Ideas (Parents)
+
+```
+💑 DATE NIGHT IDEAS
+
+🌙 Classic Evening Out:
+• Dinner + movie
+• Nice restaurant + walk
+• Concert or show
+• Comedy club
+• Wine tasting
+
+🎯 Active Dates:
+• Bowling
+• Mini golf
+• Escape room (just you two!)
+• Cooking class
+• Dance lesson
+• Rock climbing gym
+
+🌟 Unique Dates:
+• Food tour
+• Trivia night at a bar
+• Arcade bar
+• Paint & sip class
+• Drive-in movie
+• Karaoke
+
+🏠 At-Home Date (after kids asleep):
+• Cook a fancy meal together
+• Movie + special snacks
+• Game night for two
+• Backyard fire pit
+• Spa night at home
+
+💰 Budget:
+• $ = $30-50 total
+• $$ = $50-100
+• $$$ = $100-200
+
+Need a sitter? I can help with that too! (see hire-helper skill)
+```
+
+## Seasonal Activity Ideas
 
 ### Spring
-- Plant a garden
+- Plant a garden together
 - Fly kites
 - Visit farmers market
-- Nature photography
-- Outdoor picnics
-- Baseball games
+- Bike rides as weather warms
+- Spring cleaning as a team (with rewards!)
+- Cherry blossom viewing
+- Baseball games begin
 
 ### Summer
-- Beach days
-- Water balloon fights
-- Outdoor movies
-- Camping trips
+- Pool/beach days
+- Backyard camping
 - Ice cream making
-- Fireworks viewing
+- Water balloon fights
+- Outdoor movie nights
+- Catch fireflies
+- Road trip day adventures
+- Late bedtime stargazing
 
 ### Fall
 - Apple picking
-- Pumpkin patches
+- Pumpkin patch
 - Leaf pile jumping
 - Halloween activities
 - Football games
-- Hot cocoa nights
+- Hot cider & donuts
+- Fall crafts (leaf art)
+- Hayrides
 
 ### Winter
-- Snow activities
-- Holiday baking
-- Indoor forts
-- Game marathons
-- Winter crafts
-- Hot springs visit
+- Snow activities (sledding, snowman)
+- Holiday baking marathon
+- Indoor fort building
+- Hot cocoa bar
+- Holiday light tours
+- Ice skating
+- Game marathon days
+- Movie marathon (holiday films)
 
-## Local Event Discovery
+## Planning an Activity
 
-Search for events:
+**When user picks an activity:**
+```
+🎯 PLANNING: [Activity]
 
-```typescript
-interface EventSearch {
-  location: string;
-  dateRange: { start: Date; end: Date };
-  categories: string[];
-  ageGroups: string[];
-  priceRange: string;
-}
+📅 When: [Date/time]
+📍 Where: [Location if applicable]
+💰 Cost: [Estimated total]
 
-interface LocalEvent {
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  location: string;
-  cost: string;
-  ageRange: string;
-  category: string;
-  source: string;            // Eventbrite, Facebook, etc.
-  url: string;
-}
+📝 PREP LIST:
+☐ [Item/task 1]
+☐ [Item/task 2]
+☐ [Item/task 3]
+
+⏰ TIMELINE:
+• [Time]: [Step 1]
+• [Time]: [Step 2]
+• [Time]: [Step 3]
+
+💡 TIPS:
+• [Helpful tip 1]
+• [Helpful tip 2]
+
+🌧️ BACKUP PLAN:
+If weather changes: [Alternative]
+
+Want me to add this to your calendar?
 ```
 
-**Event Sources:**
-- Eventbrite
-- Facebook Events
-- Local newspaper
-- Parks & Recreation
-- Library programs
-- School newsletters
+**Save to calendar:**
+```bash
+cat >> ~/clawd/homeos/data/calendar.json << 'EOF'
+{
+  "type": "activity",
+  "title": "ACTIVITY_NAME",
+  "date": "DATE",
+  "time": "TIME",
+  "duration": MINUTES,
+  "location": "LOCATION",
+  "notes": "PREP_NOTES",
+  "participants": ["family"]
+}
+EOF
+```
+
+## Finding Local Events
+
+**Event search guidance:**
+```
+📅 FINDING LOCAL EVENTS
+
+Search these for [Your Area]:
+
+1. Facebook Events
+   facebook.com/events/
+   Filter: This weekend, family-friendly
+
+2. Eventbrite
+   eventbrite.com
+   Search: "kids" or "family" + [your city]
+
+3. Local Parent Blogs/Sites
+   • [City]momsblog.com
+   • [Local] Kids Calendar
+   • Red Tricycle
+
+4. Local Library
+   Check website for free events
+   Story time, craft activities, performances
+
+5. Parks & Recreation
+   City website → Parks dept
+   Free and low-cost programs
+
+6. Local Museums
+   Many have free days or family programs
+
+What type of event interests you?
+```
 
 ## Example Interactions
 
-**User**: "What can we do with the kids this rainy Saturday?"
+**User:** "What should we do this rainy Saturday?"
 
-**Assistant**:
+**Assistant:**
 ```
-☔ Rainy Day Fun for the Family!
+☔ Rainy Saturday Fun!
 
-Perfect for staying dry with kids ages 5 & 9:
+Quick check - who's participating and ages?
+(I can tailor ideas better!)
 
-🏠 AT HOME IDEAS:
+Meanwhile, here are some winners:
 
-1. 🍪 Family Bake-Off
-   Make cookies or cupcakes together
-   Let kids decorate their own!
-   Cost: Ingredients you have | Time: 1-2 hours
+🏠 AT HOME:
 
-2. 🎬 Movie Marathon + Fort
-   Build a blanket fort in the living room
-   Popcorn, pillows, pick 2-3 movies
-   Cost: Free | Time: Afternoon
+1. Epic Fort + Movie Marathon
+   ⏱️ All day | 💰 Free
+   Build the ultimate blanket fort, make popcorn,
+   watch 2-3 favorite movies. Classic!
 
-3. 🎲 Board Game Tournament
-   Bracket-style competition
-   Winner picks dinner!
-   Cost: Free | Time: 2-3 hours
+2. Family Bake-Off
+   ⏱️ 2-3 hours | 💰 $ (ingredients)
+   Everyone decorates their own cupcakes
+   or cookies. Judge and award prizes!
 
-🚗 NEARBY OPTIONS:
+3. Indoor Scavenger Hunt
+   ⏱️ 1 hour | 💰 Free
+   I can generate clues for your house!
 
-4. 🎳 Galaxy Lanes Bowling
-   $8/person includes shoes
-   3.2 miles | Opens 10am
-   Indoor arcade too!
+🚗 WORTH GOING OUT:
 
-5. 📚 Story Time at Main Library
-   Free! Saturday at 11am
-   Craft activity included
-   2.1 miles away
+4. Trampoline Park
+   ⏱️ 2 hours | 💰 $$ ($15-25/person)
+   Burn off energy, fun for all ages
 
-6. 🔬 Discovery Science Center
-   $12/kid, $15/adult
-   Hands-on exhibits
-   5.4 miles | Open 10am-5pm
+5. Bowling
+   ⏱️ 2 hours | 💰 $$ ($40-60 family)
+   Bumpers for little ones, pizza after!
 
-Which sounds fun? I can help plan any of these!
+What sounds fun? I can help plan whichever you pick!
 ```
 
-**User**: "We need a date night idea for next Friday"
+**User:** "Let's do the bake-off! Kids are 5 and 8."
 
-**Assistant**:
+**Assistant:**
 ```
-💑 Date Night Ideas for Friday
+🧁 FAMILY BAKE-OFF - Let's Plan!
 
-I can help with both the plans AND finding a sitter!
+Perfect ages for this! Here's the plan:
 
-🍽️ DINNER & ACTIVITY OPTIONS:
+📝 WHAT YOU'LL NEED:
 
-1. Classic Romance
-   Dinner at Bella Notte (Italian, $$$$)
-   + Walk along Harbor Promenade
-   Est: $120-150 | 4 hours
+Option A - Cupcake Decorating:
+☐ Cupcakes (bake or buy 12-18)
+☐ Frosting (2-3 colors/flavors)
+☐ Sprinkles, candies, toppings
+☐ Piping bags (or zip-lock bags work!)
 
-2. Fun & Games
-   Dinner at Pacific Grill ($$$)
-   + Comedy Show at Laugh Factory
-   Est: $100-130 | 4 hours
+Option B - Cookie Decorating:
+☐ Sugar cookies (slice-and-bake is easy)
+☐ Royal icing or frosting
+☐ Food coloring
+☐ Sprinkles and decorations
 
-3. Adventure Night
-   Food Hall Tasting Tour ($)
-   + Escape Room Challenge
-   Est: $80-100 | 3.5 hours
+⏰ SUGGESTED TIMELINE:
+• 2:00 - Set up stations (one per person)
+• 2:15 - Explain rules, set timer (30-45 min)
+• 2:15-3:00 - DECORATE!
+• 3:00 - Judging time (everyone votes)
+• 3:15 - Awards + taste testing 🎉
 
-4. Low-Key Evening
-   Wine Bar & Small Plates ($$)
-   + Outdoor Movie in the Park (free!)
-   Est: $60-80 | 3 hours
+🏆 FUN CATEGORIES TO JUDGE:
+• Most Creative
+• Most Colorful
+• Best Theme
+• Yummiest Looking
+• Best Effort (so everyone wins something!)
 
-📍 All options within 15 min drive
+💡 TIPS:
+• Cover the table with a plastic tablecloth (easy cleanup)
+• Put each person's name on their plate
+• Take photos before eating!
+• Have wet wipes ready
 
-Need a sitter? I found 3 available that night:
-- Sarah M. ($22/hr) - ⭐ 4.9
-- Emily K. ($20/hr) - ⭐ 4.8
-- Jessica T. ($25/hr) - ⭐ 4.7
-
-[Plan Date Night] [Find Different Sitter] [Other Ideas]
+Need me to add a grocery list or set a reminder?
 ```
 
-## Recurring Activities
+**User:** "We need a date night idea for Friday. Haven't been out in forever!"
 
-Set up regular family time:
+**Assistant:**
+```
+💑 Date Night! Let's get you two out.
 
-```typescript
-interface RecurringActivity {
-  name: string;
-  frequency: 'weekly' | 'biweekly' | 'monthly';
-  dayOfWeek: string;
-  time: string;
-  activities: string[];       // Rotation of activities
-  reminders: boolean;
+Quick questions:
+1. 💰 Budget for the evening?
+2. 🍽️ Dinner included or just activity?
+3. 🎯 Vibe: Relaxed, adventurous, romantic, fun?
+4. ⏰ How long can you be out?
+
+Meanwhile, some popular combos:
+
+🌟 CLASSIC ROMANCE:
+Nice dinner + after-dinner drinks
+💰 $$-$$$ | ⏰ 3-4 hours
+
+🎯 ACTIVE & FUN:
+Bowling or mini golf + casual dinner
+💰 $$ | ⏰ 3 hours
+
+✨ UNIQUE EXPERIENCE:
+Cooking class or paint & sip
+💰 $$-$$$ | ⏰ 2-3 hours
+
+🍿 EASY & RELAXED:
+Dinner + movie (skip the blockbuster, try indie)
+💰 $$ | ⏰ 4 hours
+
+Do you have childcare lined up, or need help finding a sitter?
+```
+
+## Save Activity Preferences
+
+**Track what the family enjoyed:**
+```bash
+cat >> ~/clawd/homeos/memory/preferences/activities.json << 'EOF'
+{
+  "activity": "ACTIVITY_NAME",
+  "date": "DATE",
+  "participants": ["who went"],
+  "rating": 5,
+  "notes": "Kids loved it / would do again",
+  "cost": AMOUNT
 }
+EOF
 ```
 
-**Suggested Traditions:**
-- Weekly game night (Fridays)
-- Monthly movie night (first Saturday)
-- Seasonal outings (quarterly)
-- Birthday traditions
-- Holiday activities
+**Use for future suggestions:**
+```
+I remember you all loved [activity] last [time]!
+Want to do that again, or try something new?
+```

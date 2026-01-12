@@ -191,3 +191,48 @@ The mockups serve as reference for:
 ---
 
 *Mockups created January 2025*
+
+---
+
+## AI-Generated Mockups (Gemini Imagen 4)
+
+Additional mockups generated using Google Gemini Imagen 4 for visual inspiration.
+
+**Note:** AI-generated images have text hallucination issues (placeholder/garbled text). Use the HTML/CSS mockups above for accurate text and layouts. Use these for style/aesthetic reference.
+
+### Generated Images
+
+| Image | Description | Use For |
+|-------|-------------|--------|
+| [hearth-menu-bar.png](./generated/hearth-menu-bar.png) | Menu dropdown concept | Visual style |
+| [hearth-elder-care.png](./generated/hearth-elder-care.png) | Elder care dashboard | Layout inspiration |
+| [hearth-approval-dialog.png](./generated/hearth-approval-dialog.png) | Dialog design | Frosted glass effect |
+| [hearth-family-dashboard.png](./generated/hearth-family-dashboard.png) | Family grid layout | Card design |
+
+### Observations
+
+**Strengths of AI-generated mockups:**
+- Beautiful frosted glass effects
+- Proper macOS window chrome (traffic lights)
+- Good color palette choices
+- Professional gradient backgrounds
+
+**Weaknesses:**
+- Text hallucination (garbled placeholder text)
+- Inconsistent icon rendering
+- Some layout alignment issues
+
+**Recommendation:** Use HTML/CSS mockups for developer handoff and accurate specifications. Use AI-generated mockups for stakeholder presentations and visual exploration.
+
+---
+
+## Mockup Comparison
+
+| Feature | HTML/CSS Mockups | AI-Generated |
+|---------|------------------|---------------|
+| Text Accuracy | ✅ Perfect | ❌ Hallucinated |
+| Layout Precision | ✅ Pixel-perfect | ⚠️ Approximate |
+| Visual Appeal | ✅ Clean | ✅ Beautiful |
+| Frosted Glass | ⚠️ CSS-based | ✅ Realistic |
+| Developer Handoff | ✅ Yes | ❌ No |
+| Stakeholder Demo | ✅ Yes | ✅ Yes |

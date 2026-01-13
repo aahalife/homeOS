@@ -17,6 +17,7 @@ enum ManagementTab: String, CaseIterable {
     case skills
     case personas
     case family
+    case telegram
     case schedules
     case voice
     case themes
@@ -33,6 +34,7 @@ enum ManagementTab: String, CaseIterable {
         case .skills: return "brain.fill"
         case .personas: return "person.2.fill"
         case .family: return "person.3.fill"
+        case .telegram: return "paperplane.fill"
         case .schedules: return "calendar.badge.clock"
         case .voice: return "waveform"
         case .themes: return "paintpalette.fill"
@@ -51,6 +53,7 @@ enum ManagementTab: String, CaseIterable {
         case .skills: return "Skills"
         case .personas: return "Personas"
         case .family: return "Family"
+        case .telegram: return "Telegram"
         case .schedules: return "Schedules"
         case .voice: return "Voice"
         case .themes: return "Themes"
@@ -133,6 +136,12 @@ struct ManagementView: View {
                 badge: FamilyManager.shared.pendingJoinRequests.isEmpty ? nil : FamilyManager.shared.pendingJoinRequests.count
             ),
             SidebarItemData(
+                id: ManagementTab.telegram.rawValue,
+                icon: ManagementTab.telegram.icon,
+                label: ManagementTab.telegram.label,
+                badge: TelegramGatewayService.shared.isPolling ? nil : nil
+            ),
+            SidebarItemData(
                 id: ManagementTab.schedules.rawValue,
                 icon: ManagementTab.schedules.icon,
                 label: ManagementTab.schedules.label,
@@ -195,6 +204,8 @@ struct ManagementView: View {
                     PersonasView()
                 case ManagementTab.family.rawValue:
                     FamilySettingsView()
+                case ManagementTab.telegram.rawValue:
+                    TelegramSettingsView()
                 case ManagementTab.schedules.rawValue:
                     SchedulesView()
                 case ManagementTab.voice.rawValue:

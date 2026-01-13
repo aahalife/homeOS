@@ -16,6 +16,7 @@ enum ManagementTab: String, CaseIterable {
     case tools
     case skills
     case personas
+    case family
     case schedules
     case voice
     case themes
@@ -31,6 +32,7 @@ enum ManagementTab: String, CaseIterable {
         case .tools: return "wrench.and.screwdriver.fill"
         case .skills: return "brain.fill"
         case .personas: return "person.2.fill"
+        case .family: return "person.3.fill"
         case .schedules: return "calendar.badge.clock"
         case .voice: return "waveform"
         case .themes: return "paintpalette.fill"
@@ -48,6 +50,7 @@ enum ManagementTab: String, CaseIterable {
         case .tools: return "Tools"
         case .skills: return "Skills"
         case .personas: return "Personas"
+        case .family: return "Family"
         case .schedules: return "Schedules"
         case .voice: return "Voice"
         case .themes: return "Themes"
@@ -124,6 +127,12 @@ struct ManagementView: View {
                 badge: customPersonaCount > 0 ? customPersonaCount : nil
             ),
             SidebarItemData(
+                id: ManagementTab.family.rawValue,
+                icon: ManagementTab.family.icon,
+                label: ManagementTab.family.label,
+                badge: FamilyManager.shared.pendingJoinRequests.isEmpty ? nil : FamilyManager.shared.pendingJoinRequests.count
+            ),
+            SidebarItemData(
                 id: ManagementTab.schedules.rawValue,
                 icon: ManagementTab.schedules.icon,
                 label: ManagementTab.schedules.label,
@@ -184,6 +193,8 @@ struct ManagementView: View {
                     SkillsManagerView()
                 case ManagementTab.personas.rawValue:
                     PersonasView()
+                case ManagementTab.family.rawValue:
+                    FamilySettingsView()
                 case ManagementTab.schedules.rawValue:
                     SchedulesView()
                 case ManagementTab.voice.rawValue:

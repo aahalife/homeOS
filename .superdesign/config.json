@@ -1,0 +1,39 @@
+{
+  "project": "OiMyAI",
+  "framework": "SwiftUI",
+  "platform": "macOS",
+  "designSystem": {
+    "colorScheme": "system",
+    "accentColor": "#007AFF",
+    "fontFamily": "SF Pro"
+  },
+  "components": {
+    "outputDirectory": "./App/Views/Generated",
+    "exportFormat": "swift"
+  },
+  "mockups": {
+    "outputDirectory": "./.superdesign/mockups",
+    "resolution": "@2x"
+  },
+  "designTokens": {
+    "spacing": [4, 8, 12, 16, 24, 32, 48, 64],
+    "cornerRadius": [4, 8, 12, 16],
+    "shadows": {
+      "small": "0 1px 2px rgba(0,0,0,0.1)",
+      "medium": "0 4px 6px rgba(0,0,0,0.1)",
+      "large": "0 10px 15px rgba(0,0,0,0.1)"
+    }
+  },
+  "uiPatterns": {
+    "skillsTile": {
+      "width": 180,
+      "height": 120,
+      "cornerRadius": 12,
+      "badges": ["top-right"]
+    },
+    "detailView": {
+      "layout": "sidebar",
+      "sidebarWidth": 280
+    }
+  }
+}

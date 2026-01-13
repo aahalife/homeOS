@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://dinoki-ai.github.io/osaurus/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>HBRBQ8QQOhmvMKnSxQxqb3upTjyirdx0xkHSSRqn7aI=</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Oi My AI skills may use automation to control other applications on your behalf.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Oi My AI skills may access your calendar to read and create events.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Oi My AI skills may access your calendar to read and create events.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Oi My AI skills may access your contacts to search and read contact information.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Oi My AI skills may access your reminders to read and create tasks.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Oi My AI skills may access your location to provide location-based services.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Oi My AI skills may access your location to provide location-based services.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Oi My AI uses the microphone for voice transcription with WhisperKit.</string>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>Oi My AI can capture system audio for transcription. Screen content is not recorded.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>HuggingFaceDeepLink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>huggingface</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

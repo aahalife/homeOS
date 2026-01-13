@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    { "path": ".claude/plugins/feature-dev" },
+    { "path": ".claude/plugins/ralph-wiggum" }
+  ],
+  "project": {
+    "name": "OiMyAI",
+    "description": "Oi My AI - Transform Osaurus into a family AI assistant with Skills capability"
+  }
+}

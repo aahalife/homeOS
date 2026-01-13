@@ -1,0 +1,164 @@
+{
+  "id": "home.meal_planning.v1",
+  "name": "Meal Planning",
+  "version": "1.0.0",
+  "category": "Meal Planning",
+  "short_description": "Plan weekly meals and generate shopping lists",
+  "full_description": "Help plan meals for the week based on dietary preferences, generate organized shopping lists, and optionally order groceries through Instacart.",
+  "author": "Oi My AI",
+  "tags": ["meals", "groceries", "family", "planning", "recipes"],
+  "capabilities": {
+    "mcp_servers": [
+      {
+        "provider": "official",
+        "server": "firecrawl-mcp",
+        "tools": ["scrape_url"],
+        "config": {
+          "base_url": "https://www.plantoeat.com"
+        },
+        "required": false
+      },
+      {
+        "provider": "standalone",
+        "server": "spoonacular-mcp",
+        "tools": ["recipes.search", "recipes.get_nutrition"],
+        "required": false
+      },
+      {
+        "provider": "rube",
+        "tools": ["instacart.search_products", "instacart.add_to_cart"],
+        "required": false
+      }
+    ],
+    "builtin_tools": ["osaurus.filesystem", "osaurus.time"],
+    "optional": [
+      {
+        "type": "mcp",
+        "provider": "rube",
+        "tools": ["amazon_fresh.search", "amazon_fresh.add_to_cart"],
+        "usage": "Alternative grocery ordering"
+      }
+    ]
+  },
+  "tool_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.filesystem",
+      "params": ["preferences_path"],
+      "description": "Load family dietary preferences and restrictions",
+      "on_error": {
+        "action": "skip",
+        "user_message": "No saved preferences found, using defaults"
+      }
+    },
+    {
+      "step": 2,
+      "tool": "spoonacular.recipes.search",
+      "params": ["cuisine", "diet", "exclude_ingredients"],
+      "description": "Search for recipes matching preferences",
+      "on_error": {
+        "action": "fallback",
+        "fallback_tool": "exa.search",
+        "user_message": "Using web search for recipes"
+      }
+    },
+    {
+      "step": 3,
+      "tool": "osaurus.filesystem",
+      "params": ["meal_plan"],
+      "static_params": {
+        "action": "write",
+        "format": "json"
+      },
+      "description": "Save the meal plan"
+    },
+    {
+      "step": 4,
+      "tool": "osaurus.filesystem",
+      "params": ["shopping_list"],
+      "static_params": {
+        "action": "write",
+        "format": "markdown"
+      },
+      "description": "Generate and save shopping list organized by store aisle"
+    },
+    {
+      "step": 5,
+      "tool": "instacart.add_to_cart",
+      "params": ["shopping_list_items"],
+      "requires_approval": true,
+      "description": "Add items to Instacart cart for ordering",
+      "on_error": {
+        "action": "skip",
+        "user_message": "Instacart not available - shopping list saved locally"
+      }
+    }
+  ],
+  "fallback_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.filesystem",
+      "params": ["preferences_path"],
+      "description": "Load preferences"
+    },
+    {
+      "step": 2,
+      "tool": "exa.search",
+      "params": ["recipe_query"],
+      "description": "Search web for recipes"
+    },
+    {
+      "step": 3,
+      "tool": "osaurus.filesystem",
+      "params": ["meal_plan", "shopping_list"],
+      "description": "Save meal plan and shopping list locally"
+    }
+  ],
+  "approval_gates": {
+    "high_risk": ["instacart.checkout", "amazon_fresh.checkout"],
+    "medium_risk": ["instacart.add_to_cart"],
+    "valid_responses": ["yes", "order", "add to cart", "approved"],
+    "timeout_seconds": 60
+  },
+  "example_prompts": [
+    "Plan meals for this week",
+    "What should we have for dinner?",
+    "Make a shopping list",
+    "I need healthy meal ideas for the kids",
+    "Plan vegetarian meals for the week"
+  ],
+  "voice_triggers": [
+    "plan meals",
+    "meal planning",
+    "what's for dinner",
+    "shopping list",
+    "grocery list"
+  ],
+  "proactive_config": {
+    "enabled": true,
+    "schedule_type": "weekly",
+    "schedule_value": "Sunday 10:00",
+    "trigger_conditions": [
+      {
+        "type": "time",
+        "condition": "day_of_week == Sunday && hour >= 9",
+        "description": "Suggest meal planning on Sunday morning"
+      }
+    ]
+  },
+  "safety_constraints": {
+    "prohibited_actions": [],
+    "required_disclaimers": [
+      "Check ingredient labels for allergens",
+      "Nutritional info is approximate"
+    ],
+    "emergency_keywords": [],
+    "max_cost_usd": 500,
+    "requires_adult_supervision": false
+  },
+  "ui_config": {
+    "icon": "fork.knife",
+    "accent_color": "#FF9500",
+    "badges": ["Family", "Proactive", "Network"]
+  }
+}

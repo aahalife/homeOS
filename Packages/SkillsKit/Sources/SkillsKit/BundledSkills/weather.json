@@ -1,0 +1,129 @@
+{
+  "id": "home.weather.v1",
+  "name": "Weather",
+  "version": "1.0.0",
+  "category": "Utilities",
+  "short_description": "Get weather forecasts and alerts",
+  "full_description": "Check current weather conditions, forecasts, and severe weather alerts for your location and family members' locations.",
+  "author": "Oi My AI",
+  "tags": ["weather", "forecast", "alerts", "utilities"],
+  "capabilities": {
+    "mcp_servers": [
+      {
+        "provider": "standalone",
+        "server": "openweathermap-mcp",
+        "tools": ["weather.current", "weather.forecast", "weather.alerts"],
+        "required": true
+      }
+    ],
+    "builtin_tools": ["osaurus.time", "osaurus.notifications"],
+    "optional": [
+      {
+        "type": "mcp",
+        "provider": "standalone",
+        "tools": ["exa.search"],
+        "usage": "Fallback for weather info via web search"
+      }
+    ]
+  },
+  "tool_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.time",
+      "params": [],
+      "description": "Get current time for context"
+    },
+    {
+      "step": 2,
+      "tool": "openweathermap.weather.current",
+      "params": ["location", "units"],
+      "static_params": {
+        "units": "imperial"
+      },
+      "description": "Get current weather conditions"
+    },
+    {
+      "step": 3,
+      "tool": "openweathermap.weather.forecast",
+      "params": ["location", "days"],
+      "static_params": {
+        "days": 7
+      },
+      "description": "Get weather forecast"
+    },
+    {
+      "step": 4,
+      "tool": "openweathermap.weather.alerts",
+      "params": ["location"],
+      "description": "Check for weather alerts",
+      "on_error": {
+        "action": "skip"
+      }
+    },
+    {
+      "step": 5,
+      "tool": "osaurus.notifications",
+      "params": ["alert_message"],
+      "condition": "has_severe_alerts == true",
+      "description": "Send notification for severe weather"
+    }
+  ],
+  "fallback_sequence": [
+    {
+      "step": 1,
+      "tool": "exa.search",
+      "params": ["weather_query"],
+      "description": "Search web for weather info"
+    }
+  ],
+  "approval_gates": {
+    "high_risk": [],
+    "medium_risk": [],
+    "valid_responses": [],
+    "timeout_seconds": null
+  },
+  "example_prompts": [
+    "What's the weather?",
+    "Will it rain tomorrow?",
+    "Weekend forecast",
+    "Do I need an umbrella?",
+    "Weather for the school trip on Friday"
+  ],
+  "voice_triggers": [
+    "weather",
+    "forecast",
+    "rain",
+    "temperature",
+    "umbrella"
+  ],
+  "proactive_config": {
+    "enabled": true,
+    "schedule_type": "daily",
+    "schedule_value": "06:30",
+    "trigger_conditions": [
+      {
+        "type": "time",
+        "condition": "hour == 6 && minute >= 30",
+        "description": "Morning weather briefing"
+      },
+      {
+        "type": "event",
+        "condition": "severe_weather_alert == true",
+        "description": "Alert on severe weather"
+      }
+    ]
+  },
+  "safety_constraints": {
+    "prohibited_actions": [],
+    "required_disclaimers": [],
+    "emergency_keywords": ["tornado warning", "hurricane warning", "flash flood"],
+    "emergency_action": "SEVERE WEATHER ALERT: Please take shelter immediately and monitor local emergency broadcasts.",
+    "max_cost_usd": null,
+    "requires_adult_supervision": false
+  },
+  "ui_config": {
+    "icon": "cloud.sun",
+    "accent_color": "#007AFF",
+    "badges": ["Proactive", "Bundled"]
+  }
+}

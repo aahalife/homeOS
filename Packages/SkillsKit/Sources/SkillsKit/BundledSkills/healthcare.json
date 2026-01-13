@@ -1,0 +1,187 @@
+{
+  "id": "home.healthcare.v1",
+  "name": "Healthcare Assistant",
+  "version": "1.0.0",
+  "category": "Healthcare",
+  "short_description": "Manage medications, appointments, and health records",
+  "full_description": "Track medications and refills, schedule doctor appointments, store health records securely, and get reminders. Never provides medical diagnoses.",
+  "author": "Oi My AI",
+  "tags": ["health", "medications", "appointments", "medical", "reminders"],
+  "capabilities": {
+    "mcp_servers": [
+      {
+        "provider": "builtin",
+        "server": "apple_eventkit",
+        "tools": ["calendar.create_event", "reminders.create"],
+        "required": true
+      },
+      {
+        "provider": "rube",
+        "tools": ["cvs.check_prescription", "cvs.request_refill"],
+        "required": false
+      },
+      {
+        "provider": "rube",
+        "tools": ["zocdoc.search_doctors", "zocdoc.book_appointment"],
+        "required": false
+      }
+    ],
+    "builtin_tools": ["osaurus.filesystem", "osaurus.notifications", "osaurus.time"],
+    "optional": [
+      {
+        "type": "mcp",
+        "provider": "telephony",
+        "tools": ["bland.make_call"],
+        "usage": "Call to schedule appointments when API not available"
+      }
+    ]
+  },
+  "tool_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.filesystem",
+      "params": ["health_records_path"],
+      "description": "Load encrypted health records",
+      "on_error": {
+        "action": "skip",
+        "user_message": "No health records found"
+      }
+    },
+    {
+      "step": 2,
+      "tool": "osaurus.filesystem",
+      "params": ["medications_path"],
+      "description": "Load medication list and schedules"
+    },
+    {
+      "step": 3,
+      "tool": "apple_eventkit.reminders.create",
+      "params": ["medication_name", "time", "recurrence"],
+      "condition": "action == create_reminder",
+      "description": "Create medication reminder"
+    },
+    {
+      "step": 4,
+      "tool": "apple_eventkit.calendar.create_event",
+      "params": ["appointment_type", "doctor", "date", "time", "location"],
+      "condition": "action == schedule_appointment",
+      "description": "Add appointment to calendar"
+    },
+    {
+      "step": 5,
+      "tool": "cvs.check_prescription",
+      "params": ["prescription_id"],
+      "condition": "action == check_refill",
+      "description": "Check prescription refill status",
+      "on_error": {
+        "action": "skip",
+        "user_message": "Unable to check pharmacy - please call directly"
+      }
+    },
+    {
+      "step": 6,
+      "tool": "cvs.request_refill",
+      "params": ["prescription_id"],
+      "condition": "action == request_refill",
+      "requires_approval": true,
+      "description": "Request prescription refill",
+      "on_error": {
+        "action": "fallback",
+        "fallback_tool": "osaurus.notifications",
+        "user_message": "Pharmacy API unavailable - reminder set to call pharmacy"
+      }
+    }
+  ],
+  "fallback_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.filesystem",
+      "params": ["health_records_path", "medications_path"],
+      "description": "Load local health data"
+    },
+    {
+      "step": 2,
+      "tool": "apple_eventkit.reminders.create",
+      "params": ["reminder_text"],
+      "description": "Create manual reminder for health tasks"
+    },
+    {
+      "step": 3,
+      "tool": "osaurus.notifications",
+      "params": ["message"],
+      "description": "Show notification with health info"
+    }
+  ],
+  "approval_gates": {
+    "high_risk": ["cvs.request_refill", "bland.make_call"],
+    "medium_risk": ["zocdoc.book_appointment"],
+    "valid_responses": ["yes", "refill", "book", "schedule", "approved"],
+    "timeout_seconds": 60
+  },
+  "example_prompts": [
+    "Remind me to take my medication at 8am",
+    "Schedule a checkup with Dr. Smith",
+    "When is my next appointment?",
+    "I need to refill my prescription",
+    "Add a new medication to track"
+  ],
+  "voice_triggers": [
+    "medication",
+    "medicine",
+    "prescription",
+    "doctor appointment",
+    "health"
+  ],
+  "proactive_config": {
+    "enabled": true,
+    "schedule_type": "daily",
+    "schedule_value": "08:00",
+    "trigger_conditions": [
+      {
+        "type": "time",
+        "condition": "medication_due == true",
+        "description": "Remind when medication is due"
+      },
+      {
+        "type": "event",
+        "condition": "appointment_tomorrow == true",
+        "description": "Remind day before appointments"
+      },
+      {
+        "type": "event",
+        "condition": "refill_needed_soon == true",
+        "description": "Alert when refills are running low"
+      }
+    ]
+  },
+  "safety_constraints": {
+    "prohibited_actions": [
+      "diagnose_condition",
+      "recommend_dosage_change",
+      "suggest_stopping_medication"
+    ],
+    "required_disclaimers": [
+      "Consult a healthcare provider for medical advice",
+      "This is not medical diagnosis",
+      "Always follow your doctor's instructions"
+    ],
+    "emergency_keywords": [
+      "chest pain",
+      "difficulty breathing",
+      "can't breathe",
+      "heart attack",
+      "stroke",
+      "unconscious",
+      "severe bleeding",
+      "overdose"
+    ],
+    "emergency_action": "EMERGENCY DETECTED. If this is a medical emergency, please call 911 immediately.",
+    "max_cost_usd": null,
+    "requires_adult_supervision": true
+  },
+  "ui_config": {
+    "icon": "heart.text.square",
+    "accent_color": "#FF3B30",
+    "badges": ["Family", "Proactive", "Setup Required"]
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "id": "home.family_calendar.v1",
+  "name": "Family Calendar",
+  "version": "1.0.0",
+  "category": "Family",
+  "short_description": "Manage family events and schedules",
+  "full_description": "Keep track of family events, school activities, appointments, sports schedules, and more. Syncs with Apple Calendar and Google Calendar.",
+  "author": "Oi My AI",
+  "tags": ["calendar", "family", "schedule", "events", "appointments"],
+  "capabilities": {
+    "mcp_servers": [
+      {
+        "provider": "builtin",
+        "server": "apple_eventkit",
+        "tools": ["calendar.list_events", "calendar.create_event", "calendar.update_event", "calendar.delete_event"],
+        "required": true
+      },
+      {
+        "provider": "rube",
+        "tools": ["google_calendar.list_events", "google_calendar.create_event"],
+        "required": false
+      }
+    ],
+    "builtin_tools": ["osaurus.time", "osaurus.notifications"],
+    "optional": []
+  },
+  "tool_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.time",
+      "params": [],
+      "static_params": {
+        "format": "iso8601"
+      },
+      "description": "Get current date/time for context"
+    },
+    {
+      "step": 2,
+      "tool": "apple_eventkit.calendar.list_events",
+      "params": ["date_range", "calendar_ids"],
+      "description": "Fetch events from Apple Calendar"
+    },
+    {
+      "step": 3,
+      "tool": "google_calendar.list_events",
+      "params": ["date_range"],
+      "condition": "google_calendar_connected == true",
+      "description": "Fetch events from Google Calendar if connected",
+      "on_error": {
+        "action": "skip"
+      }
+    },
+    {
+      "step": 4,
+      "tool": "apple_eventkit.calendar.create_event",
+      "params": ["title", "start_time", "end_time", "location", "notes", "calendar_id"],
+      "condition": "action == create",
+      "requires_approval": false,
+      "description": "Create a new calendar event"
+    }
+  ],
+  "approval_gates": {
+    "high_risk": ["calendar.delete_event"],
+    "medium_risk": [],
+    "valid_responses": ["yes", "create", "schedule", "add"],
+    "timeout_seconds": 30
+  },
+  "example_prompts": [
+    "What's on the calendar today?",
+    "Schedule a dentist appointment for Thursday",
+    "When is soccer practice?",
+    "Add Emma's birthday party to the calendar",
+    "What do we have this weekend?"
+  ],
+  "voice_triggers": [
+    "calendar",
+    "schedule",
+    "what's today",
+    "appointments",
+    "events"
+  ],
+  "proactive_config": {
+    "enabled": true,
+    "schedule_type": "daily",
+    "schedule_value": "07:30",
+    "trigger_conditions": [
+      {
+        "type": "time",
+        "condition": "hour == 7 && minute >= 30",
+        "description": "Morning calendar briefing"
+      },
+      {
+        "type": "event",
+        "condition": "event_starts_in <= 30_minutes",
+        "description": "Remind 30 minutes before events"
+      }
+    ]
+  },
+  "safety_constraints": {
+    "prohibited_actions": [],
+    "required_disclaimers": [],
+    "emergency_keywords": [],
+    "max_cost_usd": null,
+    "requires_adult_supervision": false
+  },
+  "ui_config": {
+    "icon": "calendar",
+    "accent_color": "#34C759",
+    "badges": ["Family", "Proactive", "Bundled"]
+  }
+}

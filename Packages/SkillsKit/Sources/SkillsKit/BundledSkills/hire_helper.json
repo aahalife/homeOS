@@ -1,0 +1,155 @@
+{
+  "id": "home.hire_helper.v1",
+  "name": "Hire Helper",
+  "version": "1.0.0",
+  "category": "Services",
+  "short_description": "Find and book local service providers",
+  "full_description": "Search for and book local service providers for tasks like cleaning, repairs, lawn care, and more using TaskRabbit, Nextdoor, and other services.",
+  "author": "Oi My AI",
+  "tags": ["services", "helpers", "taskrabbit", "local", "handyman"],
+  "capabilities": {
+    "mcp_servers": [
+      {
+        "provider": "rube",
+        "tools": ["taskrabbit.search_taskers", "taskrabbit.get_availability", "taskrabbit.book_task"],
+        "required": false
+      },
+      {
+        "provider": "rube",
+        "tools": ["nextdoor.search_recommendations", "nextdoor.get_business"],
+        "required": false
+      },
+      {
+        "provider": "standalone",
+        "server": "exa-mcp",
+        "tools": ["search.web"],
+        "required": true
+      }
+    ],
+    "builtin_tools": ["osaurus.filesystem", "osaurus.notifications"],
+    "optional": [
+      {
+        "type": "mcp",
+        "provider": "standalone",
+        "server": "firecrawl-mcp",
+        "tools": ["scrape_url"],
+        "usage": "Scrape local business info"
+      }
+    ]
+  },
+  "tool_sequence": [
+    {
+      "step": 1,
+      "tool": "osaurus.filesystem",
+      "params": ["location_preferences"],
+      "description": "Load user location and preferences"
+    },
+    {
+      "step": 2,
+      "tool": "taskrabbit.search_taskers",
+      "params": ["task_type", "location", "date"],
+      "description": "Search TaskRabbit for available taskers",
+      "on_error": {
+        "action": "fallback",
+        "fallback_tool": "exa.search"
+      }
+    },
+    {
+      "step": 3,
+      "tool": "nextdoor.search_recommendations",
+      "params": ["service_category", "location"],
+      "description": "Get Nextdoor recommendations",
+      "on_error": {
+        "action": "skip"
+      }
+    },
+    {
+      "step": 4,
+      "tool": "exa.search",
+      "params": ["search_query"],
+      "description": "Search web for additional providers"
+    },
+    {
+      "step": 5,
+      "tool": "taskrabbit.get_availability",
+      "params": ["tasker_id", "date_range"],
+      "condition": "selected_provider == taskrabbit",
+      "description": "Check tasker availability"
+    },
+    {
+      "step": 6,
+      "tool": "taskrabbit.book_task",
+      "params": ["tasker_id", "task_details", "date", "time"],
+      "condition": "action == book",
+      "requires_approval": true,
+      "description": "Book the task",
+      "on_error": {
+        "action": "abort",
+        "user_message": "Booking failed - please try again or contact provider directly"
+      }
+    }
+  ],
+  "fallback_sequence": [
+    {
+      "step": 1,
+      "tool": "exa.search",
+      "params": ["local_service_query"],
+      "description": "Search for local service providers"
+    },
+    {
+      "step": 2,
+      "tool": "firecrawl.scrape_url",
+      "params": ["business_urls"],
+      "description": "Get details from business websites"
+    },
+    {
+      "step": 3,
+      "tool": "osaurus.filesystem",
+      "params": ["saved_providers"],
+      "description": "Save provider info for manual contact"
+    }
+  ],
+  "approval_gates": {
+    "high_risk": ["taskrabbit.book_task", "payment"],
+    "medium_risk": ["taskrabbit.get_availability"],
+    "valid_responses": ["yes", "book", "hire", "schedule", "approved"],
+    "timeout_seconds": 120
+  },
+  "example_prompts": [
+    "Find someone to mow the lawn",
+    "I need a plumber",
+    "Book a house cleaner for Saturday",
+    "Help me find a handyman",
+    "Who can fix my fence?"
+  ],
+  "voice_triggers": [
+    "find helper",
+    "hire someone",
+    "need a plumber",
+    "house cleaner",
+    "handyman"
+  ],
+  "proactive_config": {
+    "enabled": false,
+    "schedule_type": null,
+    "schedule_value": null,
+    "trigger_conditions": []
+  },
+  "safety_constraints": {
+    "prohibited_actions": [],
+    "required_disclaimers": [
+      "Always verify provider credentials",
+      "Meet providers in public or with others present",
+      "Never share financial information directly"
+    ],
+    "emergency_keywords": [],
+    "emergency_action": null,
+    "max_cost_usd": 1000,
+    "requires_adult_supervision": true
+  },
+  "ui_config": {
+    "icon": "person.2",
+    "accent_color": "#5856D6",
+    "badges": ["Network", "Setup Required"]
+  }
+}

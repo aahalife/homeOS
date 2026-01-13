@@ -567,9 +567,30 @@ final class ChatSession: ObservableObject {
         let isRegeneration = trimmed.isEmpty && images.isEmpty && !turns.isEmpty
         guard !trimmed.isEmpty || !images.isEmpty || isRegeneration else { return }
 
+        // Fast-path skill detection: Check if input matches a skill with high confidence
+        // If so, execute the skill directly without LLM invocation
+        if !trimmed.isEmpty && images.isEmpty && !isRegeneration {
+            Task { @MainActor in
+                let handled = await tryFastPathSkillExecution(input: trimmed, images: images)
+                if handled {
+                    print("[Oi My AI] Fast-path skill execution completed")
+                    return
+                }
+                // Continue with normal LLM flow
+                sendToLLM(text: trimmed, images: images, isRegeneration: false)
+            }
+            return
+        }
+
+        // Normal flow for images, regeneration, or when fast-path doesn't match
+        sendToLLM(text: trimmed, images: images, isRegeneration: isRegeneration)
+    }
+
+    /// Internal method for sending to LLM (called after fast-path check)
+    private func sendToLLM(text: String, images: [Data], isRegeneration: Bool) {
         // Only append user turn if there's actual content
-        if !trimmed.isEmpty || !images.isEmpty {
-            turns.append(ChatTurn(role: .user, content: trimmed, images: images))
+        if !text.isEmpty || !images.isEmpty {
+            turns.append(ChatTurn(role: .user, content: text, images: images))
             isDirty = true
 
             // Immediately save new session so it appears in sidebar

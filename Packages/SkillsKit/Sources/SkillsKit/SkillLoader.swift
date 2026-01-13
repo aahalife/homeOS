@@ -60,6 +60,19 @@ public final class SkillLoader: @unchecked Sendable {
         return cachedSkills[id]
     }
 
+    /// Alias for skill(byId:) for compatibility
+    public func skill(withId id: String) -> SkillDefinition? {
+        skill(byId: id)
+    }
+
+    /// Get all loaded skills
+    public var allSkills: [SkillDefinition] {
+        if cachedSkills.isEmpty {
+            _ = loadAllSkills()
+        }
+        return Array(cachedSkills.values)
+    }
+
     /// Load a single skill from JSON data
     public func loadSkill(from data: Data) throws -> SkillDefinition {
         let decoder = JSONDecoder()

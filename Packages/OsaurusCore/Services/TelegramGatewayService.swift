@@ -47,8 +47,9 @@ public final class TelegramGatewayService: ObservableObject {
     private var userMessageCounts: [Int64: (count: Int, windowStart: Date)] = [:]
 
     private init() {
-        self.configuration = TelegramConfigurationStore.load()
-        self.connectionStatus = configuration.lastConnectionStatus ?? TelegramConnectionStatus()
+        let loadedConfig = TelegramConfigurationStore.load()
+        self.configuration = loadedConfig
+        self.connectionStatus = loadedConfig.lastConnectionStatus ?? TelegramConnectionStatus()
     }
 
     // MARK: - Public API

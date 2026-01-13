@@ -42,8 +42,9 @@ public final class RubeService: ObservableObject {
     private static let providerName = "Rube"
 
     private init() {
-        self.configuration = RubeConfigurationStore.load()
-        self.connectionStatus = configuration.lastConnectionStatus ?? RubeConnectionStatus()
+        let loadedConfig = RubeConfigurationStore.load()
+        self.configuration = loadedConfig
+        self.connectionStatus = loadedConfig.lastConnectionStatus ?? RubeConnectionStatus()
     }
 
     // MARK: - Public API
@@ -181,28 +182,19 @@ public final class RubeService: ObservableObject {
     /// Test connection without persisting
     public func testConnection(apiKey: String) async -> RubeConnectionStatus {
         do {
-            // Create a temporary provider for testing
-            let tempProvider = MCPProvider(
-                id: UUID(),
-                name: "Rube (Test)",
+            let headers = ["x-api-key": apiKey]
+            let toolCount = try await MCPProviderManager.shared.testConnection(
                 url: configuration.endpoint,
-                enabled: true,
-                customHeaders: ["x-api-key": apiKey],
-                streamingEnabled: true,
-                discoveryTimeout: configuration.discoveryTimeout,
-                toolCallTimeout: configuration.toolCallTimeout,
-                autoConnect: false,
-                secretHeaderKeys: []
+                token: nil,
+                headers: headers
             )
 
-            let result = try await MCPProviderManager.shared.testConnection(provider: tempProvider)
-
             return RubeConnectionStatus(
-                isConnected: result.success,
-                toolCount: result.toolCount,
-                discoveredTools: result.toolNames,
-                lastError: result.error,
-                connectedAt: result.success ? Date() : nil
+                isConnected: true,
+                toolCount: toolCount,
+                discoveredTools: [],
+                lastError: nil,
+                connectedAt: Date()
             )
         } catch {
             return RubeConnectionStatus(
@@ -257,7 +249,7 @@ public final class RubeService: ObservableObject {
         }
 
         // Check if there's already a Rube provider in the list
-        let existing = MCPProviderManager.shared.providers.first { $0.name == Self.providerName }
+        let existing = MCPProviderManager.shared.configuration.providers.first { $0.name == Self.providerName }
         if let existing = existing {
             mcpProviderId = existing.id
             MCPProviderKeychain.saveToken(apiKey, for: existing.id)
@@ -279,7 +271,9 @@ public final class RubeService: ObservableObject {
         )
 
         // Save to MCPProviderManager
-        try await MCPProviderManager.shared.addProvider(provider, token: "Bearer \(apiKey)")
+        await MainActor.run {
+            MCPProviderManager.shared.addProvider(provider, token: "Bearer \(apiKey)")
+        }
         mcpProviderId = provider.id
 
         return provider.id

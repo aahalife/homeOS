@@ -149,7 +149,7 @@ public struct ApprovalRequest: Sendable {
 
 /// Delegate for handling runtime events
 @MainActor
-public protocol SkillRuntimeDelegate: AnyObject {
+public protocol SkillRuntimeDelegate: AnyObject, Sendable {
     /// Called when approval is needed for a step
     func skillRuntime(_ runtime: SkillRuntime, needsApprovalFor request: ApprovalRequest) async -> Bool
 

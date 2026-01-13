@@ -59,9 +59,7 @@ public final class SkillToolProvider: @unchecked Sendable {
         }
 
         // Try ToolRegistry
-        return try await MainActor.run {
-            try await ToolRegistry.shared.execute(name: toolName, argumentsJSON: jsonString)
-        }
+        return try await ToolRegistry.shared.execute(name: toolName, argumentsJSON: jsonString)
     }
 
     /// Get all available tools grouped by source
@@ -118,7 +116,7 @@ public final class SkillToolProvider: @unchecked Sendable {
                 name: entry.name,
                 description: entry.description,
                 source: entry.name.hasPrefix("osaurus.") ? .builtin : .mcpProvider,
-                isEnabled: entry.isEnabled
+                isEnabled: entry.enabled
             )
         }
 
@@ -199,6 +197,7 @@ public enum ToolSource: String, Sendable {
 /// Checks if skills have their required capabilities available
 public struct SkillCapabilityChecker {
     /// Check if all required tools for a capability set are available
+    @MainActor
     public static func checkCapabilities(
         _ capabilities: SkillCapabilitiesInfo
     ) async -> CapabilityCheckResult {
@@ -221,7 +220,9 @@ public struct SkillCapabilityChecker {
         for server in capabilities.mcpServers {
             for tool in server.tools {
                 let fullToolName = server.server.map { "\($0).\(tool)" } ?? tool
-                if await provider.isToolAvailable(tool) || await provider.isToolAvailable(fullToolName) {
+                let toolAvailable = await provider.isToolAvailable(tool)
+                let fullToolAvailable = await provider.isToolAvailable(fullToolName)
+                if toolAvailable || fullToolAvailable {
                     availableTools.append(tool)
                 } else if server.required {
                     missingRequired.append(tool)

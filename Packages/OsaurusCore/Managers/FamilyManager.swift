@@ -48,10 +48,6 @@ public final class FamilyManager: ObservableObject {
         startCleanupTimer()
     }
 
-    deinit {
-        cleanupTimer?.invalidate()
-    }
-
     // MARK: - State Management
 
     private func loadState() {

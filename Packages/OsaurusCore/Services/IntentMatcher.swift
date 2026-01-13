@@ -378,7 +378,7 @@ public final class IntentMatcher: @unchecked Sendable {
 
 extension IntentMatcher {
     /// Configuration for intent matching behavior
-    public struct Configuration {
+    public struct Configuration: Sendable {
         public var minimumConfidence: Double
         public var enableFuzzyMatching: Bool
         public var prioritizeVoiceTriggers: Bool

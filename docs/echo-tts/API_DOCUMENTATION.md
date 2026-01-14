@@ -6,6 +6,41 @@
 
 This API provides voice cloning and text-to-speech capabilities powered by the [Echo-TTS model](https://github.com/jordandare/echo-tts). Voice references can be persisted by ID, allowing reuse without re-uploading audio files.
 
+---
+
+## Authentication
+
+All endpoints require API key authentication. Provide your API key using one of these methods:
+
+### Option 1: Bearer Token (Recommended)
+```http
+Authorization: Bearer YOUR_API_KEY
+```
+
+### Option 2: X-API-Key Header
+```http
+X-API-Key: YOUR_API_KEY
+```
+
+### Option 3: Query Parameter
+```
+?api_key=YOUR_API_KEY
+```
+
+**Example with Bearer token:**
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" https://reef-moon.exe.xyz:8080/voices
+```
+
+**Error Response (401 Unauthorized):**
+```json
+{
+  "error": "Invalid or missing API key"
+}
+```
+
+---
+
 ## Default Settings
 
 The API is configured with optimal defaults as recommended:
@@ -113,6 +148,7 @@ Registers a new voice from a reference audio file. The voice can then be used fo
 **Example (curl):**
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/voices \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -F "audio=@reference.wav" \
   -F "id=john" \
   -F "name=John's Voice" \
@@ -205,6 +241,7 @@ Content-Type: multipart/form-data
 **Example (curl with registered voice):**
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/tts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello world!", "voice_id": "john"}' \
   --output output.wav
@@ -213,6 +250,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 **Example (curl with audio file):**
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/tts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -F "text=Hello world!" \
   -F "audio=@reference.wav" \
   --output output.wav
@@ -301,6 +339,7 @@ All errors return JSON with an `error` field:
 | 201 | Created (voice registered) |
 | 400 | Bad request (missing required parameters) |
 | 404 | Voice not found |
+| 401 | Unauthorized (invalid or missing API key) |
 | 409 | Conflict (voice ID already exists) |
 | 500 | Server error (TTS generation failed) |
 
@@ -312,6 +351,7 @@ All errors return JSON with an `error` field:
 
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/voices \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -F "audio=@speaker_sample.wav" \
   -F "id=alice"
 ```
@@ -320,6 +360,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/voices \
 
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/tts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Welcome to our service! How can I help you today?", "voice_id": "alice"}' \
   --output welcome.wav
@@ -329,6 +370,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/tts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Thank you for your purchase.", "voice_id": "alice", "rng_seed": 42}' \
   --output thanks.wav
@@ -338,6 +380,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 
 ```bash
 curl -X POST https://reef-moon.exe.xyz:8080/tts \
+  -H "Authorization: Bearer YOUR_API_KEY" \
   -F "text=Quick test with a different voice." \
   -F "audio=@temp_reference.mp3" \
   --output test.wav
@@ -353,11 +396,15 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 import requests
 
 BASE_URL = "https://reef-moon.exe.xyz:8080"
+API_KEY = "YOUR_API_KEY"
+
+headers = {"Authorization": f"Bearer {API_KEY}"}
 
 # Register a voice
 with open("reference.wav", "rb") as f:
     response = requests.post(
         f"{BASE_URL}/voices",
+        headers=headers,
         files={"audio": f},
         data={"id": "myvoice", "name": "My Voice"}
     )
@@ -366,6 +413,7 @@ with open("reference.wav", "rb") as f:
 # Generate speech
 response = requests.post(
     f"{BASE_URL}/tts",
+    headers={**headers, "Content-Type": "application/json"},
     json={
         "text": "Hello from Python!",
         "voice_id": "myvoice"
@@ -375,12 +423,19 @@ response = requests.post(
 if response.status_code == 200:
     with open("output.wav", "wb") as f:
         f.write(response.content)
+else:
+    print(f"Error: {response.json()}")
 ```
 
 ### JavaScript (fetch)
 
 ```javascript
 const BASE_URL = "https://reef-moon.exe.xyz:8080";
+const API_KEY = "YOUR_API_KEY";
+
+const authHeaders = {
+  "Authorization": `Bearer ${API_KEY}`
+};
 
 // Register a voice
 async function registerVoice(audioFile, id, name) {
@@ -391,6 +446,7 @@ async function registerVoice(audioFile, id, name) {
 
   const response = await fetch(`${BASE_URL}/voices`, {
     method: "POST",
+    headers: authHeaders,
     body: formData
   });
   return response.json();
@@ -400,7 +456,10 @@ async function registerVoice(audioFile, id, name) {
 async function generateSpeech(text, voiceId) {
   const response = await fetch(`${BASE_URL}/tts`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      ...authHeaders,
+      "Content-Type": "application/json" 
+    },
     body: JSON.stringify({ text, voice_id: voiceId })
   });
   

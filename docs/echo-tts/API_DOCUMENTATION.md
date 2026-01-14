@@ -1,7 +1,5 @@
 # Echo-TTS REST API Documentation
 
-**Base URL:** `https://reef-moon.exe.xyz`
-
 ## Overview
 
 This API provides voice cloning and text-to-speech capabilities powered by the [Echo-TTS model](https://github.com/jordandare/echo-tts). Voice references can be persisted by ID, allowing reuse without re-uploading audio files.
@@ -22,14 +20,9 @@ Authorization: Bearer YOUR_API_KEY
 X-API-Key: YOUR_API_KEY
 ```
 
-### Option 3: Query Parameter
-```
-?api_key=YOUR_API_KEY
-```
-
-**Example with Bearer token:**
+**Example:**
 ```bash
-curl -H "Authorization: Bearer YOUR_API_KEY" https://reef-moon.exe.xyz/voices
+curl -H "Authorization: Bearer YOUR_API_KEY" https://echo-tts-seven.vercel.app/api/voices
 ```
 
 **Error Response (401 Unauthorized):**
@@ -43,7 +36,7 @@ curl -H "Authorization: Bearer YOUR_API_KEY" https://reef-moon.exe.xyz/voices
 
 ## Default Settings
 
-The API is configured with optimal defaults as recommended:
+The API is configured with optimal defaults:
 
 | Setting | Value | Description |
 |---------|-------|-------------|
@@ -59,7 +52,7 @@ The API is configured with optimal defaults as recommended:
 ### Health Check
 
 ```http
-GET /health
+GET /api/health
 ```
 
 Returns service health status.
@@ -78,7 +71,7 @@ Returns service health status.
 ### List All Voices
 
 ```http
-GET /voices
+GET /api/voices
 ```
 
 Returns a list of all registered voice IDs with metadata.
@@ -102,7 +95,7 @@ Returns a list of all registered voice IDs with metadata.
 ### Get Voice Details
 
 ```http
-GET /voices/{voice_id}
+GET /api/voices/{voice_id}
 ```
 
 Returns details about a specific registered voice.
@@ -114,14 +107,8 @@ Returns details about a specific registered voice.
   "name": "John's Voice",
   "created_at": "2025-01-14T10:00:00Z",
   "description": "Male speaker sample",
-  "file_size_bytes": 245760
-}
-```
-
-**Error (404):**
-```json
-{
-  "error": "Voice not found: xyz"
+  "file_size": 245760,
+  "blob_url": "https://..."
 }
 ```
 
@@ -130,11 +117,9 @@ Returns details about a specific registered voice.
 ### Register a New Voice
 
 ```http
-POST /voices
+POST /api/voices
 Content-Type: multipart/form-data
 ```
-
-Registers a new voice from a reference audio file. The voice can then be used for TTS without re-uploading the audio.
 
 **Form Fields:**
 
@@ -145,14 +130,13 @@ Registers a new voice from a reference audio file. The voice can then be used fo
 | `name` | string | No | Display name for the voice |
 | `description` | string | No | Voice description |
 
-**Example (curl):**
+**Example:**
 ```bash
-curl -X POST https://reef-moon.exe.xyz/voices \
+curl -X POST https://echo-tts-seven.vercel.app/api/voices \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "audio=@reference.wav" \
   -F "id=john" \
-  -F "name=John's Voice" \
-  -F "description=Male speaker sample"
+  -F "name=John's Voice"
 ```
 
 **Response (201 Created):**
@@ -165,19 +149,12 @@ curl -X POST https://reef-moon.exe.xyz/voices \
 }
 ```
 
-**Error (409 Conflict):**
-```json
-{
-  "error": "Voice ID already exists: john"
-}
-```
-
 ---
 
 ### Delete a Voice
 
 ```http
-DELETE /voices/{voice_id}
+DELETE /api/voices/{voice_id}
 ```
 
 Deletes a registered voice and its audio file.
@@ -194,7 +171,7 @@ Deletes a registered voice and its audio file.
 ### Generate Speech (TTS)
 
 ```http
-POST /tts
+POST /api/tts
 ```
 
 Generate speech from text using a registered voice or one-time audio upload.
@@ -231,25 +208,24 @@ Content-Type: multipart/form-data
 | `voice_id` | string | No* | ID of a registered voice |
 | `audio` | file | No* | One-time reference audio file |
 | `num_steps` | int | No | Diffusion steps (default: 40) |
-| `rng_seed` | int | No | Random seed for reproducibility (default: 0) |
-| `speaker_kv_enable` | bool | No | Enable speaker KV scaling (default: true) |
-| `speaker_kv_scale` | float | No | Speaker KV scale factor (default: 1.5) |
-| `preset_name` | string | No | Sampler preset name |
+| `rng_seed` | int | No | Random seed (default: 0) |
+| `speaker_kv_enable` | bool | No | Enable speaker KV (default: true) |
+| `speaker_kv_scale` | float | No | Speaker KV scale (default: 1.5) |
 
 *Either `voice_id` OR `audio` must be provided.
 
-**Example (curl with registered voice):**
+**Example (with registered voice):**
 ```bash
-curl -X POST https://reef-moon.exe.xyz/tts \
+curl -X POST https://echo-tts-seven.vercel.app/api/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello world!", "voice_id": "john"}' \
   --output output.wav
 ```
 
-**Example (curl with audio file):**
+**Example (with audio file):**
 ```bash
-curl -X POST https://reef-moon.exe.xyz/tts \
+curl -X POST https://echo-tts-seven.vercel.app/api/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "text=Hello world!" \
   -F "audio=@reference.wav" \
@@ -260,13 +236,6 @@ curl -X POST https://reef-moon.exe.xyz/tts \
 
 Returns WAV audio file directly (Content-Type: audio/wav).
 
-**Error Response:**
-```json
-{
-  "error": "TTS generation failed: ..."
-}
-```
-
 ---
 
 ## Generation Parameters
@@ -275,7 +244,7 @@ Returns WAV audio file directly (Content-Type: audio/wav).
 |-----------|---------|-------|-------------|
 | `num_steps` | 40 | 1-80 | Number of diffusion steps. Higher = better quality, slower. |
 | `rng_seed` | 0 | any int | Random seed for reproducible output. |
-| `speaker_kv_enable` | true | true/false | Enable speaker KV attention scaling. Helps match reference voice. |
+| `speaker_kv_enable` | true | true/false | Enable speaker KV attention scaling. |
 | `speaker_kv_scale` | 1.5 | 1.0-2.0 | Scale factor for speaker KV. Higher = stronger voice adherence. |
 | `preset_name` | "Independent (High Speaker CFG)" | see below | Sampler preset. |
 
@@ -291,17 +260,11 @@ Returns WAV audio file directly (Content-Type: audio/wav).
 
 ## Text Format
 
-Text prompts follow the [WhisperD](https://huggingface.co/jordand/whisper-d-v1a) transcription format:
+Text prompts follow the WhisperD transcription format:
 
 - The API automatically prepends `[S1] ` if not present
 - **Commas** function as pauses
 - **Exclamation points** may increase expressiveness
-- Colons, semicolons, and em-dashes are normalized to commas
-
-**Example:**
-```
-Hello, this is a test. How are you doing today?
-```
 
 ---
 
@@ -310,14 +273,13 @@ Hello, this is a test. How are you doing today?
 - **Duration:** 10-30 seconds works well; up to 5 minutes supported
 - **Quality:** Clear audio with minimal background noise is best
 - **Format:** WAV, MP3, OGG, FLAC, M4A, AAC
-- **Tip:** If generated voice doesn't match reference, ensure `speaker_kv_enable=true`
 
 ---
 
 ## Response Times
 
 - **Typical:** 10-30 seconds per request
-- **Factors:** Text length, HuggingFace Space queue, network latency
+- **Note:** Vercel function timeout is set to 60 seconds
 
 ---
 
@@ -337,65 +299,23 @@ All errors return JSON with an `error` field:
 |------|-------------|
 | 200 | Success |
 | 201 | Created (voice registered) |
-| 400 | Bad request (missing required parameters) |
-| 404 | Voice not found |
+| 400 | Bad request (missing parameters) |
 | 401 | Unauthorized (invalid or missing API key) |
+| 404 | Voice not found |
 | 409 | Conflict (voice ID already exists) |
 | 500 | Server error (TTS generation failed) |
-
----
-
-## Example Workflow
-
-### 1. Register a voice
-
-```bash
-curl -X POST https://reef-moon.exe.xyz/voices \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -F "audio=@speaker_sample.wav" \
-  -F "id=alice"
-```
-
-### 2. Generate speech (using registered voice)
-
-```bash
-curl -X POST https://reef-moon.exe.xyz/tts \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Welcome to our service! How can I help you today?", "voice_id": "alice"}' \
-  --output welcome.wav
-```
-
-### 3. Generate speech (with new seed for variation)
-
-```bash
-curl -X POST https://reef-moon.exe.xyz/tts \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Thank you for your purchase.", "voice_id": "alice", "rng_seed": 42}' \
-  --output thanks.wav
-```
-
-### 4. One-time voice (no registration)
-
-```bash
-curl -X POST https://reef-moon.exe.xyz/tts \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -F "text=Quick test with a different voice." \
-  -F "audio=@temp_reference.mp3" \
-  --output test.wav
-```
+| 503 | Service unavailable (storage not configured) |
 
 ---
 
 ## SDK Examples
 
-### Python (requests)
+### Python
 
 ```python
 import requests
 
-BASE_URL = "https://reef-moon.exe.xyz"
+BASE_URL = "https://echo-tts-seven.vercel.app"
 API_KEY = "YOUR_API_KEY"
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
@@ -403,7 +323,7 @@ headers = {"Authorization": f"Bearer {API_KEY}"}
 # Register a voice
 with open("reference.wav", "rb") as f:
     response = requests.post(
-        f"{BASE_URL}/voices",
+        f"{BASE_URL}/api/voices",
         headers=headers,
         files={"audio": f},
         data={"id": "myvoice", "name": "My Voice"}
@@ -412,7 +332,7 @@ with open("reference.wav", "rb") as f:
 
 # Generate speech
 response = requests.post(
-    f"{BASE_URL}/tts",
+    f"{BASE_URL}/api/tts",
     headers={**headers, "Content-Type": "application/json"},
     json={
         "text": "Hello from Python!",
@@ -423,41 +343,24 @@ response = requests.post(
 if response.status_code == 200:
     with open("output.wav", "wb") as f:
         f.write(response.content)
-else:
-    print(f"Error: {response.json()}")
 ```
 
-### JavaScript (fetch)
+### JavaScript
 
 ```javascript
-const BASE_URL = "https://reef-moon.exe.xyz";
+const BASE_URL = "https://echo-tts-seven.vercel.app";
 const API_KEY = "YOUR_API_KEY";
 
-const authHeaders = {
+const headers = {
   "Authorization": `Bearer ${API_KEY}`
 };
 
-// Register a voice
-async function registerVoice(audioFile, id, name) {
-  const formData = new FormData();
-  formData.append("audio", audioFile);
-  formData.append("id", id);
-  formData.append("name", name);
-
-  const response = await fetch(`${BASE_URL}/voices`, {
-    method: "POST",
-    headers: authHeaders,
-    body: formData
-  });
-  return response.json();
-}
-
 // Generate speech
 async function generateSpeech(text, voiceId) {
-  const response = await fetch(`${BASE_URL}/tts`, {
+  const response = await fetch(`${BASE_URL}/api/tts`, {
     method: "POST",
     headers: { 
-      ...authHeaders,
+      ...headers,
       "Content-Type": "application/json" 
     },
     body: JSON.stringify({ text, voice_id: voiceId })
@@ -468,16 +371,24 @@ async function generateSpeech(text, voiceId) {
   }
   throw new Error(await response.text());
 }
-
-// Usage
-const audioBlob = await generateSpeech("Hello from JavaScript!", "myvoice");
-const audioUrl = URL.createObjectURL(audioBlob);
 ```
+
+---
+
+## Environment Variables
+
+Set these in your Vercel project:
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `API_KEY` | Yes | Secret key for API authentication |
+| `BLOB_READ_WRITE_TOKEN` | Yes | Vercel Blob read/write token (auto-added when you create Blob storage) |
+| `HF_SPACE` | No | HuggingFace Space (default: jordand/echo-tts-preview) |
 
 ---
 
 ## Notes
 
-- This service relies on the [HuggingFace Echo-TTS Space](https://huggingface.co/spaces/jordand/echo-tts-preview) as backend
-- Audio outputs are [CC-BY-NC-SA-4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) licensed due to Fish Speech S1-DAC dependency
+- This service uses the [HuggingFace Echo-TTS Space](https://huggingface.co/spaces/jordand/echo-tts-preview) as backend
+- Audio outputs are [CC-BY-NC-SA-4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) licensed
 - Please use responsibly and do not impersonate real people without consent

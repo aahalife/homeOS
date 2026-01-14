@@ -1,6 +1,6 @@
 # Echo-TTS REST API Documentation
 
-**Base URL:** `https://reef-moon.exe.xyz:8080`
+**Base URL:** `https://reef-moon.exe.xyz`
 
 ## Overview
 
@@ -29,7 +29,7 @@ X-API-Key: YOUR_API_KEY
 
 **Example with Bearer token:**
 ```bash
-curl -H "Authorization: Bearer YOUR_API_KEY" https://reef-moon.exe.xyz:8080/voices
+curl -H "Authorization: Bearer YOUR_API_KEY" https://reef-moon.exe.xyz/voices
 ```
 
 **Error Response (401 Unauthorized):**
@@ -147,7 +147,7 @@ Registers a new voice from a reference audio file. The voice can then be used fo
 
 **Example (curl):**
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/voices \
+curl -X POST https://reef-moon.exe.xyz/voices \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "audio=@reference.wav" \
   -F "id=john" \
@@ -240,7 +240,7 @@ Content-Type: multipart/form-data
 
 **Example (curl with registered voice):**
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/tts \
+curl -X POST https://reef-moon.exe.xyz/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Hello world!", "voice_id": "john"}' \
@@ -249,7 +249,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 
 **Example (curl with audio file):**
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/tts \
+curl -X POST https://reef-moon.exe.xyz/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "text=Hello world!" \
   -F "audio=@reference.wav" \
@@ -350,7 +350,7 @@ All errors return JSON with an `error` field:
 ### 1. Register a voice
 
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/voices \
+curl -X POST https://reef-moon.exe.xyz/voices \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "audio=@speaker_sample.wav" \
   -F "id=alice"
@@ -359,7 +359,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/voices \
 ### 2. Generate speech (using registered voice)
 
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/tts \
+curl -X POST https://reef-moon.exe.xyz/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Welcome to our service! How can I help you today?", "voice_id": "alice"}' \
@@ -369,7 +369,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 ### 3. Generate speech (with new seed for variation)
 
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/tts \
+curl -X POST https://reef-moon.exe.xyz/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"text": "Thank you for your purchase.", "voice_id": "alice", "rng_seed": 42}' \
@@ -379,7 +379,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 ### 4. One-time voice (no registration)
 
 ```bash
-curl -X POST https://reef-moon.exe.xyz:8080/tts \
+curl -X POST https://reef-moon.exe.xyz/tts \
   -H "Authorization: Bearer YOUR_API_KEY" \
   -F "text=Quick test with a different voice." \
   -F "audio=@temp_reference.mp3" \
@@ -395,7 +395,7 @@ curl -X POST https://reef-moon.exe.xyz:8080/tts \
 ```python
 import requests
 
-BASE_URL = "https://reef-moon.exe.xyz:8080"
+BASE_URL = "https://reef-moon.exe.xyz"
 API_KEY = "YOUR_API_KEY"
 
 headers = {"Authorization": f"Bearer {API_KEY}"}
@@ -430,7 +430,7 @@ else:
 ### JavaScript (fetch)
 
 ```javascript
-const BASE_URL = "https://reef-moon.exe.xyz:8080";
+const BASE_URL = "https://reef-moon.exe.xyz";
 const API_KEY = "YOUR_API_KEY";
 
 const authHeaders = {

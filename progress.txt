@@ -1,0 +1,65 @@
+# HomeOS Development Progress Log
+
+## Codebase Patterns
+
+### Backend (TypeScript/Fastify)
+- Use Fastify with `@fastify/cors`, `@fastify/helmet`, `@fastify/jwt`
+- Routes defined in separate files under `src/routes/`
+- Services for business logic under `src/services/`
+- Zod schemas in `@homeos/shared` for validation
+- ESM with `.js` extensions in imports
+
+### iOS (SwiftUI)
+- MVVM pattern with `@StateObject` ViewModels
+- `GlassSurface` component for glassmorphic design
+- `AuthManager` for Apple Sign In and JWT management
+- `NetworkManager` for API calls with async/await
+- `KeychainHelper` for secure token storage
+
+### Workflows (Temporal)
+- Keep workflows deterministic
+- Side effects go in activities
+- Use signals for human-in-the-loop approvals
+- Emit events for real-time streaming to clients
+
+### Database
+- PostgreSQL with pgvector extension
+- Raw SQL queries (no ORM currently)
+- Migrations in `/infra/init-scripts/`
+
+---
+
+## 2026-01-15 - Project Initialization
+
+### What was done
+- Created comprehensive PRD document at `/docs/HomeOS_PRD.md`
+- Created Ralph-format `prd.json` with 30 user stories across 5 phases
+- Created `AGENTS.md` with project guidelines and patterns
+- Initialized this progress log
+
+### Project structure analyzed
+- Backend services: control-plane (3001), runtime (3002), workflows
+- iOS app with SwiftUI in `apps/ios/HomeOS/`
+- Infrastructure: PostgreSQL, Redis, MinIO, Temporal
+- Shared types in `packages/shared/`
+
+### Key decisions
+1. MVP focuses on cloud deployment (Fly.io/AWS)
+2. Apple Sign In is primary auth for iOS
+3. Temporal for durable workflow execution
+4. Claude as primary LLM, OpenAI for embeddings
+5. Risk-tiered approval system for automations
+
+### Phase priorities
+1. Phase 1: Core Infrastructure (backend foundation)
+2. Phase 2: iOS App MVP (chat, tasks, settings)
+3. Phase 3: Workflow Engine (Temporal integration)
+4. Phase 4: Integrations (Google, Telegram, Twilio)
+5. Phase 5: Workflow Packs (Morning Launch, Family Comms)
+
+### Next steps
+- Start with US-001: Initialize database schema
+- Ensure Docker infrastructure starts correctly
+- Verify existing code compiles
+
+---

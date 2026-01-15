@@ -1,0 +1,551 @@
+{
+  "project": "HomeOS",
+  "branchName": "HomeOS-IOS",
+  "description": "HomeOS iOS Platform - Family AI assistant with Clawdbot integration",
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Core Infrastructure",
+      "description": "Backend foundation with authentication, workspaces, and database"
+    },
+    {
+      "id": "phase-2",
+      "name": "iOS App MVP",
+      "description": "Core iOS app with chat, tasks, and settings"
+    },
+    {
+      "id": "phase-3",
+      "name": "Workflow Engine",
+      "description": "Temporal workflows with tool use and approvals"
+    },
+    {
+      "id": "phase-4",
+      "name": "Integrations",
+      "description": "Third-party integrations (Telegram, Twilio, Google)"
+    },
+    {
+      "id": "phase-5",
+      "name": "Workflow Packs",
+      "description": "Pre-built automation bundles for families"
+    }
+  ],
+  "userStories": [
+    {
+      "id": "US-001",
+      "phase": "phase-1",
+      "title": "Initialize database schema with migrations",
+      "description": "As a developer, I need the database schema set up so the backend services can persist data.",
+      "acceptanceCriteria": [
+        "All SQL migration files execute successfully",
+        "Tables created: users, workspaces, workspace_members, devices, secrets",
+        "pgvector extension enabled for embeddings",
+        "Docker compose starts PostgreSQL with schema applied",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "Check /infra/init-scripts/ for existing migrations"
+    },
+    {
+      "id": "US-002",
+      "phase": "phase-1",
+      "title": "Implement Apple Sign In endpoint",
+      "description": "As a user, I want to sign in with my Apple ID so I can access the app securely.",
+      "acceptanceCriteria": [
+        "POST /v1/auth/signin-with-apple accepts Apple identity token",
+        "Validates token with Apple's public keys",
+        "Creates or retrieves user record",
+        "Returns JWT access token with user claims",
+        "Typecheck passes",
+        "Test with mock Apple token works"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "AuthManager.swift in iOS app already has Apple Sign In UI"
+    },
+    {
+      "id": "US-003",
+      "phase": "phase-1",
+      "title": "Implement workspace CRUD operations",
+      "description": "As a user, I need to create and manage my family workspace.",
+      "acceptanceCriteria": [
+        "POST /v1/workspaces creates workspace linked to user",
+        "GET /v1/workspaces returns user's workspaces",
+        "GET /v1/workspaces/:id returns workspace details",
+        "PUT /v1/workspaces/:id updates workspace",
+        "Only workspace admin can delete workspace",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "phase": "phase-1",
+      "title": "Implement workspace member management",
+      "description": "As a workspace admin, I want to add and manage family members.",
+      "acceptanceCriteria": [
+        "POST /v1/workspaces/:id/members adds member with role",
+        "GET /v1/workspaces/:id/members lists all members",
+        "PUT /v1/workspaces/:id/members/:memberId updates role",
+        "DELETE /v1/workspaces/:id/members/:memberId removes member",
+        "Roles: admin, adult, teen, child, caregiver, guest",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "phase": "phase-1",
+      "title": "Implement BYOK secrets storage",
+      "description": "As a user, I want to store my integration tokens securely.",
+      "acceptanceCriteria": [
+        "POST /v1/workspaces/:id/secrets stores encrypted secret",
+        "Envelope encryption with workspace-specific key",
+        "GET /v1/workspaces/:id/secrets lists secret names (not values)",
+        "DELETE /v1/workspaces/:id/secrets/:name removes secret",
+        "Audit log entry created for each secret operation",
+        "Typecheck passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Check packages/shared/src/crypto/envelope.ts"
+    },
+    {
+      "id": "US-006",
+      "phase": "phase-1",
+      "title": "Implement runtime token generation",
+      "description": "As a device, I need a workspace-scoped token for the runtime API.",
+      "acceptanceCriteria": [
+        "POST /v1/runtime/token generates runtime JWT",
+        "Token includes workspace_id, member_id, role claims",
+        "Token expires in 24 hours",
+        "Runtime service validates these tokens",
+        "Typecheck passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "phase": "phase-2",
+      "title": "Connect iOS app to Control Plane auth",
+      "description": "As a user, I want to sign in from the iOS app and receive a token.",
+      "acceptanceCriteria": [
+        "AuthManager.swift sends Apple credential to backend",
+        "Stores JWT token in Keychain",
+        "NetworkManager includes token in all requests",
+        "Handles token refresh/expiration gracefully",
+        "ContentView shows main content when authenticated",
+        "App builds without warnings"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": "OnboardingView.swift has sign in button"
+    },
+    {
+      "id": "US-008",
+      "phase": "phase-2",
+      "title": "Implement chat message sending",
+      "description": "As a user, I want to send a message and receive a response.",
+      "acceptanceCriteria": [
+        "POST /v1/chat/turn accepts message text",
+        "Returns conversation ID and initiates workflow",
+        "ChatViewModel.swift calls endpoint and handles response",
+        "Messages appear in chat view with user/assistant bubbles",
+        "Typecheck passes",
+        "Verify in iOS app (simulator)"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": "ChatView.swift already has UI"
+    },
+    {
+      "id": "US-009",
+      "phase": "phase-2",
+      "title": "Implement WebSocket streaming for chat",
+      "description": "As a user, I want to see the assistant's response stream in real-time.",
+      "acceptanceCriteria": [
+        "WS /v1/stream accepts authentication",
+        "Emits 'chat:chunk' events as response generates",
+        "Emits 'chat:complete' when response finished",
+        "ChatViewModel subscribes to WebSocket",
+        "UI updates progressively as chunks arrive",
+        "Handles disconnection and reconnection",
+        "Typecheck passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": "Check services/runtime/src/ws/stream.ts"
+    },
+    {
+      "id": "US-010",
+      "phase": "phase-2",
+      "title": "Implement voice input transcription",
+      "description": "As a user, I want to speak my message instead of typing.",
+      "acceptanceCriteria": [
+        "POST /v1/voice/transcribe accepts audio data",
+        "Returns transcribed text using Whisper/OpenAI",
+        "ChatView sends recording via AudioManager",
+        "Transcribed text appears in input and sends",
+        "Loading state during transcription",
+        "Typecheck passes",
+        "Verify voice recording works in simulator"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "AudioManager.swift handles recording"
+    },
+    {
+      "id": "US-011",
+      "phase": "phase-2",
+      "title": "Implement tasks list view",
+      "description": "As a user, I want to see my pending tasks and workflows.",
+      "acceptanceCriteria": [
+        "GET /v1/tasks returns tasks for workspace",
+        "TasksView.swift displays task list",
+        "Shows task status (pending, running, completed, failed)",
+        "Pull to refresh loads latest tasks",
+        "Tap task shows detail view",
+        "Typecheck passes",
+        "Verify in iOS app"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": "TasksView.swift and TaskCard.swift exist"
+    },
+    {
+      "id": "US-012",
+      "phase": "phase-2",
+      "title": "Implement push notifications",
+      "description": "As a user, I want to receive push notifications for important events.",
+      "acceptanceCriteria": [
+        "iOS app requests notification permission",
+        "Device token registered with backend",
+        "POST /v1/devices stores APNs token",
+        "Backend can send push via APNs",
+        "Notification appears when app backgrounded",
+        "Tapping notification opens relevant view",
+        "App builds and runs"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": "Need Apple Developer account for APNs"
+    },
+    {
+      "id": "US-013",
+      "phase": "phase-2",
+      "title": "Implement settings and preferences",
+      "description": "As a user, I want to configure my preferences.",
+      "acceptanceCriteria": [
+        "GET /v1/preferences returns user preferences",
+        "PUT /v1/preferences updates preferences",
+        "SettingsView.swift displays and edits preferences",
+        "Quiet hours setting (start/end time)",
+        "Notification tier setting (all, important, critical)",
+        "Sign out clears keychain and returns to onboarding",
+        "Typecheck passes"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": "SettingsView.swift exists"
+    },
+    {
+      "id": "US-014",
+      "phase": "phase-3",
+      "title": "Implement ChatTurnWorkflow foundation",
+      "description": "As the system, I need a durable workflow for chat conversations.",
+      "acceptanceCriteria": [
+        "ChatTurnWorkflow registered with Temporal",
+        "Accepts conversation_id, message, context",
+        "Calls LLM activity for response generation",
+        "Emits events for streaming to client",
+        "Handles tool calls via activity dispatch",
+        "Stores conversation turn in database",
+        "Typecheck passes"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": "Check services/workflows/src/workflows/ChatTurnWorkflow.ts"
+    },
+    {
+      "id": "US-015",
+      "phase": "phase-3",
+      "title": "Implement LLM activity with Claude",
+      "description": "As the system, I need to generate responses using Claude.",
+      "acceptanceCriteria": [
+        "llm.ts activity calls Anthropic Claude API",
+        "Supports streaming responses",
+        "Includes system prompt with family context",
+        "Handles tool definitions in messages",
+        "Implements retry with backoff on failures",
+        "Typecheck passes"
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": "Check services/workflows/src/activities/llm.ts"
+    },
+    {
+      "id": "US-016",
+      "phase": "phase-3",
+      "title": "Implement memory storage and retrieval",
+      "description": "As the system, I need to store and recall conversation context.",
+      "acceptanceCriteria": [
+        "memory.ts storeMemory saves with embedding",
+        "memory.ts recall does semantic search",
+        "Uses pgvector for similarity search",
+        "memory.ts getConversationContext retrieves recent turns",
+        "ChatTurnWorkflow uses memory for context",
+        "Typecheck passes"
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": "Check services/workflows/src/activities/memory.ts"
+    },
+    {
+      "id": "US-017",
+      "phase": "phase-3",
+      "title": "Implement tools activity router",
+      "description": "As the system, I need to execute tools requested by the LLM.",
+      "acceptanceCriteria": [
+        "tools.ts routes tool calls to handlers",
+        "Implements calendar tools (list, create, update)",
+        "Implements reminder tools (create, list, delete)",
+        "Implements weather tool (current, forecast)",
+        "Returns tool results to workflow",
+        "Typecheck passes"
+      ],
+      "priority": 17,
+      "passes": false,
+      "notes": "Check services/workflows/src/activities/tools.ts"
+    },
+    {
+      "id": "US-018",
+      "phase": "phase-3",
+      "title": "Implement approval workflow",
+      "description": "As a user, I want to approve or deny high-risk actions.",
+      "acceptanceCriteria": [
+        "approvals.ts requestApproval creates approval record",
+        "POST /v1/approvals lists pending approvals",
+        "POST /v1/approvals/:id accepts approve/deny",
+        "Workflow waits for approval signal",
+        "Push notification sent for new approvals",
+        "Approval envelope logged with context",
+        "Typecheck passes"
+      ],
+      "priority": 18,
+      "passes": false,
+      "notes": "Check packages/shared/src/schemas/approval.ts"
+    },
+    {
+      "id": "US-019",
+      "phase": "phase-3",
+      "title": "Implement notification router",
+      "description": "As the system, I need to send notifications via multiple channels.",
+      "acceptanceCriteria": [
+        "NotificationWorkflow accepts message, channels, recipients",
+        "Checks quiet hours before sending",
+        "Routes to APNs for iOS push",
+        "Routes to Telegram if configured",
+        "Routes to SMS if configured",
+        "Logs delivery status",
+        "Typecheck passes"
+      ],
+      "priority": 19,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "phase": "phase-4",
+      "title": "Implement Google Calendar OAuth flow",
+      "description": "As a user, I want to connect my Google Calendar.",
+      "acceptanceCriteria": [
+        "GET /v1/integrations/google/auth returns OAuth URL",
+        "POST /v1/integrations/google/callback handles redirect",
+        "Stores refresh token encrypted in secrets",
+        "iOS app opens OAuth in-app browser",
+        "Connection status visible in ConnectionsView",
+        "Typecheck passes"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "phase": "phase-4",
+      "title": "Implement Google Calendar tools",
+      "description": "As a user, I want the assistant to read and create calendar events.",
+      "acceptanceCriteria": [
+        "calendar_list tool returns upcoming events",
+        "calendar_create tool creates new event",
+        "calendar_update tool modifies event",
+        "calendar_find_free_time finds available slots",
+        "Tools use stored OAuth token",
+        "Typecheck passes"
+      ],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "phase": "phase-4",
+      "title": "Implement Telegram bot integration",
+      "description": "As a user, I want to chat with the assistant via Telegram.",
+      "acceptanceCriteria": [
+        "POST /v1/telegram/webhook receives Telegram updates",
+        "Validates webhook with bot token",
+        "Routes messages to ChatTurnWorkflow",
+        "Sends responses back via Telegram API",
+        "Supports /start and /help commands",
+        "Typecheck passes"
+      ],
+      "priority": 22,
+      "passes": false,
+      "notes": "Check services/runtime/src/routes/telegram.ts"
+    },
+    {
+      "id": "US-023",
+      "phase": "phase-4",
+      "title": "Implement Twilio SMS integration",
+      "description": "As a user, I want to receive SMS notifications.",
+      "acceptanceCriteria": [
+        "telephony.ts sendSMS sends via Twilio API",
+        "Notification router includes SMS channel",
+        "Phone number verification flow",
+        "Inbound SMS webhook routes to chat",
+        "Rate limiting prevents abuse",
+        "Typecheck passes"
+      ],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "phase": "phase-5",
+      "title": "Implement Morning Briefing workflow",
+      "description": "As a user, I want a daily morning briefing.",
+      "acceptanceCriteria": [
+        "MorningBriefingWorkflow scheduled via Temporal",
+        "Gathers: weather, calendar, tasks, anomalies",
+        "Generates personalized summary via LLM",
+        "Sends via configured channel (push/Telegram)",
+        "Respects user's briefing time preference",
+        "Typecheck passes"
+      ],
+      "priority": 24,
+      "passes": false,
+      "notes": "Part of Morning Launch pack"
+    },
+    {
+      "id": "US-025",
+      "phase": "phase-5",
+      "title": "Implement workflow pack management",
+      "description": "As a user, I want to enable and configure workflow packs.",
+      "acceptanceCriteria": [
+        "GET /v1/workflow-packs lists available packs",
+        "POST /v1/workflow-packs/:id/enable activates pack",
+        "POST /v1/workflow-packs/:id/configure updates settings",
+        "ActionsView shows pack toggles",
+        "Pack activation schedules relevant workflows",
+        "Typecheck passes"
+      ],
+      "priority": 25,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-026",
+      "phase": "phase-5",
+      "title": "Implement Family Communications pack",
+      "description": "As a parent, I want to broadcast messages to the family.",
+      "acceptanceCriteria": [
+        "FamilyAnnouncementWorkflow sends to all members",
+        "Respects per-member channel preferences",
+        "FamilyCheckInWorkflow requests status from members",
+        "Aggregates responses for summary",
+        "Chore assignment and tracking",
+        "Typecheck passes"
+      ],
+      "priority": 26,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-027",
+      "phase": "phase-5",
+      "title": "Implement onboarding setup flow",
+      "description": "As a new user, I want guided setup after first sign in.",
+      "acceptanceCriteria": [
+        "SetupFlowView shows after first login",
+        "Step 1: Household basics (name, location, timezone)",
+        "Step 2: Add family members",
+        "Step 3: Connect integrations (Google Calendar)",
+        "Step 4: Enable first workflow pack",
+        "Progress saved; can resume if interrupted",
+        "App builds and flow works"
+      ],
+      "priority": 27,
+      "passes": false,
+      "notes": "SetupFlowView.swift exists"
+    },
+    {
+      "id": "US-028",
+      "phase": "phase-5",
+      "title": "Implement integration health monitoring",
+      "description": "As a user, I want to see the status of my integrations.",
+      "acceptanceCriteria": [
+        "GET /v1/integrations returns integration list with status",
+        "Periodic health check for each integration",
+        "ConnectionsView shows status indicators (green/red)",
+        "Alert when integration needs re-auth",
+        "Re-connect flow from ConnectionsView",
+        "Typecheck passes"
+      ],
+      "priority": 28,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-029",
+      "phase": "phase-5",
+      "title": "Implement error handling and recovery UI",
+      "description": "As a user, I want helpful error messages and recovery options.",
+      "acceptanceCriteria": [
+        "API errors return structured error response",
+        "iOS app shows user-friendly error messages",
+        "Retry button for transient failures",
+        "Offline mode banner when no connection",
+        "Error reporting to backend for debugging",
+        "App handles all error states gracefully"
+      ],
+      "priority": 29,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-030",
+      "phase": "phase-5",
+      "title": "Implement conversation history",
+      "description": "As a user, I want to see my past conversations.",
+      "acceptanceCriteria": [
+        "GET /v1/chat/history returns paginated history",
+        "ChatView loads history on appear",
+        "Infinite scroll loads older messages",
+        "Search within conversation history",
+        "Clear history option in settings",
+        "Typecheck passes"
+      ],
+      "priority": 30,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

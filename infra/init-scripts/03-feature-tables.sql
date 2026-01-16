@@ -26,6 +26,27 @@ CREATE INDEX IF NOT EXISTS idx_user_preferences_workspace_user ON user_preferenc
 -- 'approvals': { autoApproveBelow: 50, requireApprovalFor: ['calls', 'payments'], timeBasedApproval: false }
 
 -- =====================================================
+-- NOTIFICATIONS
+-- =====================================================
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    type VARCHAR(100) NOT NULL,
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'delivered', 'read', 'failed')),
+    deliver_at TIMESTAMPTZ,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_workspace ON notifications(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_status ON notifications(status);
+
+-- =====================================================
 -- FAMILY MEMBERS
 -- =====================================================
 CREATE TABLE IF NOT EXISTS family_members (
@@ -81,6 +102,20 @@ CREATE TABLE IF NOT EXISTS onboarding_sessions (
 );
 
 CREATE INDEX IF NOT EXISTS idx_onboarding_sessions_workspace_user ON onboarding_sessions(workspace_id, user_id);
+
+-- =====================================================
+-- ONBOARDING INFERENCE SNAPSHOTS
+-- =====================================================
+CREATE TABLE IF NOT EXISTS onboarding_inference (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workspace_id UUID REFERENCES workspaces(id) ON DELETE SET NULL,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_onboarding_inference_workspace ON onboarding_inference(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_onboarding_inference_user ON onboarding_inference(user_id);
 
 -- =====================================================
 -- PHONE NUMBERS (Twilio)

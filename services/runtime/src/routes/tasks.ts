@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { emitToWorkspace } from '../ws/stream.js';
+import { queueNotificationForEvent } from '../services/notifications.js';
 
 // In-memory task storage (in production, use database)
 const tasksStore = new Map<string, Map<string, TaskRecord>>();
@@ -252,6 +253,17 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
         payload: { taskId, status: 'running' },
       });
 
+      await queueNotificationForEvent({
+        workspaceId,
+        eventType: 'task.approved',
+        payload: { taskId, status: 'running' },
+        notification: {
+          title: 'Task approved',
+          body: 'Your approval was recorded. Oi is continuing the task.',
+          priority: 'normal',
+        },
+      });
+
       return {
         success: true,
         taskId,
@@ -327,6 +339,17 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
       emitToWorkspace(workspaceId, {
         type: 'task.denied',
         payload: { taskId, reason: reason || 'Denied by user' },
+      });
+
+      await queueNotificationForEvent({
+        workspaceId,
+        eventType: 'task.denied',
+        payload: { taskId, reason: reason || 'Denied by user' },
+        notification: {
+          title: 'Task denied',
+          body: reason || 'An action was denied.',
+          priority: 'normal',
+        },
       });
 
       return {
@@ -415,6 +438,30 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
           requiresApproval: task.requiresApproval,
           summaryForUser: task.summaryForUser,
         },
+      });
+
+      await queueNotificationForEvent({
+        workspaceId: body.workspaceId,
+        eventType: task.requiresApproval ? 'approval.requested' : 'task.created',
+        payload: {
+          taskId: task.taskId,
+          title: task.title,
+          category: task.category,
+          status: task.status,
+          riskLevel: task.riskLevel,
+          requiresApproval: task.requiresApproval,
+        },
+        notification: task.requiresApproval
+          ? {
+              title: 'Approval needed',
+              body: `Approve: ${task.title}`,
+              priority: task.riskLevel === 'high' ? 'urgent' : 'normal',
+            }
+          : {
+              title: 'New task',
+              body: task.summaryForUser,
+              priority: 'normal',
+            },
       });
 
       return {

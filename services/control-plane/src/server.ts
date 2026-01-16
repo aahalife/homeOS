@@ -12,6 +12,9 @@ import { runtimeRoutes } from './routes/runtime.js';
 import { preferencesRoutes } from './routes/preferences.js';
 import { twilioRoutes } from './routes/twilio.js';
 import { integrationsRoutes } from './routes/integrations.js';
+import { onboardingRoutes } from './routes/onboarding.js';
+import { internalRoutes } from './routes/internal.js';
+import { notificationsRoutes } from './routes/notifications.js';
 import { runMigrations } from './db.js';
 
 const PORT = parseInt(process.env['PORT'] ?? '3001', 10);
@@ -76,6 +79,9 @@ async function buildApp() {
   await app.register(preferencesRoutes, { prefix: '/v1/preferences' });
   await app.register(twilioRoutes, { prefix: '/v1/twilio' });
   await app.register(integrationsRoutes, { prefix: '/v1/integrations' });
+  await app.register(onboardingRoutes, { prefix: '/v1/onboarding' });
+  await app.register(internalRoutes, { prefix: '/v1/internal' });
+  await app.register(notificationsRoutes, { prefix: '/v1/notifications' });
 
   return app;
 }

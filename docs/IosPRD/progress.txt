@@ -1,0 +1,20 @@
+Ralph Execution Progress Log
+============================
+
+Format:
+YYYY-MM-DDTHH:MM:SSZ | STORY_ID | short note
+
+2026-01-16T05:20:56Z | US-001 | Implemented permissions UI + Info.plist usage strings in moments app (pending build/test)
+2026-01-16T05:20:56Z | US-002 | Implemented inference snapshot extraction + sync scaffolding (pending build/test)
+2026-01-16T05:22:14Z | TEST | xcodebuild failed: iOS Simulator unavailable / CoreSimulator service error
+2026-01-16T05:45:11Z | US-003 | Implemented family confirmation flow and persistence (pending build/test)
+2026-01-16T06:06:36Z | US-004 | Implemented critical questions UI + local preferences storage (pending build/test)
+2026-01-16T06:06:36Z | US-005 | Added onboarding inference storage + API routes (pending build/test)
+2026-01-16T06:22:24Z | UX | Applied Design Philosophy onboarding layout (welcome, progress, setup complete)
+2026-01-16T06:22:24Z | US-008/009/010/011/012 | Added MVP UI scaffolding for Home/Chat/Inbox/Automations/Settings (pending build/test)
+2026-01-16T16:04:57Z | UX | Added value prop onboarding screens + Oi naming updates
+2026-01-16T16:04:57Z | US-006 | Added passcode sign-in, workspace creation, device registration (pending build/test)
+2026-01-16T16:27:03Z | US-007 | Added HealthKit permissions, entitlements, and sleep-based quiet hours inference (pending build/test)
+2026-01-16T16:57:44Z | US-007 | Added notifications pipeline (runtime events, control-plane storage, iOS inbox + APNs token capture) (pending build/test)
+2026-01-16T18:01:31Z | US-007 | Added runtime notification queueing + control-plane notification APIs + APNs registration flow (pending build/test)
+

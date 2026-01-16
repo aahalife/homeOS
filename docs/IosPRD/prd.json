@@ -1,0 +1,365 @@
+{
+  "branchName": "HomeOS-IOS",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "iOS permissions and inference data capture",
+      "description": "As a new user, I grant permissions so the app can infer family context.",
+      "acceptanceCriteria": [
+        "App requests Contacts, Calendar, Location, Notifications permissions",
+        "Permission rationale is shown for each permission",
+        "App works with partial permissions (graceful degradation)",
+        "Photos permission is optional and presented only as explicit opt-in",
+        "iOS build succeeds"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": [],
+      "notes": "iOS client"
+    },
+    {
+      "id": "US-002",
+      "title": "Device inference pipeline and sync",
+      "description": "Infer family context from device data and sync to the control plane.",
+      "acceptanceCriteria": [
+        "Extract candidate family members from contacts and calendar",
+        "Detect recurring events for school and activities",
+        "Sync inferred data to control plane",
+        "Data is encrypted at rest",
+        "If Photos is opted in, use face grouping to improve family inference"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-001"],
+      "notes": "iOS client + control plane"
+    },
+    {
+      "id": "US-003",
+      "title": "Family confirmation UI",
+      "description": "As a user, I can confirm or edit inferred family members.",
+      "acceptanceCriteria": [
+        "List inferred members with edit controls",
+        "Add and remove members",
+        "Edit roles and ages",
+        "Changes persist to control plane"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-002"],
+      "notes": "iOS client"
+    },
+    {
+      "id": "US-004",
+      "title": "Critical questions flow",
+      "description": "Ask only essential questions and store preferences.",
+      "acceptanceCriteria": [
+        "3-5 questions: dietary, budget, brief time, quiet hours, emergency contact",
+        "Defaults provided and editable",
+        "Answers stored in preferences",
+        "Can skip questions"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-003"],
+      "notes": "iOS client + control plane"
+    },
+    {
+      "id": "US-005",
+      "title": "Control plane core data model",
+      "description": "Create tenant, household, member, preference, approval, and workflow data models.",
+      "acceptanceCriteria": [
+        "CRUD endpoints for each entity",
+        "Tenant isolation enforced",
+        "Schema migrations documented"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": [],
+      "notes": "control plane"
+    },
+    {
+      "id": "US-006",
+      "title": "Auth and device binding",
+      "description": "Authenticate users and bind devices for secure sessions.",
+      "acceptanceCriteria": [
+        "Magic link or OAuth sign-in",
+        "Device registration with APNs token",
+        "Session expiry handling"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-005"],
+      "notes": "iOS client + control plane"
+    },
+    {
+      "id": "US-007",
+      "title": "Notification routing and quiet hours",
+      "description": "Deliver notifications and respect quiet hours.",
+      "acceptanceCriteria": [
+        "APNs push delivery working",
+        "Quiet hours enforced",
+        "Escalation rules configurable"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-006"],
+      "notes": "notification router"
+    },
+    {
+      "id": "US-008",
+      "title": "Home screen (Today view)",
+      "description": "Provide a daily command center with priorities, schedule, and attention items.",
+      "acceptanceCriteria": [
+        "Priorities card, schedule card, attention card present",
+        "Ask Clawd input visible",
+        "Pull to refresh updates cards"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-006"],
+      "notes": "iOS client"
+    },
+    {
+      "id": "US-009",
+      "title": "Chat interface with rich cards",
+      "description": "Enable natural conversation with rich content cards.",
+      "acceptanceCriteria": [
+        "Message list with markdown rendering",
+        "Rich cards for recipes, approvals, schedules",
+        "Voice input supported"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-006"],
+      "notes": "iOS client"
+    },
+    {
+      "id": "US-010",
+      "title": "Inbox approvals UI",
+      "description": "Allow users to approve or deny high-risk actions.",
+      "acceptanceCriteria": [
+        "Approval cards with approve/deny buttons",
+        "Detail sheet with context",
+        "Remember choice setting"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-006"],
+      "notes": "iOS client"
+    },
+    {
+      "id": "US-011",
+      "title": "Automations gallery and workflow detail",
+      "description": "Browse and configure workflow packs.",
+      "acceptanceCriteria": [
+        "Active and available packs list",
+        "Toggle enables/disables pack",
+        "Detail sheet with settings and run history"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-006"],
+      "notes": "iOS client"
+    },
+    {
+      "id": "US-012",
+      "title": "Settings and integrations management",
+      "description": "Manage family, integrations, and preferences.",
+      "acceptanceCriteria": [
+        "Family members list and roles",
+        "Integrations setup for Google and Telegram",
+        "Preferences editable"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-006"],
+      "notes": "iOS client + control plane"
+    },
+    {
+      "id": "US-013",
+      "title": "Workflow orchestration baseline",
+      "description": "Run workflows with retries and status tracking.",
+      "acceptanceCriteria": [
+        "Temporal workflows execute successfully",
+        "Retry and error status recorded",
+        "Manual run supported"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": [],
+      "notes": "workflows"
+    },
+    {
+      "id": "US-014",
+      "title": "Approval envelope service",
+      "description": "Generate approvals for high-risk actions and record audit trail.",
+      "acceptanceCriteria": [
+        "Approval requests created for high-risk actions",
+        "Approval ledger persisted",
+        "Audit trail retrievable"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-013"],
+      "notes": "workflows + control plane"
+    },
+    {
+      "id": "US-015",
+      "title": "Google OAuth integration",
+      "description": "Connect Google Calendar and Gmail for scheduling and school emails.",
+      "acceptanceCriteria": [
+        "Calendar read/write supported",
+        "Gmail read for school domains",
+        "Token refresh handling implemented"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-005"],
+      "notes": "integrations"
+    },
+    {
+      "id": "US-025",
+      "title": "Telegram per-family bot provisioning",
+      "description": "Create and configure a unique Telegram bot for each household.",
+      "acceptanceCriteria": [
+        "Bot created per household with unique token",
+        "Webhook configured to tenant runtime endpoint",
+        "Bot token stored in secrets manager with rotation support",
+        "Invite flow generates per-family QR or deep link"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-005"],
+      "notes": "integrations"
+    },
+    {
+      "id": "US-016",
+      "title": "Morning Launch workflow pack",
+      "description": "Deliver daily morning briefings to family members.",
+      "acceptanceCriteria": [
+        "Briefing delivered at configured time",
+        "Includes schedule, weather, priorities",
+        "Push notification sent to selected members"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-013", "US-015"],
+      "notes": "workflows"
+    },
+    {
+      "id": "US-017",
+      "title": "School Ops workflow pack",
+      "description": "Parse school emails and manage tasks and events.",
+      "acceptanceCriteria": [
+        "School emails parsed for action items",
+        "Tasks created for forms and deadlines",
+        "Events added to calendar"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-013", "US-015"],
+      "notes": "workflows"
+    },
+    {
+      "id": "US-018",
+      "title": "Dinner and Groceries workflow pack",
+      "description": "Generate weekly meal plans and grocery lists.",
+      "acceptanceCriteria": [
+        "Meal plan generated weekly",
+        "Grocery list organized by category",
+        "Dietary preferences respected"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-013"],
+      "notes": "workflows"
+    },
+    {
+      "id": "US-019",
+      "title": "Activity Coordinator workflow pack",
+      "description": "Coordinate after-school activities and logistics.",
+      "acceptanceCriteria": [
+        "Detect recurring activities from calendar",
+        "Send reminders to parents",
+        "Highlight schedule conflicts"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-013", "US-015"],
+      "notes": "workflows"
+    },
+    {
+      "id": "US-020",
+      "title": "Clawdbot skill format and manifest",
+      "description": "Define Clawdbot skill file format and registry manifest.",
+      "acceptanceCriteria": [
+        "Skill files use Clawdbot frontmatter format",
+        "skills_manifest.json created with dependencies",
+        "Install flow documented"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": [],
+      "notes": "skills"
+    },
+    {
+      "id": "US-021",
+      "title": "Convert homeskills to executable skills",
+      "description": "Implement core homeskills as executable Clawdbot skills.",
+      "acceptanceCriteria": [
+        "family-comms, mental-load, school, meal-planning, transportation, healthcare, elder-care converted",
+        "Each skill includes deterministic steps and tool calls"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-020"],
+      "notes": "skills"
+    },
+    {
+      "id": "US-022",
+      "title": "Port skills catalog to Clawdbot",
+      "description": "Translate skills catalog into executable Clawdbot skills.",
+      "acceptanceCriteria": [
+        "Skills grouped by domain",
+        "Dependencies defined per skill",
+        "Example flows for multiple family scenarios"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-020"],
+      "notes": "skills"
+    },
+    {
+      "id": "US-023",
+      "title": "Observability and health checks",
+      "description": "Provide health endpoints and monitoring for all services.",
+      "acceptanceCriteria": [
+        "Health endpoints for control plane, runtime, workflows",
+        "Logs centralized with redaction",
+        "Alerts for failures over 5 minutes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "dependsOn": ["US-013"],
+      "notes": "ops"
+    },
+    {
+      "id": "US-024",
+      "title": "Security and privacy controls",
+      "description": "Ensure encryption, isolation, and data lifecycle controls.",
+      "acceptanceCriteria": [
+        "Encryption at rest and in transit",
+        "Tenant isolation enforced",
+        "Data deletion and export flows documented"
+      ],
+      "priority": 1,
+      "passes": false,
+      "dependsOn": ["US-005"],
+      "notes": "security"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2026-01-15T00:00:00Z",
+    "version": "1.0"
+  }
+}

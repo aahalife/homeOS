@@ -62,6 +62,41 @@ export async function runMigrations(): Promise<void> {
 
   await p.query(`CREATE INDEX IF NOT EXISTS idx_oauth_states_expires ON homeos.oauth_states(expires_at)`);
 
+  // Create onboarding_inference table if not exists
+  await p.query(`
+    CREATE TABLE IF NOT EXISTS homeos.onboarding_inference (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      workspace_id UUID REFERENCES homeos.workspaces(id) ON DELETE SET NULL,
+      user_id UUID NOT NULL REFERENCES homeos.users(id) ON DELETE CASCADE,
+      payload JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_onboarding_inference_workspace ON homeos.onboarding_inference(workspace_id)`);
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_onboarding_inference_user ON homeos.onboarding_inference(user_id)`);
+
+  // Create notifications table if not exists
+  await p.query(`
+    CREATE TABLE IF NOT EXISTS homeos.notifications (
+      id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      workspace_id UUID NOT NULL REFERENCES homeos.workspaces(id) ON DELETE CASCADE,
+      user_id UUID REFERENCES homeos.users(id) ON DELETE SET NULL,
+      type VARCHAR(100) NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'queued' CHECK (status IN ('queued', 'delivered', 'read', 'failed')),
+      deliver_at TIMESTAMPTZ,
+      metadata JSONB DEFAULT '{}',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_notifications_workspace ON homeos.notifications(workspace_id)`);
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_notifications_user ON homeos.notifications(user_id)`);
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_notifications_status ON homeos.notifications(status)`);
+
   console.log('Migrations completed successfully');
 }
 

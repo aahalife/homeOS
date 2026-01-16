@@ -47,7 +47,15 @@ export async function streamHandler(
       ws: socket,
       workspaceId,
       userId: decoded.sub,
-      subscriptions: new Set(['task.created', 'task.updated', 'approval.requested', 'approval.resolved', 'chat.message.delta', 'chat.message.final']),
+      subscriptions: new Set([
+        '*',
+        'task.created',
+        'task.updated',
+        'approval.requested',
+        'approval.resolved',
+        'chat.message.delta',
+        'chat.message.final',
+      ]),
     };
 
     connections.set(socket, connection);

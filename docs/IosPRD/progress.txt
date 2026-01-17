@@ -17,4 +17,5 @@ YYYY-MM-DDTHH:MM:SSZ | STORY_ID | short note
 2026-01-16T16:27:03Z | US-007 | Added HealthKit permissions, entitlements, and sleep-based quiet hours inference (pending build/test)
 2026-01-16T16:57:44Z | US-007 | Added notifications pipeline (runtime events, control-plane storage, iOS inbox + APNs token capture) (pending build/test)
 2026-01-16T18:01:31Z | US-007 | Added runtime notification queueing + control-plane notification APIs + APNs registration flow (pending build/test)
+2026-01-17T02:59:50Z | US-007 | Added Twilio auto-provisioning API and iOS settings activation flow (pending build/test)
 

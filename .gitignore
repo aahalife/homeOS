@@ -39,3 +39,7 @@ docker/data/
 # Misc
 .cache/
 tmp/
+
+# Secrets
+keys api and certs/
+*.p8

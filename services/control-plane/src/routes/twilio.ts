@@ -26,6 +26,14 @@ const PurchaseNumberSchema = z.object({
   friendlyName: z.string().optional(),
 });
 
+const ProvisionNumberSchema = z.object({
+  country: z.string().default('US'),
+  areaCode: z.string().optional(),
+  contains: z.string().optional(),
+  friendlyName: z.string().optional(),
+  confirm: z.boolean(),
+});
+
 export const twilioRoutes: FastifyPluginAsync = async (app) => {
   const pool = getPool();
 
@@ -142,6 +150,135 @@ export const twilioRoutes: FastifyPluginAsync = async (app) => {
       } catch (error) {
         app.log.error({ err: error }, 'Twilio search error');
         return sendError(reply, 500, 'Failed to search numbers');
+      }
+    }
+  );
+
+  // Auto-provision a phone number (search + purchase)
+  app.post(
+    '/numbers/provision',
+    {
+      schema: {
+        description: 'Provision a phone number for a workspace',
+        tags: ['twilio'],
+        security: [{ bearerAuth: [] }],
+        querystring: {
+          type: 'object',
+          required: ['workspaceId'],
+          properties: {
+            workspaceId: { type: 'string', format: 'uuid' },
+          },
+        },
+        body: {
+          type: 'object',
+          required: ['confirm'],
+          properties: {
+            country: { type: 'string', default: 'US' },
+            areaCode: { type: 'string' },
+            contains: { type: 'string' },
+            friendlyName: { type: 'string' },
+            confirm: { type: 'boolean' },
+          },
+        },
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              existing: { type: 'boolean' },
+              id: { type: 'string' },
+              phoneNumber: { type: 'string' },
+              friendlyName: { type: 'string' },
+              status: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      if (!twilioClient) {
+        return sendError(reply, 503, 'Twilio not configured');
+      }
+
+      const { workspaceId } = request.query as { workspaceId: string };
+      const body = ProvisionNumberSchema.parse(request.body);
+
+      if (!body.confirm) {
+        return sendError(reply, 400, 'Confirmation required');
+      }
+
+      const existing = await pool.query(
+        `SELECT id, phone_number, friendly_name, status
+         FROM homeos.phone_numbers
+         WHERE workspace_id = $1 AND status = 'active'
+         ORDER BY created_at DESC
+         LIMIT 1`,
+        [workspaceId]
+      );
+
+      if (existing.rows.length > 0) {
+        return reply.status(201).send({
+          existing: true,
+          id: existing.rows[0].id,
+          phoneNumber: existing.rows[0].phone_number,
+          friendlyName: existing.rows[0].friendly_name,
+          status: existing.rows[0].status,
+        });
+      }
+
+      try {
+        const searchParams: Record<string, unknown> = {
+          voiceEnabled: true,
+          smsEnabled: true,
+        };
+
+        if (body.areaCode) {
+          searchParams.areaCode = body.areaCode;
+        }
+        if (body.contains) {
+          searchParams.contains = body.contains;
+        }
+
+        const numbers = await twilioClient.availablePhoneNumbers(body.country)
+          .local
+          .list(searchParams);
+
+        if (!numbers.length) {
+          return sendError(reply, 404, 'No numbers available');
+        }
+
+        const selected = numbers[0];
+        const purchased = await twilioClient.incomingPhoneNumbers.create({
+          phoneNumber: selected.phoneNumber,
+          friendlyName: body.friendlyName ?? `Oi My Day - ${new Date().toISOString().split('T')[0]}`,
+        });
+
+        const result = await pool.query(
+          `INSERT INTO homeos.phone_numbers
+           (workspace_id, phone_number, twilio_sid, friendly_name, capabilities, status)
+           VALUES ($1, $2, $3, $4, $5, 'active')
+           RETURNING id, phone_number, friendly_name, status`,
+          [
+            workspaceId,
+            purchased.phoneNumber,
+            purchased.sid,
+            purchased.friendlyName,
+            JSON.stringify({
+              voice: purchased.capabilities.voice,
+              sms: purchased.capabilities.sms,
+            }),
+          ]
+        );
+
+        return reply.status(201).send({
+          existing: false,
+          id: result.rows[0].id,
+          phoneNumber: result.rows[0].phone_number,
+          friendlyName: result.rows[0].friendly_name,
+          status: result.rows[0].status,
+        });
+      } catch (error) {
+        app.log.error({ err: error }, 'Twilio provision error');
+        return sendError(reply, 500, 'Failed to provision number');
       }
     }
   );

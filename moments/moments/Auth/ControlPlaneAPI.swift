@@ -146,6 +146,62 @@ final class ControlPlaneAPI {
         try validate(response)
     }
 
+    func fetchPhoneNumbers(token: String, workspaceId: String) async throws -> [PhoneNumberRecord] {
+        guard let baseURL else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        guard var components = URLComponents(url: baseURL.appendingPathComponent("/v1/twilio/numbers"), resolvingAgainstBaseURL: false) else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        components.queryItems = [URLQueryItem(name: "workspaceId", value: workspaceId)]
+        guard let url = components.url else {
+            throw ControlPlaneError.missingBaseURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+        return try JSONDecoder().decode([PhoneNumberRecord].self, from: data)
+    }
+
+    func provisionPhoneNumber(
+        token: String,
+        workspaceId: String,
+        confirm: Bool,
+        areaCode: String? = nil,
+        contains: String? = nil
+    ) async throws -> PhoneNumberProvisionResult {
+        guard let baseURL else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        guard var components = URLComponents(url: baseURL.appendingPathComponent("/v1/twilio/numbers/provision"), resolvingAgainstBaseURL: false) else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        components.queryItems = [URLQueryItem(name: "workspaceId", value: workspaceId)]
+        guard let url = components.url else {
+            throw ControlPlaneError.missingBaseURL
+        }
+
+        let payload = PhoneNumberProvisionRequest(
+            areaCode: areaCode,
+            contains: contains,
+            confirm: confirm
+        )
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+        return try JSONDecoder().decode(PhoneNumberProvisionResult.self, from: data)
+    }
+
     func fetchRuntimeConnectionInfo(token: String, workspaceId: String) async throws -> RuntimeConnectionInfo {
         guard let baseURL else {
             throw ControlPlaneError.missingBaseURL
@@ -258,4 +314,26 @@ struct RuntimeConnectionInfo: Codable {
     let baseUrl: String
     let wsUrl: String
     let token: String
+}
+
+struct PhoneNumberRecord: Codable {
+    let id: String
+    let phoneNumber: String
+    let friendlyName: String?
+    let status: String
+}
+
+struct PhoneNumberProvisionRequest: Codable {
+    let country: String = "US"
+    let areaCode: String?
+    let contains: String?
+    let confirm: Bool
+}
+
+struct PhoneNumberProvisionResult: Codable {
+    let existing: Bool
+    let id: String
+    let phoneNumber: String
+    let friendlyName: String?
+    let status: String
 }

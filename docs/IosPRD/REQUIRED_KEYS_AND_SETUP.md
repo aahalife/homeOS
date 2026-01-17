@@ -17,6 +17,11 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
   - Backend uses `APPLE_CLIENT_ID` (Services ID or bundle ID).
   - Provide: **Client ID**, **Team ID**, **Key ID**, **Private Key (.p8)** if using server validation.
 
+### Notes from you (do not commit)
+- APNs key file is available locally and ignored by git.
+- Bundle ID should match **com.fantasticapp.HomeOS** for pushes and Sign in with Apple.
+- Please rotate any secrets shared in chat before production use.
+
 ### Control Plane / Runtime (Needed to ship)
 - **JWT secrets**
   - `JWT_SECRET` for control-plane and runtime.
@@ -43,6 +48,7 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
   - Where: @BotFather on Telegram.
 - **Webhook URL + secret**
   - Where: Telegram bot settings or Bot API.
+  - Note: Telegram does **not** allow programmatic bot creation. We can automate linking per workspace using a single bot, but a BotFather token is still required.
 
 ### Google OAuth (Needed for Gmail/Calendar)
 - **OAuth Client ID + Secret**

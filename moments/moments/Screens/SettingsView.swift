@@ -5,6 +5,10 @@ struct SettingsView: View {
     @State private var pushNotifications = true
     @State private var emailDigests = true
     @State private var smsUrgentOnly = true
+    @State private var oiPhoneNumber = "Loading"
+    @State private var isProvisioningNumber = false
+    @State private var showProvisionConfirm = false
+    @State private var showProvisionError = false
 
     var body: some View {
         NavigationStack {
@@ -36,6 +40,20 @@ struct SettingsView: View {
 
                 Section("CONNECTED SERVICES") {
                     SettingsRow(title: "Oi phone number", status: oiPhoneNumber)
+                    if oiPhoneNumber == "Not provisioned" {
+                        Button {
+                            showProvisionConfirm = true
+                        } label: {
+                            HStack {
+                                Text("Get Oi phone number")
+                                Spacer()
+                                if isProvisioningNumber {
+                                    ProgressView()
+                                }
+                            }
+                        }
+                        .disabled(isProvisioningNumber)
+                    }
                     SettingsRow(title: "Google Calendar", status: "Connected")
                     SettingsRow(title: "Gmail", status: "Connected")
                     SettingsRow(title: "Apple Calendar", status: "Connected")
@@ -79,10 +97,69 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
         }
+        .task {
+            await loadPhoneNumber()
+        }
+        .alert("Activate Oi phone number?", isPresented: $showProvisionConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("Activate") {
+                Task { await provisionPhoneNumber() }
+            }
+        } message: {
+            Text("Oi will purchase a phone number for calls and SMS. Standard carrier fees may apply.")
+        }
+        .alert("Unable to provision number", isPresented: $showProvisionError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Please try again later.")
+        }
     }
 
-    private var oiPhoneNumber: String {
-        UserDefaults.standard.string(forKey: "oiPhoneNumber") ?? "Provisioning"
+    private func loadPhoneNumber() async {
+        guard let token = KeychainStore.shared.getString(forKey: "authToken"),
+              let workspaceId = UserDefaults.standard.string(forKey: "workspaceId"),
+              !token.isEmpty,
+              !workspaceId.isEmpty else {
+            oiPhoneNumber = "Not provisioned"
+            return
+        }
+
+        do {
+            let numbers = try await ControlPlaneAPI.shared.fetchPhoneNumbers(token: token, workspaceId: workspaceId)
+            if let number = numbers.first {
+                oiPhoneNumber = number.phoneNumber
+                UserDefaults.standard.set(number.phoneNumber, forKey: "oiPhoneNumber")
+            } else {
+                oiPhoneNumber = "Not provisioned"
+            }
+        } catch {
+            oiPhoneNumber = UserDefaults.standard.string(forKey: "oiPhoneNumber") ?? "Not provisioned"
+        }
+    }
+
+    private func provisionPhoneNumber() async {
+        guard let token = KeychainStore.shared.getString(forKey: "authToken"),
+              let workspaceId = UserDefaults.standard.string(forKey: "workspaceId"),
+              !token.isEmpty,
+              !workspaceId.isEmpty else {
+            showProvisionError = true
+            return
+        }
+
+        isProvisioningNumber = true
+        defer { isProvisioningNumber = false }
+
+        do {
+            let result = try await ControlPlaneAPI.shared.provisionPhoneNumber(
+                token: token,
+                workspaceId: workspaceId,
+                confirm: true
+            )
+            oiPhoneNumber = result.phoneNumber
+            UserDefaults.standard.set(result.phoneNumber, forKey: "oiPhoneNumber")
+        } catch {
+            showProvisionError = true
+        }
     }
 
     private var healthStatus: String {

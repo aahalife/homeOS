@@ -15,6 +15,7 @@ import { integrationsRoutes } from './routes/integrations.js';
 import { onboardingRoutes } from './routes/onboarding.js';
 import { internalRoutes } from './routes/internal.js';
 import { notificationsRoutes } from './routes/notifications.js';
+import { usageRoutes } from './routes/usage.js';
 import { runMigrations } from './db.js';
 
 const PORT = parseInt(process.env['PORT'] ?? '3001', 10);
@@ -82,6 +83,7 @@ async function buildApp() {
   await app.register(onboardingRoutes, { prefix: '/v1/onboarding' });
   await app.register(internalRoutes, { prefix: '/v1/internal' });
   await app.register(notificationsRoutes, { prefix: '/v1/notifications' });
+  await app.register(usageRoutes, { prefix: '/v1/usage' });
 
   return app;
 }

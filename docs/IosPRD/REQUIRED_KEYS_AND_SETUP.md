@@ -25,6 +25,8 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
 ### Control Plane / Runtime (Needed to ship)
 - **JWT secrets**
   - `JWT_SECRET` for control-plane and runtime.
+- **Encryption key**
+  - `MASTER_ENCRYPTION_KEY` for encrypting workspace secrets.
 - **Service tokens**
   - `RUNTIME_SERVICE_TOKEN` (workflows → runtime internal events).
   - `CONTROL_PLANE_SERVICE_TOKEN` (runtime → control-plane notifications/preferences).
@@ -37,11 +39,28 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
 - `services/runtime/env.sample`
 - `services/workflows/env.sample`
 
+### Fly.io setup inputs
+- Fly.io **org slug** to deploy into
+- Preferred **primary region** (e.g., `sjc`, `iad`, `sin`)
+- App names (or let me create):
+  - `homeos-control-plane`
+  - `homeos-runtime`
+  - `homeos-workflows`
+- Postgres size/plan (smallest to start is fine)
+- Whether to use **Fly Postgres** or external Postgres
+
+### Modal setup inputs
+- Modal **account/email** for the project
+- Preferred **app name** for the LLM endpoint
+- Whether the endpoint should be OpenAI-compatible
+
 ### Database + Temporal (Needed to ship)
 - **Postgres connection**
   - `DATABASE_URL` for control-plane.
 - **Temporal**
   - `TEMPORAL_ADDRESS` for runtime/workflows.
+  - `TEMPORAL_NAMESPACE` for Temporal Cloud.
+  - `TEMPORAL_API_KEY` for Temporal Cloud auth (if enabled).
 
 ### Twilio (Needed to ship for SMS/voice)
 - **Account SID + Auth Token**
@@ -69,6 +88,14 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
 ### LLM Providers (Needed to ship)
 - **Anthropic API key**
 - **OpenAI API key** (if used by workflows)
+- **Modal LLM endpoint + token** (if using private hosted models)
+  - Provide: `MODAL_LLM_URL` and `MODAL_LLM_TOKEN`.
+  - The endpoint should be OpenAI-compatible (chat completions).
+
+### BYOK vs Managed Keys
+- Users can bring their own keys via the **Secrets** endpoints.
+- We can provide a **managed key** (platform-owned) for users who opt in.
+- Fully automating Anthropic account creation per user is not supported by provider terms.
 
 ### APNs delivery (Server-side push)
 When you are ready to ship push notifications, I will need:

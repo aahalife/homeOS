@@ -41,6 +41,9 @@ const DEFAULT_PREFERENCES: Record<string, object> = {
     personality: 'friendly',
     voiceProfileId: null,
     useVoiceResponses: false,
+    llmProvider: 'modal',
+    llmModel: null,
+    llmEndpoint: null,
   },
   approvals: {
     autoApproveBelow: 50,

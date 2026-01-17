@@ -137,6 +137,26 @@ CREATE TABLE IF NOT EXISTS phone_numbers (
 CREATE INDEX IF NOT EXISTS idx_phone_numbers_workspace ON phone_numbers(workspace_id);
 
 -- =====================================================
+-- LLM USAGE
+-- =====================================================
+CREATE TABLE IF NOT EXISTS llm_usage (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    provider VARCHAR(50) NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    input_tokens INTEGER,
+    output_tokens INTEGER,
+    total_tokens INTEGER,
+    estimated_cost_usd DECIMAL(10, 4),
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_llm_usage_workspace ON llm_usage(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_llm_usage_created_at ON llm_usage(created_at DESC);
+
+-- =====================================================
 -- CALL HISTORY
 -- =====================================================
 CREATE TABLE IF NOT EXISTS call_history (

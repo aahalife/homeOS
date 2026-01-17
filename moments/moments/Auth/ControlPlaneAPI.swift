@@ -223,6 +223,98 @@ final class ControlPlaneAPI {
         return try JSONDecoder().decode(RuntimeConnectionInfo.self, from: data)
     }
 
+    func fetchLlmUsage(token: String, workspaceId: String) async throws -> LlmUsageSummary {
+        guard let baseURL else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        guard var components = URLComponents(url: baseURL.appendingPathComponent("/v1/usage/llm"), resolvingAgainstBaseURL: false) else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        components.queryItems = [URLQueryItem(name: "workspaceId", value: workspaceId)]
+        guard let url = components.url else {
+            throw ControlPlaneError.missingBaseURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+        return try JSONDecoder().decode(LlmUsageSummary.self, from: data)
+    }
+
+    func updateAIPreferences(
+        token: String,
+        workspaceId: String,
+        provider: String,
+        endpoint: String?
+    ) async throws {
+        guard let baseURL else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        guard var components = URLComponents(url: baseURL.appendingPathComponent("/v1/preferences/ai"), resolvingAgainstBaseURL: false) else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        components.queryItems = [URLQueryItem(name: "workspaceId", value: workspaceId)]
+        guard let url = components.url else {
+            throw ControlPlaneError.missingBaseURL
+        }
+
+        let payload = AIPreferencesUpdate(
+            preferences: [
+                "llmProvider": AnyEncodable(provider),
+                "llmEndpoint": AnyEncodable(endpoint)
+            ]
+        )
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+    }
+
+    func setSecret(token: String, workspaceId: String, provider: String, apiKey: String) async throws {
+        guard let baseURL else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        let url = baseURL.appendingPathComponent("/v1/workspaces/\(workspaceId)/secrets")
+
+        let payload = SecretSetRequest(provider: provider, apiKey: apiKey)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+    }
+
+    func testSecret(token: String, workspaceId: String, provider: String) async throws -> SecretTestResponse {
+        guard let baseURL else {
+            throw ControlPlaneError.missingBaseURL
+        }
+        let url = baseURL.appendingPathComponent("/v1/workspaces/\(workspaceId)/secrets/test")
+
+        let payload = SecretTestRequest(provider: provider)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try JSONEncoder().encode(payload)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response)
+        return try JSONDecoder().decode(SecretTestResponse.self, from: data)
+    }
+
     private var baseURL: URL? {
         guard let baseURLString = Bundle.main.infoDictionary?["ControlPlaneBaseURL"] as? String,
               !baseURLString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
@@ -336,4 +428,64 @@ struct PhoneNumberProvisionResult: Codable {
     let phoneNumber: String
     let friendlyName: String?
     let status: String
+}
+
+struct LlmUsageSummary: Codable {
+    let totalTokens: Double
+    let totalCostUsd: Double
+    let byProvider: [LlmUsageBreakdown]
+}
+
+struct LlmUsageBreakdown: Codable {
+    let provider: String
+    let model: String
+    let tokens: Double
+    let costUsd: Double
+}
+
+struct AIPreferencesUpdate: Encodable {
+    let preferences: [String: AnyEncodable]
+}
+
+struct AnyEncodable: Encodable {
+    private let encodeFn: (Encoder) throws -> Void
+
+    init(_ value: Any?) {
+        self.encodeFn = { encoder in
+            var container = encoder.singleValueContainer()
+            switch value {
+            case let string as String:
+                try container.encode(string)
+            case let number as Int:
+                try container.encode(number)
+            case let number as Double:
+                try container.encode(number)
+            case let bool as Bool:
+                try container.encode(bool)
+            case .none:
+                try container.encodeNil()
+            default:
+                try container.encodeNil()
+            }
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        try encodeFn(encoder)
+    }
+}
+
+struct SecretSetRequest: Codable {
+    let provider: String
+    let apiKey: String
+}
+
+struct SecretTestRequest: Codable {
+    let provider: String
+}
+
+struct SecretTestResponse: Codable {
+    let success: Bool
+    let provider: String
+    let error: String?
 }

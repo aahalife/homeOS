@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var isProvisioningNumber = false
     @State private var showProvisionConfirm = false
     @State private var showProvisionError = false
+    @State private var llmUsageStatus = "Loading"
 
     var body: some View {
         NavigationStack {
@@ -69,6 +70,11 @@ struct SettingsView: View {
                     NavigationLink("Dietary Restrictions") {}
                 }
 
+                Section("AI") {
+                    SettingsRow(title: "Usage (30 days)", status: llmUsageStatus)
+                    NavigationLink("AI Provider") { AIProviderView() }
+                }
+
                 Section("NOTIFICATIONS") {
                     Toggle("Push Notifications", isOn: $pushNotifications)
                     Toggle("Email Digests", isOn: $emailDigests)
@@ -99,6 +105,7 @@ struct SettingsView: View {
         }
         .task {
             await loadPhoneNumber()
+            await loadLlmUsage()
         }
         .alert("Activate Oi phone number?", isPresented: $showProvisionConfirm) {
             Button("Cancel", role: .cancel) {}
@@ -159,6 +166,29 @@ struct SettingsView: View {
             UserDefaults.standard.set(result.phoneNumber, forKey: "oiPhoneNumber")
         } catch {
             showProvisionError = true
+        }
+    }
+
+    private func loadLlmUsage() async {
+        guard let token = KeychainStore.shared.getString(forKey: "authToken"),
+              let workspaceId = UserDefaults.standard.string(forKey: "workspaceId"),
+              !token.isEmpty,
+              !workspaceId.isEmpty else {
+            llmUsageStatus = "Unavailable"
+            return
+        }
+
+        do {
+            let usage = try await ControlPlaneAPI.shared.fetchLlmUsage(token: token, workspaceId: workspaceId)
+            if usage.totalCostUsd > 0 {
+                llmUsageStatus = String(format: "$%.2f", usage.totalCostUsd)
+            } else if usage.totalTokens > 0 {
+                llmUsageStatus = "\(Int(usage.totalTokens)) tokens"
+            } else {
+                llmUsageStatus = "No usage yet"
+            }
+        } catch {
+            llmUsageStatus = "Unavailable"
         }
     }
 

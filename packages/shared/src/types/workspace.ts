@@ -36,7 +36,7 @@ export interface Device {
 }
 
 export interface SecretStatus {
-  provider: 'openai' | 'anthropic';
+  provider: 'openai' | 'anthropic' | 'modal';
   configured: boolean;
   lastTestedAt?: string;
   testSuccessful?: boolean;

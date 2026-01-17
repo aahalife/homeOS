@@ -8,7 +8,7 @@ const MASTER_KEY = process.env['MASTER_ENCRYPTION_KEY'] ?? 'dev-master-key-32-by
 interface DBSecret {
   id: string;
   workspace_id: string;
-  provider: 'openai' | 'anthropic';
+  provider: 'openai' | 'anthropic' | 'modal';
   ciphertext: string;
   iv: string;
   auth_tag: string;
@@ -25,7 +25,7 @@ export class SecretsService {
   async setSecret(
     workspaceId: string,
     userId: string,
-    provider: 'openai' | 'anthropic',
+    provider: 'openai' | 'anthropic' | 'modal',
     apiKey: string
   ): Promise<void> {
     // Check if user is authorized
@@ -60,7 +60,7 @@ export class SecretsService {
       throw new Error('Not authorized');
     }
 
-    const providers: Array<'openai' | 'anthropic'> = ['openai', 'anthropic'];
+    const providers: Array<'openai' | 'anthropic' | 'modal'> = ['openai', 'anthropic', 'modal'];
     const status: SecretStatus[] = [];
 
     for (const provider of providers) {
@@ -83,7 +83,7 @@ export class SecretsService {
 
   async getDecryptedSecret(
     workspaceId: string,
-    provider: 'openai' | 'anthropic'
+    provider: 'openai' | 'anthropic' | 'modal'
   ): Promise<string | null> {
     const secret = await queryOne<DBSecret>(
       `SELECT * FROM homeos.workspace_secrets
@@ -108,7 +108,7 @@ export class SecretsService {
   async testConnection(
     workspaceId: string,
     userId: string,
-    provider: 'openai' | 'anthropic'
+    provider: 'openai' | 'anthropic' | 'modal'
   ): Promise<{ success: boolean; provider: string; error?: string }> {
     // Check if user is authorized
     const role = await this.workspaceService.getUserRole(workspaceId, userId);
@@ -148,6 +148,10 @@ export class SecretsService {
         if (response.status === 401 || response.status === 403) {
           throw new Error('Invalid API key');
         }
+      } else if (provider === 'modal') {
+        if (!process.env['MODAL_LLM_URL']) {
+          throw new Error('MODAL_LLM_URL not configured');
+        }
       }
 
       // Update test status
@@ -179,7 +183,7 @@ export class SecretsService {
   async deleteSecret(
     workspaceId: string,
     userId: string,
-    provider: 'openai' | 'anthropic'
+    provider: 'openai' | 'anthropic' | 'modal'
   ): Promise<void> {
     // Check if user is authorized
     const role = await this.workspaceService.getUserRole(workspaceId, userId);

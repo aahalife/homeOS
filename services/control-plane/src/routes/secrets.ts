@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { SecretsService } from '../services/secrets.js';
 
 const SetSecretSchema = z.object({
-  provider: z.enum(['openai', 'anthropic']),
+  provider: z.enum(['openai', 'anthropic', 'modal']),
   apiKey: z.string().min(1),
 });
 
@@ -36,7 +36,7 @@ export const secretsRoutes: FastifyPluginAsync = async (app) => {
           type: 'object',
           required: ['provider', 'apiKey'],
           properties: {
-            provider: { type: 'string', enum: ['openai', 'anthropic'] },
+            provider: { type: 'string', enum: ['openai', 'anthropic', 'modal'] },
             apiKey: { type: 'string', minLength: 1 },
           },
         },
@@ -147,7 +147,7 @@ export const secretsRoutes: FastifyPluginAsync = async (app) => {
           type: 'object',
           required: ['provider'],
           properties: {
-            provider: { type: 'string', enum: ['openai', 'anthropic'] },
+            provider: { type: 'string', enum: ['openai', 'anthropic', 'modal'] },
           },
         },
         response: {
@@ -171,7 +171,7 @@ export const secretsRoutes: FastifyPluginAsync = async (app) => {
     async (request, reply) => {
       const userId = (request.user as { sub: string }).sub;
       const { id: workspaceId } = request.params as { id: string };
-      const { provider } = request.body as { provider: 'openai' | 'anthropic' };
+      const { provider } = request.body as { provider: 'openai' | 'anthropic' | 'modal' };
 
       try {
         const result = await secretsService.testConnection(workspaceId, userId, provider);
@@ -197,7 +197,7 @@ export const secretsRoutes: FastifyPluginAsync = async (app) => {
           required: ['id', 'provider'],
           properties: {
             id: { type: 'string', format: 'uuid' },
-            provider: { type: 'string', enum: ['openai', 'anthropic'] },
+            provider: { type: 'string', enum: ['openai', 'anthropic', 'modal'] },
           },
         },
         response: {
@@ -220,7 +220,7 @@ export const secretsRoutes: FastifyPluginAsync = async (app) => {
       const userId = (request.user as { sub: string }).sub;
       const { id: workspaceId, provider } = request.params as {
         id: string;
-        provider: 'openai' | 'anthropic';
+        provider: 'openai' | 'anthropic' | 'modal';
       };
 
       try {

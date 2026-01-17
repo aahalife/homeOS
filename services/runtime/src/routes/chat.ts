@@ -6,13 +6,23 @@ import { ChatTurnInputSchema } from '@homeos/shared/schemas';
 import { emitToWorkspace } from '../ws/stream.js';
 
 const TEMPORAL_ADDRESS = process.env['TEMPORAL_ADDRESS'] ?? 'localhost:7233';
+const TEMPORAL_NAMESPACE = process.env['TEMPORAL_NAMESPACE'] ?? 'default';
+const TEMPORAL_API_KEY = process.env['TEMPORAL_API_KEY'];
 
 let temporalClient: Client | null = null;
 
 async function getTemporalClient(): Promise<Client> {
   if (!temporalClient) {
-    const connection = await Connection.connect({ address: TEMPORAL_ADDRESS });
-    temporalClient = new Client({ connection });
+    const isTemporalCloud = TEMPORAL_ADDRESS.includes('temporal.io');
+    const connectionOptions: Parameters<typeof Connection.connect>[0] = {
+      address: TEMPORAL_ADDRESS,
+    };
+    if (isTemporalCloud && TEMPORAL_API_KEY) {
+      connectionOptions.tls = true;
+      connectionOptions.apiKey = TEMPORAL_API_KEY;
+    }
+    const connection = await Connection.connect(connectionOptions);
+    temporalClient = new Client({ connection, namespace: TEMPORAL_NAMESPACE });
   }
   return temporalClient;
 }

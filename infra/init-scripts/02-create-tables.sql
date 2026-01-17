@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS devices (
 CREATE TABLE IF NOT EXISTS workspace_secrets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
-    provider VARCHAR(50) NOT NULL CHECK (provider IN ('openai', 'anthropic')),
+    provider VARCHAR(50) NOT NULL CHECK (provider IN ('openai', 'anthropic', 'modal')),
     ciphertext TEXT NOT NULL,
     iv TEXT NOT NULL,
     auth_tag TEXT NOT NULL,

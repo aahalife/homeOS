@@ -12,6 +12,7 @@ import {
   defineSignal,
   setHandler,
   condition,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -60,6 +61,7 @@ export async function ScheduleMaintenanceWorkflow(input: ScheduleMaintenanceWork
   scheduledWith?: unknown;
 }> {
   const { workspaceId, userId, taskType, description, urgency, preferredDate } = input;
+  const { workflowId } = workflowInfo();
   let pendingApproval: ApprovalSignal | null = null;
 
   setHandler(maintenanceApprovalSignal, (signal) => {
@@ -100,6 +102,7 @@ export async function ScheduleMaintenanceWorkflow(input: ScheduleMaintenanceWork
   const envelopeId = await requestApproval({
     workspaceId,
     userId,
+    workflowId,
     intent: `Schedule ${taskType} service`,
     toolName: 'maintenance.schedule',
     inputs: {

@@ -12,6 +12,7 @@ import {
   sleep,
   defineSignal,
   setHandler,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -59,6 +60,7 @@ export async function BookRideWorkflow(input: BookRideWorkflowInput): Promise<{
   estimates?: unknown[];
 }> {
   const { workspaceId, userId, memberId, pickup, dropoff, preferredProvider, scheduledTime } = input;
+  const { workflowId } = workflowInfo();
 
   await emitTaskEvent(workspaceId, 'transportation.ride.start', { pickup, dropoff });
 
@@ -83,6 +85,7 @@ export async function BookRideWorkflow(input: BookRideWorkflowInput): Promise<{
   const envelopeId = await requestApproval({
     workspaceId,
     userId,
+    workflowId,
     intent: `Book ${selectedEstimate.provider} ride from ${pickup} to ${dropoff}`,
     toolName: 'transportation.book_ride',
     inputs: {

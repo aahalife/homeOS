@@ -4,6 +4,7 @@ import {
   setHandler,
   condition,
   sleep,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -44,6 +45,7 @@ export async function ChatTurnWorkflow(input: ChatTurnInput): Promise<{
   actions: string[];
 }> {
   const { workspaceId, userId, message, sessionId } = input;
+  const { workflowId } = workflowInfo();
   let pendingApproval: ApprovalSignal | null = null;
 
   // Set up approval signal handler
@@ -88,6 +90,7 @@ export async function ChatTurnWorkflow(input: ChatTurnInput): Promise<{
       const envelopeId = await requestApproval({
         workspaceId,
         userId,
+        workflowId,
         intent: step.intent,
         toolName: step.toolName,
         inputs: step.inputs,

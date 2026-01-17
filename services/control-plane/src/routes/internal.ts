@@ -48,6 +48,35 @@ const WorkflowRunUpsertSchema = z.object({
   completedAt: z.string().datetime().optional().nullable(),
 });
 
+const ApprovalEnvelopeSchema = z.object({
+  envelopeId: z.string().uuid(),
+  workspaceId: z.string().uuid(),
+  intent: z.string().min(1),
+  toolName: z.string().min(1),
+  inputs: z.record(z.unknown()),
+  expectedOutputs: z.union([z.record(z.unknown()), z.string()]),
+  riskLevel: z.string().min(1),
+  piiFields: z.array(z.string()),
+  rollbackPlan: z.string(),
+  auditHash: z.string().min(1),
+  createdAt: z.string().datetime(),
+});
+
+const ApprovalCreateSchema = z.object({
+  envelope: ApprovalEnvelopeSchema,
+  userId: z.string().uuid(),
+  taskId: z.string().uuid().optional(),
+  workflowId: z.string().optional(),
+  signalName: z.string().optional(),
+  expiresAt: z.string().datetime().optional(),
+});
+
+const ApprovalDecisionSchema = z.object({
+  approved: z.boolean(),
+  userId: z.string().uuid(),
+  reason: z.string().max(500).optional(),
+});
+
 export const internalRoutes: FastifyPluginAsync = async (app) => {
   const pool = getPool();
   const secretsService = new SecretsService();
@@ -424,6 +453,269 @@ export const internalRoutes: FastifyPluginAsync = async (app) => {
         workflowId: result.rows[0].workflow_id,
         status: result.rows[0].status,
       });
+    }
+  );
+
+  app.post(
+    '/approvals',
+    {
+      schema: {
+        description: 'Internal: create approval envelope',
+        tags: ['internal'],
+        body: {
+          type: 'object',
+          required: ['envelope', 'userId'],
+          properties: {
+            envelope: { type: 'object' },
+            userId: { type: 'string', format: 'uuid' },
+            taskId: { type: 'string', format: 'uuid' },
+            workflowId: { type: 'string' },
+            signalName: { type: 'string' },
+            expiresAt: { type: 'string' },
+          },
+        },
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              envelopeId: { type: 'string' },
+              status: { type: 'string' },
+              expiresAt: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const body = ApprovalCreateSchema.parse(request.body);
+      const envelope = body.envelope;
+      const expiresAt =
+        body.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+      const result = await pool.query(
+        `INSERT INTO homeos.action_envelopes
+          (id, workspace_id, task_id, workflow_id, signal_name, intent, tool_name, inputs,
+           expected_outputs, risk_level, pii_fields, rollback_plan, audit_hash, status, expires_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8,
+           $9, $10, $11, $12, $13, 'pending', $14)
+         RETURNING id, status, expires_at`,
+        [
+          envelope.envelopeId,
+          envelope.workspaceId,
+          body.taskId ?? null,
+          body.workflowId ?? null,
+          body.signalName ?? 'approval',
+          envelope.intent,
+          envelope.toolName,
+          JSON.stringify(envelope.inputs),
+          JSON.stringify(envelope.expectedOutputs),
+          envelope.riskLevel,
+          envelope.piiFields,
+          envelope.rollbackPlan,
+          envelope.auditHash,
+          expiresAt,
+        ]
+      );
+
+      return reply.status(201).send({
+        envelopeId: result.rows[0].id,
+        status: result.rows[0].status,
+        expiresAt: result.rows[0].expires_at,
+      });
+    }
+  );
+
+  app.get(
+    '/approvals/pending',
+    {
+      schema: {
+        description: 'Internal: list pending approvals',
+        tags: ['internal'],
+        querystring: {
+          type: 'object',
+          required: ['workspaceId'],
+          properties: {
+            workspaceId: { type: 'string', format: 'uuid' },
+          },
+        },
+        response: {
+          200: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                envelopeId: { type: 'string' },
+                taskId: { type: 'string' },
+                workflowId: { type: 'string' },
+                intent: { type: 'string' },
+                toolName: { type: 'string' },
+                riskLevel: { type: 'string' },
+                requestedAt: { type: 'string' },
+                expiresAt: { type: 'string' },
+                signalName: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
+    async (request) => {
+      const { workspaceId } = request.query as { workspaceId: string };
+
+      const result = await pool.query(
+        `SELECT id, task_id, workflow_id, intent, tool_name, risk_level, created_at, expires_at, signal_name
+         FROM homeos.action_envelopes
+         WHERE workspace_id = $1 AND status = 'pending' AND expires_at > NOW()
+         ORDER BY created_at DESC`,
+        [workspaceId]
+      );
+
+      return result.rows.map((row) => ({
+        envelopeId: row.id,
+        taskId: row.task_id ?? undefined,
+        workflowId: row.workflow_id ?? undefined,
+        intent: row.intent,
+        toolName: row.tool_name,
+        riskLevel: row.risk_level,
+        requestedAt: row.created_at,
+        expiresAt: row.expires_at,
+        signalName: row.signal_name ?? 'approval',
+      }));
+    }
+  );
+
+  app.get(
+    '/approvals/:envelopeId',
+    {
+      schema: {
+        description: 'Internal: get approval envelope',
+        tags: ['internal'],
+        params: {
+          type: 'object',
+          required: ['envelopeId'],
+          properties: {
+            envelopeId: { type: 'string', format: 'uuid' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              envelopeId: { type: 'string' },
+              workspaceId: { type: 'string' },
+              taskId: { type: 'string' },
+              workflowId: { type: 'string' },
+              signalName: { type: 'string' },
+              intent: { type: 'string' },
+              toolName: { type: 'string' },
+              inputs: { type: 'object' },
+              expectedOutputs: {},
+              riskLevel: { type: 'string' },
+              piiFields: { type: 'array', items: { type: 'string' } },
+              rollbackPlan: { type: 'string' },
+              auditHash: { type: 'string' },
+              status: { type: 'string' },
+              requestedAt: { type: 'string' },
+              expiresAt: { type: 'string' },
+            },
+          },
+          404: {
+            type: 'object',
+            properties: {
+              error: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const { envelopeId } = request.params as { envelopeId: string };
+
+      const result = await pool.query(
+        `SELECT id, workspace_id, task_id, workflow_id, signal_name, intent, tool_name,
+                inputs, expected_outputs, risk_level, pii_fields, rollback_plan, audit_hash,
+                status, created_at, expires_at
+         FROM homeos.action_envelopes
+         WHERE id = $1
+         LIMIT 1`,
+        [envelopeId]
+      );
+
+      const row = result.rows[0];
+      if (!row) {
+        return reply.status(404).send({ error: 'Envelope not found' });
+      }
+
+      return {
+        envelopeId: row.id,
+        workspaceId: row.workspace_id,
+        taskId: row.task_id ?? undefined,
+        workflowId: row.workflow_id ?? undefined,
+        signalName: row.signal_name ?? 'approval',
+        intent: row.intent,
+        toolName: row.tool_name,
+        inputs: row.inputs ?? {},
+        expectedOutputs: row.expected_outputs ?? {},
+        riskLevel: row.risk_level,
+        piiFields: row.pii_fields ?? [],
+        rollbackPlan: row.rollback_plan ?? '',
+        auditHash: row.audit_hash,
+        status: row.status,
+        requestedAt: row.created_at,
+        expiresAt: row.expires_at,
+      };
+    }
+  );
+
+  app.post(
+    '/approvals/:envelopeId/decision',
+    {
+      schema: {
+        description: 'Internal: record approval decision',
+        tags: ['internal'],
+        params: {
+          type: 'object',
+          required: ['envelopeId'],
+          properties: {
+            envelopeId: { type: 'string', format: 'uuid' },
+          },
+        },
+        body: {
+          type: 'object',
+          required: ['approved', 'userId'],
+          properties: {
+            approved: { type: 'boolean' },
+            userId: { type: 'string', format: 'uuid' },
+            reason: { type: 'string' },
+          },
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              status: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request) => {
+      const { envelopeId } = request.params as { envelopeId: string };
+      const body = ApprovalDecisionSchema.parse(request.body);
+
+      const status = body.approved ? 'approved' : 'denied';
+      await pool.query(
+        `UPDATE homeos.action_envelopes
+         SET status = $1,
+             approved_by = $2,
+             approved_at = CASE WHEN $1 = 'approved' THEN NOW() ELSE NULL END,
+             denied_reason = CASE WHEN $1 = 'denied' THEN $3 ELSE NULL END,
+             updated_at = NOW()
+         WHERE id = $4`,
+        [status, body.userId, body.reason ?? null, envelopeId]
+      );
+
+      return { status };
     }
   );
 };

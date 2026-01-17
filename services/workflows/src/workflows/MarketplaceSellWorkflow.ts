@@ -4,6 +4,7 @@ import {
   setHandler,
   condition,
   sleep,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -64,6 +65,7 @@ export async function MarketplaceSellWorkflow(input: MarketplaceSellInput): Prom
   soldPrice?: number;
 }> {
   const { workspaceId, userId, photos, userDescription } = input;
+  const { workflowId } = workflowInfo();
   let pendingApproval: ApprovalSignal | null = null;
   let listingApproval: ListingApprovalSignal | null = null;
   const messageQueue: BuyerMessageSignal[] = [];
@@ -112,6 +114,7 @@ export async function MarketplaceSellWorkflow(input: MarketplaceSellInput): Prom
   const postEnvelopeId = await requestApproval({
     workspaceId,
     userId,
+    workflowId,
     intent: `Post "${draft.title}" for $${draft.price} on Facebook Marketplace`,
     toolName: 'marketplace.post_listing',
     inputs: draft as unknown as Record<string, unknown>,
@@ -180,6 +183,7 @@ export async function MarketplaceSellWorkflow(input: MarketplaceSellInput): Prom
         const addressEnvelopeId = await requestApproval({
           workspaceId,
           userId,
+          workflowId,
           intent: `Share pickup address with buyer`,
           toolName: 'marketplace.message_buyer',
           inputs: { includeAddress: true },

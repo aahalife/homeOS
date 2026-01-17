@@ -95,6 +95,30 @@ export async function runMigrations(): Promise<void> {
     END $$;
   `);
 
+  // Ensure action_envelopes has workflow_id and signal_name columns
+  await p.query(`
+    DO $$
+    BEGIN
+      IF to_regclass('homeos.action_envelopes') IS NOT NULL THEN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'homeos' AND table_name = 'action_envelopes' AND column_name = 'workflow_id'
+        ) THEN
+          ALTER TABLE homeos.action_envelopes ADD COLUMN workflow_id VARCHAR(255);
+        END IF;
+
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'homeos' AND table_name = 'action_envelopes' AND column_name = 'signal_name'
+        ) THEN
+          ALTER TABLE homeos.action_envelopes ADD COLUMN signal_name VARCHAR(100) NOT NULL DEFAULT 'approval';
+        END IF;
+      END IF;
+    END $$;
+  `);
+
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_action_envelopes_workflow ON homeos.action_envelopes(workflow_id)`);
+
   // Create notifications table if not exists
   await p.query(`
     CREATE TABLE IF NOT EXISTS homeos.notifications (

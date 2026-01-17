@@ -3,6 +3,7 @@ import {
   defineSignal,
   setHandler,
   condition,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -44,6 +45,7 @@ export async function DynamicIntegrationWorkflow(input: DynamicIntegrationInput)
   toolVersion?: string;
 }> {
   const { workspaceId, userId, capabilityRequest } = input;
+  const { workflowId } = workflowInfo();
   let pendingApproval: ApprovalSignal | null = null;
 
   setHandler(approvalSignal, (signal) => {
@@ -137,6 +139,7 @@ export async function DynamicIntegrationWorkflow(input: DynamicIntegrationInput)
   const publishEnvelopeId = await requestApproval({
     workspaceId,
     userId,
+    workflowId,
     intent: `Publish new tool integration: ${chosen.service.name}`,
     toolName: 'integration.publish',
     inputs: {

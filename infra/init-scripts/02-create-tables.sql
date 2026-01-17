@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS action_envelopes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
     task_id UUID REFERENCES tasks(id) ON DELETE SET NULL,
+    workflow_id VARCHAR(255),
     intent TEXT NOT NULL,
     tool_name VARCHAR(100) NOT NULL,
     inputs JSONB NOT NULL,
@@ -92,6 +93,7 @@ CREATE TABLE IF NOT EXISTS action_envelopes (
     rollback_plan TEXT,
     audit_hash VARCHAR(64) NOT NULL,
     status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    signal_name VARCHAR(100) NOT NULL DEFAULT 'approval',
     approved_by UUID REFERENCES users(id),
     approved_at TIMESTAMPTZ,
     denied_reason TEXT,
@@ -188,6 +190,7 @@ CREATE INDEX IF NOT EXISTS idx_memory_items_embedding ON memory_items USING ivff
 CREATE INDEX IF NOT EXISTS idx_entities_workspace ON entities(workspace_id);
 CREATE INDEX IF NOT EXISTS idx_action_envelopes_workspace ON action_envelopes(workspace_id);
 CREATE INDEX IF NOT EXISTS idx_action_envelopes_status ON action_envelopes(status);
+CREATE INDEX IF NOT EXISTS idx_action_envelopes_workflow ON action_envelopes(workflow_id);
 
 -- Updated at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()

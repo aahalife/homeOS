@@ -25,6 +25,8 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
 ### Control Plane / Runtime (Needed to ship)
 - **JWT secrets**
   - `JWT_SECRET` for control-plane and runtime.
+- **Approval token secret**
+  - `APPROVAL_TOKEN_SECRET` (optional) to sign approval tokens. Falls back to `JWT_SECRET` if unset.
 - **Encryption key**
   - `MASTER_ENCRYPTION_KEY` for encrypting workspace secrets.
 - **Service tokens**

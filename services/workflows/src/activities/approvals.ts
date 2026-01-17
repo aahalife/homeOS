@@ -4,6 +4,9 @@ import type { RiskLevel } from '@homeos/shared';
 export interface RequestApprovalInput {
   workspaceId: string;
   userId: string;
+  workflowId?: string;
+  signalName?: string;
+  taskId?: string;
   intent: string;
   toolName: string;
   inputs: Record<string, unknown>;
@@ -22,16 +25,27 @@ export async function requestApproval(input: RequestApprovalInput): Promise<stri
     piiFields: input.piiFields,
   });
 
-  // Store envelope in database
-  const RUNTIME_URL = process.env['RUNTIME_URL'] ?? 'http://localhost:3002';
+  // Store envelope in control-plane
+  const CONTROL_PLANE_URL = process.env['CONTROL_PLANE_URL'];
+  const SERVICE_TOKEN = process.env['CONTROL_PLANE_SERVICE_TOKEN'];
 
   try {
-    await fetch(`${RUNTIME_URL}/internal/approvals`, {
+    if (!CONTROL_PLANE_URL || !SERVICE_TOKEN) {
+      throw new Error('CONTROL_PLANE_URL or CONTROL_PLANE_SERVICE_TOKEN not configured');
+    }
+
+    await fetch(`${CONTROL_PLANE_URL}/v1/internal/approvals`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-service-token': SERVICE_TOKEN,
+      },
       body: JSON.stringify({
         envelope,
         userId: input.userId,
+        taskId: input.taskId,
+        workflowId: input.workflowId,
+        signalName: input.signalName ?? 'approval',
       }),
     });
   } catch (error) {

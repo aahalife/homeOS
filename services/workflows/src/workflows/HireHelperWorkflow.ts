@@ -3,6 +3,7 @@ import {
   defineSignal,
   setHandler,
   condition,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -56,6 +57,7 @@ export async function HireHelperWorkflow(input: HireHelperInput): Promise<{
   };
 }> {
   const { workspaceId, userId } = input;
+  const { workflowId } = workflowInfo();
   let pendingApproval: ApprovalSignal | null = null;
   let selectedCandidates: CandidateSelectionSignal | null = null;
 
@@ -131,6 +133,7 @@ export async function HireHelperWorkflow(input: HireHelperInput): Promise<{
   const bookEnvelopeId = await requestApproval({
     workspaceId,
     userId,
+    workflowId,
     intent: `Book ${bestQuote.helperName} for $${bestQuote.price}`,
     toolName: 'helpers.book',
     inputs: bestQuote as unknown as Record<string, unknown>,

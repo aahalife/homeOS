@@ -4,6 +4,7 @@ import {
   setHandler,
   condition,
   sleep,
+  workflowInfo,
 } from '@temporalio/workflow';
 import type * as activities from '../activities/index.js';
 
@@ -59,6 +60,7 @@ export async function ReservationCallWorkflow(input: ReservationInput): Promise<
   transcript?: string;
 }> {
   const { workspaceId, userId } = input;
+  const { workflowId } = workflowInfo();
   let pendingApproval: ApprovalSignal | null = null;
   let selectedCandidate: CandidateSelectionSignal | null = null;
 
@@ -113,6 +115,7 @@ export async function ReservationCallWorkflow(input: ReservationInput): Promise<
   const envelopeId = await requestApproval({
     workspaceId,
     userId,
+    workflowId,
     intent: `Call ${chosen.name} to make a reservation`,
     toolName: 'telephony.place_call',
     inputs: {

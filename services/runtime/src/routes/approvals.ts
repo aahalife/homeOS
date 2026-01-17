@@ -1,4 +1,16 @@
 import type { FastifyPluginAsync } from 'fastify';
+import { createApprovalToken } from '@homeos/shared/crypto';
+import {
+  getApprovalEnvelope,
+  listPendingApprovals,
+  recordApprovalDecision,
+} from '../services/controlPlane.js';
+import { getTemporalClient } from '../services/temporal.js';
+
+const APPROVAL_TOKEN_SECRET =
+  process.env['APPROVAL_TOKEN_SECRET'] ??
+  process.env['JWT_SECRET'] ??
+  'dev-approval-secret-change-in-production';
 
 export const approvalsRoutes: FastifyPluginAsync = async (app) => {
   app.addHook('onRequest', async (request, reply) => {
@@ -44,9 +56,12 @@ export const approvalsRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request) => {
       const { workspaceId } = request.query as { workspaceId: string };
+      const user = request.user as { workspaceId?: string };
+      if (user.workspaceId && user.workspaceId !== workspaceId) {
+        return [];
+      }
 
-      // TODO: Implement pending approvals listing
-      return [];
+      return (await listPendingApprovals(workspaceId)) ?? [];
     }
   );
 
@@ -92,9 +107,28 @@ export const approvalsRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request, reply) => {
       const { envelopeId } = request.params as { envelopeId: string };
+      const user = request.user as { workspaceId?: string };
+      const envelope = await getApprovalEnvelope(envelopeId);
+      if (!envelope) {
+        return reply.status(404).send({ error: 'Envelope not found' });
+      }
+      if (user.workspaceId && user.workspaceId !== envelope.workspaceId) {
+        return reply.status(403).send({ error: 'Forbidden' });
+      }
 
-      // TODO: Implement envelope retrieval
-      return reply.status(404).send({ error: 'Envelope not found' });
+      return {
+        envelopeId: envelope.envelopeId,
+        workspaceId: envelope.workspaceId,
+        intent: envelope.intent,
+        toolName: envelope.toolName,
+        inputs: envelope.inputs,
+        expectedOutputs: envelope.expectedOutputs,
+        riskLevel: envelope.riskLevel,
+        piiFields: envelope.piiFields,
+        rollbackPlan: envelope.rollbackPlan,
+        auditHash: envelope.auditHash,
+        createdAt: envelope.requestedAt,
+      };
     }
   );
 
@@ -132,14 +166,46 @@ export const approvalsRoutes: FastifyPluginAsync = async (app) => {
     async (request, reply) => {
       const { envelopeId } = request.params as { envelopeId: string };
       const userId = (request.user as { sub: string }).sub;
+      const user = request.user as { workspaceId?: string };
+      const envelope = await getApprovalEnvelope(envelopeId);
+      if (!envelope) {
+        return reply.status(404).send({ error: 'Envelope not found' });
+      }
+      if (user.workspaceId && user.workspaceId !== envelope.workspaceId) {
+        return reply.status(403).send({ error: 'Forbidden' });
+      }
 
-      // TODO: Implement approval
-      // 1. Verify envelope exists and is pending
-      // 2. Generate approval token with signature
-      // 3. Signal the waiting workflow
-      // 4. Update envelope status
+      const token = createApprovalToken(
+        envelope.envelopeId,
+        envelope.workspaceId,
+        userId,
+        APPROVAL_TOKEN_SECRET
+      );
 
-      return reply.status(501).send({ error: 'Not implemented' });
+      await recordApprovalDecision({
+        envelopeId,
+        approved: true,
+        userId,
+      });
+
+      if (envelope.workflowId) {
+        try {
+          const client = await getTemporalClient();
+          const handle = client.workflow.getHandle(envelope.workflowId);
+          await handle.signal(envelope.signalName ?? 'approval', {
+            envelopeId: envelope.envelopeId,
+            approved: true,
+            token,
+          });
+        } catch (error) {
+          app.log.error(error, 'Failed to signal workflow approval');
+        }
+      }
+
+      return {
+        success: true,
+        token,
+      };
     }
   );
 
@@ -183,10 +249,39 @@ export const approvalsRoutes: FastifyPluginAsync = async (app) => {
       const { envelopeId } = request.params as { envelopeId: string };
       const { reason } = request.body as { reason?: string };
       const userId = (request.user as { sub: string }).sub;
+      const user = request.user as { workspaceId?: string };
+      const envelope = await getApprovalEnvelope(envelopeId);
+      if (!envelope) {
+        return reply.status(404).send({ error: 'Envelope not found' });
+      }
+      if (user.workspaceId && user.workspaceId !== envelope.workspaceId) {
+        return reply.status(403).send({ error: 'Forbidden' });
+      }
 
-      // TODO: Implement denial
+      await recordApprovalDecision({
+        envelopeId,
+        approved: false,
+        userId,
+        reason,
+      });
 
-      return reply.status(501).send({ error: 'Not implemented' });
+      if (envelope.workflowId) {
+        try {
+          const client = await getTemporalClient();
+          const handle = client.workflow.getHandle(envelope.workflowId);
+          await handle.signal(envelope.signalName ?? 'approval', {
+            envelopeId: envelope.envelopeId,
+            approved: false,
+            reason: reason || 'Denied by user',
+          });
+        } catch (error) {
+          app.log.error(error, 'Failed to signal workflow denial');
+        }
+      }
+
+      return {
+        success: true,
+      };
     }
   );
 };

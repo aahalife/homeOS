@@ -3,8 +3,8 @@
 # Development: Services auto-stop when idle (cost-efficient)
 # Production: Set min_machines_running = 1 via: fly scale count 1 --app homeos-control-plane
 #
-app = 'homeos-control-plane'
-primary_region = 'sjc'
+app = 'homeos-w6ef6q-control-plane'
+primary_region = 'iad'
 
 [build]
   image = "bharathsud123/homeos-control-plane:latest"

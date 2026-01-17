@@ -25,6 +25,11 @@ fi
 
 # Use flyctl from PATH or ~/.fly/bin
 FLYCTL=$(command -v flyctl 2>/dev/null || echo "$HOME/.fly/bin/flyctl")
+ORG_SLUG=${FLY_ORG_SLUG:-bharath-mech-email-com}
+APP_PREFIX=${APP_PREFIX:-homeos-w6ef6q}
+CONTROL_PLANE_APP=${CONTROL_PLANE_APP:-${APP_PREFIX}-control-plane}
+RUNTIME_APP=${RUNTIME_APP:-${APP_PREFIX}-runtime}
+WORKFLOWS_APP=${WORKFLOWS_APP:-${APP_PREFIX}-workflows}
 
 # Check if user is authenticated
 if ! $FLYCTL auth whoami &> /dev/null; then
@@ -47,7 +52,7 @@ deploy_service() {
     # Check if app exists, create if not
     if ! $FLYCTL apps list | grep -q "$service_name"; then
         echo "Creating app: $service_name"
-        $FLYCTL apps create "$service_name" --org personal || true
+        $FLYCTL apps create "$service_name" --org "$ORG_SLUG" || true
     fi
 
     # Deploy
@@ -105,9 +110,9 @@ echo -e "${YELLOW}Step 3: Deploying Services${NC}"
 echo -e "${YELLOW}======================================${NC}"
 echo ""
 
-deploy_service "homeos-control-plane" "$PROJECT_ROOT/services/control-plane"
-deploy_service "homeos-runtime" "$PROJECT_ROOT/services/runtime"
-deploy_service "homeos-workflows" "$PROJECT_ROOT/services/workflows"
+deploy_service "$CONTROL_PLANE_APP" "$PROJECT_ROOT/services/control-plane"
+deploy_service "$RUNTIME_APP" "$PROJECT_ROOT/services/runtime"
+deploy_service "$WORKFLOWS_APP" "$PROJECT_ROOT/services/workflows"
 
 # Print deployment summary
 echo -e "${GREEN}======================================${NC}"
@@ -117,13 +122,13 @@ echo ""
 echo "Your services are now deployed:"
 echo ""
 echo "Control Plane API:"
-$FLYCTL status --app homeos-control-plane 2>/dev/null | grep "Hostname:" || echo "  https://homeos-control-plane.fly.dev"
+$FLYCTL status --app "$CONTROL_PLANE_APP" 2>/dev/null | grep "Hostname:" || echo "  https://${CONTROL_PLANE_APP}.fly.dev"
 echo ""
 echo "Runtime API:"
-$FLYCTL status --app homeos-runtime 2>/dev/null | grep "Hostname:" || echo "  https://homeos-runtime.fly.dev"
+$FLYCTL status --app "$RUNTIME_APP" 2>/dev/null | grep "Hostname:" || echo "  https://${RUNTIME_APP}.fly.dev"
 echo ""
 echo "Workflows Worker: (background worker - no HTTP endpoint)"
-echo "  Check status: flyctl status --app homeos-workflows"
+echo "  Check status: flyctl status --app ${WORKFLOWS_APP}"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo "1. Set up secrets (DATABASE_URL, JWT_SECRET, etc.) for each app"

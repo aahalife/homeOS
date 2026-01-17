@@ -3,8 +3,8 @@
 # Development: Services auto-stop when idle (cost-efficient)
 # Production: Set min_machines_running = 1 via: fly scale count 1 --app homeos-runtime
 #
-app = 'homeos-runtime'
-primary_region = 'sjc'
+app = 'homeos-w6ef6q-runtime'
+primary_region = 'iad'
 
 [build]
   image = "bharathsud123/homeos-runtime:latest"
@@ -13,7 +13,7 @@ primary_region = 'sjc'
   NODE_ENV = "production"
   PORT = "3002"
   HOST = "0.0.0.0"
-  CONTROL_PLANE_URL = "https://homeos-control-plane.fly.dev"
+  CONTROL_PLANE_URL = "https://homeos-w6ef6q-control-plane.fly.dev"
 
 [http_service]
   internal_port = 3002

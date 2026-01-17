@@ -4,7 +4,7 @@
  */
 
 // LLM Providers
-export type LLMProvider = 'anthropic' | 'openai';
+export type LLMProvider = 'anthropic' | 'openai' | 'modal';
 
 // Voice AI Providers (for phone calls)
 export type VoiceProvider = 'retell' | 'vapi' | 'bland';
@@ -119,6 +119,15 @@ export const PROVIDER_CONFIGS: Record<ServiceProvider, ProviderConfig> = {
     testEndpoint: 'https://api.anthropic.com/v1/messages',
     documentationUrl: 'https://docs.anthropic.com/en/api/getting-started',
     pricingUrl: 'https://www.anthropic.com/pricing',
+    sandboxAvailable: false,
+  },
+  modal: {
+    provider: 'modal',
+    displayName: 'Modal (Private LLM)',
+    category: 'llm',
+    authType: 'api_key',
+    requiredFields: ['api_key', 'base_url'],
+    documentationUrl: 'https://modal.com',
     sandboxAvailable: false,
   },
   openai: {

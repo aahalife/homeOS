@@ -8,12 +8,14 @@
 
 import type { FastifyPluginAsync, FastifyReply } from 'fastify';
 import { Connection, Client } from '@temporalio/client';
+import { readFile } from 'node:fs/promises';
 import { emitToWorkspace } from '../ws/stream.js';
 
 const TEMPORAL_ADDRESS = process.env['TEMPORAL_ADDRESS'] ?? 'localhost:7233';
 const TEMPORAL_NAMESPACE = process.env['TEMPORAL_NAMESPACE'] ?? 'default';
 const TEMPORAL_API_KEY = process.env['TEMPORAL_API_KEY'];
 const TELEGRAM_BOT_TOKEN = process.env['TELEGRAM_BOT_TOKEN'] ?? '';
+const TELEGRAM_BOTS_CONFIG_PATH = process.env['TELEGRAM_BOTS_CONFIG_PATH'];
 const TELEGRAM_API_URL = 'https://api.telegram.org';
 
 // In-memory mapping for development (use database in production)
@@ -66,14 +68,108 @@ interface TelegramUpdate {
   message?: TelegramMessage;
 }
 
-async function sendTelegramMessage(chatId: number, text: string, replyToMessageId?: number): Promise<boolean> {
-  if (!TELEGRAM_BOT_TOKEN) {
+interface TelegramBotConfig {
+  id: string;
+  token: string;
+  username?: string;
+  workspaces?: string[];
+}
+
+interface TelegramBotsConfigFile {
+  defaultBotId?: string;
+  bots: TelegramBotConfig[];
+}
+
+let botConfig: TelegramBotsConfigFile | null = null;
+
+async function loadBotConfig(): Promise<TelegramBotsConfigFile | null> {
+  if (!TELEGRAM_BOTS_CONFIG_PATH) {
+    return null;
+  }
+  try {
+    const raw = await readFile(TELEGRAM_BOTS_CONFIG_PATH, 'utf-8');
+    return JSON.parse(raw) as TelegramBotsConfigFile;
+  } catch (error) {
+    console.error('[Telegram] Failed to load bot config:', error);
+    return null;
+  }
+}
+
+async function ensureBotConfig(): Promise<void> {
+  if (!botConfig && TELEGRAM_BOTS_CONFIG_PATH) {
+    botConfig = await loadBotConfig();
+  }
+}
+
+async function resolveBotForWorkspace(workspaceId?: string, botId?: string): Promise<TelegramBotConfig | null> {
+  await ensureBotConfig();
+
+  if (botConfig) {
+    if (botId) {
+      const byId = botConfig.bots.find((bot) => bot.id === botId);
+      if (byId) {
+        return byId;
+      }
+    }
+
+    if (workspaceId) {
+      const mapped = botConfig.bots.find((bot) => bot.workspaces?.includes(workspaceId));
+      if (mapped) {
+        return mapped;
+      }
+    }
+
+    const fallbackId = botConfig.defaultBotId;
+    if (fallbackId) {
+      const fallback = botConfig.bots.find((bot) => bot.id === fallbackId);
+      if (fallback) {
+        return fallback;
+      }
+    }
+
+    if (botConfig.bots.length > 0) {
+      return botConfig.bots[0]!;
+    }
+  }
+
+  if (TELEGRAM_BOT_TOKEN) {
+    return { id: 'default', token: TELEGRAM_BOT_TOKEN };
+  }
+
+  return null;
+}
+
+async function getBotUsername(bot: TelegramBotConfig): Promise<string> {
+  if (bot.username) {
+    return bot.username;
+  }
+
+  try {
+    const response = await fetch(`${TELEGRAM_API_URL}/bot${bot.token}/getMe`);
+    const data = await response.json() as { ok: boolean; result?: { username: string } };
+    if (data.ok && data.result?.username) {
+      return data.result.username;
+    }
+  } catch {
+    // Ignore
+  }
+
+  return 'HomeOSBot';
+}
+
+async function sendTelegramMessage(
+  bot: TelegramBotConfig,
+  chatId: number,
+  text: string,
+  replyToMessageId?: number
+): Promise<boolean> {
+  if (!bot.token) {
     console.warn('[Telegram] Bot token not configured');
     return false;
   }
 
   try {
-    const response = await fetch(`${TELEGRAM_API_URL}/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    const response = await fetch(`${TELEGRAM_API_URL}/bot${bot.token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -105,6 +201,12 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       schema: {
         description: 'Telegram webhook endpoint',
         tags: ['telegram'],
+        querystring: {
+          type: 'object',
+          properties: {
+            botId: { type: 'string' },
+          },
+        },
         body: {
           type: 'object',
           properties: {
@@ -124,6 +226,12 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
     },
     async (request) => {
       const update = request.body as TelegramUpdate;
+      const { botId } = request.query as { botId?: string };
+      const bot = await resolveBotForWorkspace(undefined, botId);
+
+      if (!bot) {
+        return { ok: true };
+      }
 
       if (!update.message?.text) {
         return { ok: true };
@@ -149,6 +257,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
           }
 
           await sendTelegramMessage(
+            bot,
             chatId,
             `*Welcome to HomeOS!* 🏠\n\nYour account is being linked. Please complete the setup in the HomeOS app.`
           );
@@ -156,6 +265,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         }
 
         await sendTelegramMessage(
+          bot,
           chatId,
           `*Welcome to HomeOS!* 🏠\n\nTo get started, please link your Telegram account in the HomeOS app:\n\n1. Open HomeOS app\n2. Go to Settings → Connections\n3. Tap "Connect Telegram"\n4. Scan the QR code or enter the code shown`
         );
@@ -168,6 +278,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
 
         if (!linkCode) {
           await sendTelegramMessage(
+            bot,
             chatId,
             'Please provide a link code. Get one from the HomeOS app under Settings → Connections → Telegram.'
           );
@@ -176,6 +287,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
 
         if (!pendingLinkRequests.has(linkCode)) {
           await sendTelegramMessage(
+            bot,
             chatId,
             'Invalid or expired link code. Please generate a new one from the HomeOS app.'
           );
@@ -187,6 +299,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         if (linkRequest.expiresAt < new Date()) {
           pendingLinkRequests.delete(linkCode);
           await sendTelegramMessage(
+            bot,
             chatId,
             'This link code has expired. Please generate a new one from the HomeOS app.'
           );
@@ -196,6 +309,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         linkRequest.telegramChatId = chatId;
 
         await sendTelegramMessage(
+          bot,
           chatId,
           '✅ Account linking initiated! Please confirm in the HomeOS app to complete the connection.'
         );
@@ -205,6 +319,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       // Handle /help command
       if (text === '/help') {
         await sendTelegramMessage(
+          bot,
           chatId,
           `*HomeOS Telegram Bot* 🏠\n\n` +
           `Available commands:\n` +
@@ -222,11 +337,13 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         const mapping = telegramUserMappings.get(chatId);
         if (mapping) {
           await sendTelegramMessage(
+            bot,
             chatId,
             '✅ Your Telegram account is connected to HomeOS. Send any message to chat!'
           );
         } else {
           await sendTelegramMessage(
+            bot,
             chatId,
             '❌ Your Telegram account is not connected. Use /start to learn how to connect.'
           );
@@ -239,6 +356,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
 
       if (!mapping) {
         await sendTelegramMessage(
+          bot,
           chatId,
           'Your Telegram account is not linked to HomeOS yet. Use /start to learn how to connect.',
           message.message_id
@@ -247,7 +365,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       }
 
       // Send typing indicator
-      await fetch(`${TELEGRAM_API_URL}/bot${TELEGRAM_BOT_TOKEN}/sendChatAction`, {
+      await fetch(`${TELEGRAM_API_URL}/bot${bot.token}/sendChatAction`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -286,7 +404,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         ]) as { response: string };
 
         // Send response back to Telegram
-        await sendTelegramMessage(chatId, result.response, message.message_id);
+        await sendTelegramMessage(bot, chatId, result.response, message.message_id);
 
         // Emit to WebSocket for iOS app sync
         emitToWorkspace(mapping.workspaceId, {
@@ -300,6 +418,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       } catch (error) {
         app.log.error({ error, chatId }, 'Failed to process Telegram message');
         await sendTelegramMessage(
+          bot,
           chatId,
           'Sorry, I encountered an error processing your message. Please try again.',
           message.message_id
@@ -349,12 +468,13 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         },
       },
       async (request, reply) => {
-        if (!TELEGRAM_BOT_TOKEN) {
-          return sendError(reply, 503, 'Telegram bot not configured');
-        }
-
         const user = request.user as { sub: string };
         const { workspaceId } = request.body as { workspaceId: string };
+
+        const bot = await resolveBotForWorkspace(workspaceId);
+        if (!bot) {
+          return sendError(reply, 503, 'Telegram bot not configured');
+        }
 
         // Generate random link code
         const linkCode = Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -371,17 +491,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
           pendingLinkRequests.delete(linkCode);
         }, 10 * 60 * 1000);
 
-        // Get bot username from Telegram API
-        let botUsername = 'HomeOSBot';
-        try {
-          const response = await fetch(`${TELEGRAM_API_URL}/bot${TELEGRAM_BOT_TOKEN}/getMe`);
-          const data = await response.json() as { ok: boolean; result?: { username: string } };
-          if (data.ok && data.result?.username) {
-            botUsername = data.result.username;
-          }
-        } catch {
-          // Use default username
-        }
+        const botUsername = await getBotUsername(bot);
 
         return {
           linkCode,
@@ -422,6 +532,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       async (request, reply) => {
         const user = request.user as { sub: string };
         const { workspaceId, linkCode } = request.body as { workspaceId: string; linkCode: string };
+        const bot = await resolveBotForWorkspace(workspaceId);
 
         const linkRequest = pendingLinkRequests.get(linkCode);
 
@@ -448,10 +559,13 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
         pendingLinkRequests.delete(linkCode);
 
         // Send confirmation to Telegram
-        await sendTelegramMessage(
-          linkRequest.telegramChatId,
-          '🎉 *Account linked successfully!*\n\nYou can now chat with HomeOS directly in Telegram. Just send any message!'
-        );
+        if (bot) {
+          await sendTelegramMessage(
+            bot,
+            linkRequest.telegramChatId,
+            '🎉 *Account linked successfully!*\n\nYou can now chat with HomeOS directly in Telegram. Just send any message!'
+          );
+        }
 
         return {
           success: true,
@@ -490,6 +604,7 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       async (request) => {
         const user = request.user as { sub: string };
         const { workspaceId } = request.query as { workspaceId: string };
+        const bot = await resolveBotForWorkspace(workspaceId);
 
         // Check if user has a Telegram mapping
         for (const [chatId, mapping] of telegramUserMappings.entries()) {
@@ -542,10 +657,13 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
             telegramUserMappings.delete(chatId);
 
             // Notify user on Telegram
-            await sendTelegramMessage(
-              chatId,
-              '👋 Your HomeOS account has been disconnected. Use /start to reconnect.'
-            );
+            if (bot) {
+              await sendTelegramMessage(
+                bot,
+                chatId,
+                '👋 Your HomeOS account has been disconnected. Use /start to reconnect.'
+              );
+            }
 
             return { success: true };
           }
@@ -575,25 +693,16 @@ export const telegramRoutes: FastifyPluginAsync = async (app) => {
       },
     },
     async () => {
-      if (!TELEGRAM_BOT_TOKEN) {
+      const bot = await resolveBotForWorkspace();
+      if (!bot) {
         return { configured: false };
       }
 
-      try {
-        const response = await fetch(`${TELEGRAM_API_URL}/bot${TELEGRAM_BOT_TOKEN}/getMe`);
-        const data = await response.json() as { ok: boolean; result?: { username: string } };
-
-        if (data.ok && data.result) {
-          return {
-            configured: true,
-            botUsername: data.result.username,
-          };
-        }
-      } catch {
-        // Bot token invalid
-      }
-
-      return { configured: false };
+      const botUsername = await getBotUsername(bot);
+      return {
+        configured: true,
+        botUsername,
+      };
     }
   );
 };

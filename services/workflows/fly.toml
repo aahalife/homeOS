@@ -6,8 +6,8 @@
 # Development: Single small instance
 # Production: Scale with: fly scale count 2 --app homeos-workflows
 #
-app = 'homeos-workflows'
-primary_region = 'sjc'
+app = 'homeos-w6ef6q-workflows'
+primary_region = 'iad'
 
 [build]
   image = "bharathsud123/homeos-workflows:latest"

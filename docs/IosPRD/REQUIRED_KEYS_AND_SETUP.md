@@ -73,6 +73,24 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
 - **Webhook URL + secret**
   - Where: Telegram bot settings or Bot API.
   - Note: Telegram does **not** allow programmatic bot creation. We can automate linking per workspace using a single bot, but a BotFather token is still required.
+  - For multiple bots, provide a mapping file via `TELEGRAM_BOTS_CONFIG_PATH`:
+
+```json
+{
+  "defaultBotId": "homeos-main",
+  "bots": [
+    {
+      "id": "homeos-main",
+      "token": "BOT_TOKEN",
+      "username": "HomeOSBot",
+      "workspaces": ["<workspace-id>"]
+    }
+  ]
+}
+```
+
+Configure each bot webhook to:
+`https://<runtime-host>/v1/telegram/webhook?botId=<bot-id>`
 
 ### Google OAuth (Needed for Gmail/Calendar)
 - **OAuth Client ID + Secret**

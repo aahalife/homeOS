@@ -32,6 +32,11 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
   - `CONTROL_PLANE_URL` (runtime to control-plane).
   - `RUNTIME_URL` and `RUNTIME_WS_URL` (control-plane to runtime).
 
+### Environment templates
+- `services/control-plane/env.sample`
+- `services/runtime/env.sample`
+- `services/workflows/env.sample`
+
 ### Database + Temporal (Needed to ship)
 - **Postgres connection**
   - `DATABASE_URL` for control-plane.

@@ -54,6 +54,13 @@ Keep this updated as we wire more integrations. Items marked "Needed to ship" bl
 - Preferred **app name** for the LLM endpoint
 - Whether the endpoint should be OpenAI-compatible
 
+### Modal deployment (GPT-OSS 120B)
+- Use `services/modal-llm/modal_app.py` for a vLLM OpenAI-compatible endpoint.
+- Defaults target **2x A100-80GB**. Increase GPU count if you see OOM errors.
+- After deploy, set:
+  - `MODAL_LLM_URL` to the Modal web endpoint
+  - `MODAL_LLM_TOKEN` to the API key enforced by the server
+
 ### Database + Temporal (Needed to ship)
 - **Postgres connection**
   - `DATABASE_URL` for control-plane.

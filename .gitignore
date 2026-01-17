@@ -6,6 +6,8 @@ node_modules/
 dist/
 .turbo/
 *.tsbuildinfo
+__pycache__/
+*.pyc
 
 # Environment
 .env
@@ -32,6 +34,9 @@ coverage/
 apps/ios/homeOS/DerivedData/
 apps/ios/homeOS/*.xcuserdata/
 apps/ios/homeOS/.build/
+moments/DerivedData/
+moments/*.xcuserdata/
+moments/moments.xcodeproj/project.xcworkspace/xcuserdata/
 
 # Docker
 docker/data/
@@ -39,6 +44,8 @@ docker/data/
 # Misc
 .cache/
 tmp/
+.modal-venv/
+.venv/
 
 # Secrets
 keys api and certs/

@@ -1,31 +1,8 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
-import { Connection } from '@temporalio/client';
-import { Client } from '@temporalio/client';
 import { ChatTurnInputSchema } from '@homeos/shared/schemas';
 import { emitToWorkspace } from '../ws/stream.js';
-
-const TEMPORAL_ADDRESS = process.env['TEMPORAL_ADDRESS'] ?? 'localhost:7233';
-const TEMPORAL_NAMESPACE = process.env['TEMPORAL_NAMESPACE'] ?? 'default';
-const TEMPORAL_API_KEY = process.env['TEMPORAL_API_KEY'];
-
-let temporalClient: Client | null = null;
-
-async function getTemporalClient(): Promise<Client> {
-  if (!temporalClient) {
-    const isTemporalCloud = TEMPORAL_ADDRESS.includes('temporal.io');
-    const connectionOptions: Parameters<typeof Connection.connect>[0] = {
-      address: TEMPORAL_ADDRESS,
-    };
-    if (isTemporalCloud && TEMPORAL_API_KEY) {
-      connectionOptions.tls = true;
-      connectionOptions.apiKey = TEMPORAL_API_KEY;
-    }
-    const connection = await Connection.connect(connectionOptions);
-    temporalClient = new Client({ connection, namespace: TEMPORAL_NAMESPACE });
-  }
-  return temporalClient;
-}
+import { startWorkflowRun } from '../services/temporal.js';
 
 export const chatRoutes: FastifyPluginAsync = async (app) => {
   app.addHook('onRequest', async (request, reply) => {
@@ -90,23 +67,17 @@ export const chatRoutes: FastifyPluginAsync = async (app) => {
       }
 
       try {
-        const client = await getTemporalClient();
-
-        // Generate workflow ID
-        const workflowId = `chat-turn-${body.workspaceId}-${Date.now()}`;
-
-        // Start the workflow
-        const handle = await client.workflow.start('ChatTurnWorkflow', {
-          taskQueue: 'homeos-workflows',
-          workflowId,
-          args: [
-            {
-              sessionId: body.sessionId,
-              workspaceId: body.workspaceId,
-              userId: body.userId,
-              message: body.message,
-            },
-          ],
+        const { workflowId } = await startWorkflowRun({
+          workspaceId: body.workspaceId,
+          userId: body.userId,
+          workflowType: 'ChatTurnWorkflow',
+          triggerType: 'chat',
+          input: {
+            sessionId: body.sessionId,
+            workspaceId: body.workspaceId,
+            userId: body.userId,
+            message: body.message,
+          },
         });
 
         // Emit task created event
@@ -114,7 +85,7 @@ export const chatRoutes: FastifyPluginAsync = async (app) => {
           type: 'task.created',
           payload: {
             taskId: workflowId,
-            workflowId: handle.workflowId,
+            workflowId,
             title: 'Processing chat message',
             status: 'running',
           },
@@ -123,7 +94,7 @@ export const chatRoutes: FastifyPluginAsync = async (app) => {
         return {
           sessionId: body.sessionId ?? workflowId,
           taskId: workflowId,
-          workflowId: handle.workflowId,
+          workflowId,
         };
       } catch (error) {
         app.log.error(error, 'Failed to start ChatTurnWorkflow');

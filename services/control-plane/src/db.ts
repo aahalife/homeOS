@@ -136,6 +136,33 @@ export async function runMigrations(): Promise<void> {
   await p.query(`CREATE INDEX IF NOT EXISTS idx_llm_usage_workspace ON homeos.llm_usage(workspace_id)`);
   await p.query(`CREATE INDEX IF NOT EXISTS idx_llm_usage_created_at ON homeos.llm_usage(created_at DESC)`);
 
+  // Create workflow_runs table if not exists
+  await p.query(`
+    CREATE TABLE IF NOT EXISTS homeos.workflow_runs (
+      workflow_id VARCHAR(255) PRIMARY KEY,
+      run_id VARCHAR(255),
+      workspace_id UUID NOT NULL REFERENCES homeos.workspaces(id) ON DELETE CASCADE,
+      workflow_type VARCHAR(255) NOT NULL,
+      trigger_type VARCHAR(50) NOT NULL DEFAULT 'manual',
+      triggered_by UUID REFERENCES homeos.users(id) ON DELETE SET NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'running'
+        CHECK (status IN ('queued', 'running', 'retrying', 'succeeded', 'failed', 'canceled')),
+      attempts INTEGER NOT NULL DEFAULT 1,
+      max_attempts INTEGER,
+      input JSONB DEFAULT '{}',
+      result JSONB,
+      error TEXT,
+      started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      completed_at TIMESTAMPTZ,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_workflow_runs_workspace ON homeos.workflow_runs(workspace_id)`);
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON homeos.workflow_runs(status)`);
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_workflow_runs_started_at ON homeos.workflow_runs(started_at DESC)`);
+  await p.query(`CREATE INDEX IF NOT EXISTS idx_workflow_runs_type ON homeos.workflow_runs(workflow_type)`);
+
   console.log('Migrations completed successfully');
 }
 

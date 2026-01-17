@@ -31,6 +31,23 @@ const CreateNotificationSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 });
 
+const WorkflowRunUpsertSchema = z.object({
+  workspaceId: z.string().uuid(),
+  workflowId: z.string().min(1),
+  runId: z.string().min(1).optional().nullable(),
+  workflowType: z.string().min(1),
+  triggerType: z.string().min(1).optional().nullable(),
+  triggeredBy: z.string().uuid().optional().nullable(),
+  status: z.enum(['queued', 'running', 'retrying', 'succeeded', 'failed', 'canceled']).optional(),
+  attempts: z.number().int().positive().optional(),
+  maxAttempts: z.number().int().positive().optional().nullable(),
+  input: z.record(z.unknown()).optional(),
+  result: z.record(z.unknown()).optional(),
+  error: z.string().optional().nullable(),
+  startedAt: z.string().datetime().optional(),
+  completedAt: z.string().datetime().optional().nullable(),
+});
+
 export const internalRoutes: FastifyPluginAsync = async (app) => {
   const pool = getPool();
   const secretsService = new SecretsService();
@@ -317,6 +334,96 @@ export const internalRoutes: FastifyPluginAsync = async (app) => {
       );
 
       return reply.status(201).send({ success: true });
+    }
+  );
+
+  app.post(
+    '/workflow-runs',
+    {
+      schema: {
+        description: 'Internal: upsert workflow run status',
+        tags: ['internal'],
+        body: {
+          type: 'object',
+          required: ['workspaceId', 'workflowId', 'workflowType'],
+          properties: {
+            workspaceId: { type: 'string', format: 'uuid' },
+            workflowId: { type: 'string' },
+            runId: { type: 'string' },
+            workflowType: { type: 'string' },
+            triggerType: { type: 'string' },
+            triggeredBy: { type: 'string', format: 'uuid' },
+            status: { type: 'string' },
+            attempts: { type: 'integer' },
+            maxAttempts: { type: 'integer' },
+            input: { type: 'object', additionalProperties: true },
+            result: { type: 'object', additionalProperties: true },
+            error: { type: 'string' },
+            startedAt: { type: 'string' },
+            completedAt: { type: 'string' },
+          },
+        },
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              workflowId: { type: 'string' },
+              status: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    async (request, reply) => {
+      const body = WorkflowRunUpsertSchema.parse(request.body);
+
+      const inputPayload = body.input ? JSON.stringify(body.input) : null;
+      const resultPayload = body.result ? JSON.stringify(body.result) : null;
+
+      const result = await pool.query(
+        `INSERT INTO homeos.workflow_runs
+          (workflow_id, run_id, workspace_id, workflow_type, trigger_type, triggered_by, status,
+           attempts, max_attempts, input, result, error, started_at, completed_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7,
+           $8, $9, $10, $11, $12, $13, $14)
+         ON CONFLICT (workflow_id) DO UPDATE SET
+           run_id = COALESCE(EXCLUDED.run_id, homeos.workflow_runs.run_id),
+           workspace_id = EXCLUDED.workspace_id,
+           workflow_type = COALESCE(EXCLUDED.workflow_type, homeos.workflow_runs.workflow_type),
+           trigger_type = COALESCE(EXCLUDED.trigger_type, homeos.workflow_runs.trigger_type),
+           triggered_by = COALESCE(EXCLUDED.triggered_by, homeos.workflow_runs.triggered_by),
+           status = COALESCE(EXCLUDED.status, homeos.workflow_runs.status),
+           attempts = COALESCE(EXCLUDED.attempts, homeos.workflow_runs.attempts),
+           max_attempts = COALESCE(EXCLUDED.max_attempts, homeos.workflow_runs.max_attempts),
+           input = COALESCE(EXCLUDED.input, homeos.workflow_runs.input),
+           result = COALESCE(EXCLUDED.result, homeos.workflow_runs.result),
+           error = COALESCE(EXCLUDED.error, homeos.workflow_runs.error),
+           started_at = COALESCE(EXCLUDED.started_at, homeos.workflow_runs.started_at),
+           completed_at = COALESCE(EXCLUDED.completed_at, homeos.workflow_runs.completed_at),
+           updated_at = NOW()
+         RETURNING workflow_id, status`,
+        [
+          body.workflowId,
+          body.runId ?? null,
+          body.workspaceId,
+          body.workflowType,
+          body.triggerType ?? null,
+          body.triggeredBy ?? null,
+          body.status ?? 'running',
+          body.attempts ?? null,
+          body.maxAttempts ?? null,
+          inputPayload,
+          resultPayload,
+          body.error ?? null,
+          body.startedAt ?? null,
+          body.completedAt ?? null,
+        ]
+      );
+
+      return reply.status(201).send({
+        workflowId: result.rows[0].workflow_id,
+        status: result.rows[0].status,
+      });
     }
   );
 };

@@ -157,6 +157,33 @@ CREATE INDEX IF NOT EXISTS idx_llm_usage_workspace ON llm_usage(workspace_id);
 CREATE INDEX IF NOT EXISTS idx_llm_usage_created_at ON llm_usage(created_at DESC);
 
 -- =====================================================
+-- WORKFLOW RUNS
+-- =====================================================
+CREATE TABLE IF NOT EXISTS workflow_runs (
+    workflow_id VARCHAR(255) PRIMARY KEY,
+    run_id VARCHAR(255),
+    workspace_id UUID NOT NULL REFERENCES workspaces(id) ON DELETE CASCADE,
+    workflow_type VARCHAR(255) NOT NULL,
+    trigger_type VARCHAR(50) NOT NULL DEFAULT 'manual',
+    triggered_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'running'
+        CHECK (status IN ('queued', 'running', 'retrying', 'succeeded', 'failed', 'canceled')),
+    attempts INTEGER NOT NULL DEFAULT 1,
+    max_attempts INTEGER,
+    input JSONB DEFAULT '{}',
+    result JSONB,
+    error TEXT,
+    started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    completed_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_workflow_runs_workspace ON workflow_runs(workspace_id);
+CREATE INDEX IF NOT EXISTS idx_workflow_runs_status ON workflow_runs(status);
+CREATE INDEX IF NOT EXISTS idx_workflow_runs_started_at ON workflow_runs(started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_workflow_runs_type ON workflow_runs(workflow_type);
+
+-- =====================================================
 -- CALL HISTORY
 -- =====================================================
 CREATE TABLE IF NOT EXISTS call_history (
@@ -244,6 +271,10 @@ CREATE TRIGGER update_onboarding_sessions_updated_at
 
 CREATE TRIGGER update_phone_numbers_updated_at
     BEFORE UPDATE ON phone_numbers
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_workflow_runs_updated_at
+    BEFORE UPDATE ON workflow_runs
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_composio_connections_updated_at

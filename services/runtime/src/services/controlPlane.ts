@@ -16,6 +16,23 @@ export interface CreateNotificationInput {
   metadata?: Record<string, unknown>;
 }
 
+export interface WorkflowRunUpsertInput {
+  workspaceId: string;
+  workflowId: string;
+  runId?: string | null;
+  workflowType: string;
+  triggerType?: string | null;
+  triggeredBy?: string | null;
+  status?: 'queued' | 'running' | 'retrying' | 'succeeded' | 'failed' | 'canceled';
+  attempts?: number | null;
+  maxAttempts?: number | null;
+  input?: Record<string, unknown> | null;
+  result?: Record<string, unknown> | null;
+  error?: string | null;
+  startedAt?: string | null;
+  completedAt?: string | null;
+}
+
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const cache = new Map<string, { expiresAt: number; value: NotificationPreferences }>();
 
@@ -78,6 +95,35 @@ export async function createNotification(
 
   try {
     const response = await fetch(`${baseUrl}/v1/internal/notifications`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-service-token': serviceToken,
+      },
+      body: JSON.stringify(input),
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function upsertWorkflowRun(
+  input: WorkflowRunUpsertInput
+): Promise<{ workflowId: string; status: string } | null> {
+  const baseUrl = process.env['CONTROL_PLANE_URL'];
+  const serviceToken = process.env['CONTROL_PLANE_SERVICE_TOKEN'];
+  if (!baseUrl || !serviceToken) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(`${baseUrl}/v1/internal/workflow-runs`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

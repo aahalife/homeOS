@@ -19,4 +19,5 @@ YYYY-MM-DDTHH:MM:SSZ | STORY_ID | short note
 2026-01-16T18:01:31Z | US-007 | Added runtime notification queueing + control-plane notification APIs + APNs registration flow (pending build/test)
 2026-01-17T02:59:50Z | US-007 | Added Twilio auto-provisioning API and iOS settings activation flow (pending build/test)
 2026-01-17T04:13:35Z | US-007 | Added LLM config/usage plumbing and usage summary endpoint (pending build/test)
+2026-01-17T07:33:49Z | US-013 | Added workflow run tracking + manual run endpoint scaffolding (pending build/test)
 

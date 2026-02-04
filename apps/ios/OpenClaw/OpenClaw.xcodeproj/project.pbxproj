@@ -1,0 +1,920 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 63;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0627649051873950C61F7180 /* OpenClawUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84F1B1C88458FE4816A125E6 /* OpenClawUITests.swift */; };
+		0B450B2730432EFDEFAB3AB7 /* OpenFDAAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9407A5DB4B9AC513ECCF8DA4 /* OpenFDAAPI.swift */; };
+		0C530038340002618B84AA85 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185E59980CA6A5C8B00ED1E2 /* ChatViewModel.swift */; };
+		16898BE487BD204C81B21C9D /* WeatherAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD4D1C4F8CC34EF1E64968C0 /* WeatherAPI.swift */; };
+		187ADA950592AA71D93A1166 /* StubIntentClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DA889D39D40F0A735568B5 /* StubIntentClassifier.swift */; };
+		1D7E693E14F46929E94EEDBA /* SimulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 372368D9CD9236EC68A0C4C2 /* SimulationTests.swift */; };
+		1E2DB374A1AF9AC9CF4559A3 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB416A1C04D09285CB5E01F9 /* NetworkMonitor.swift */; };
+		1FCF17BB7B499AD2952030EB /* GooglePlacesAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815456ACEDA82FCD84DDD362 /* GooglePlacesAPI.swift */; };
+		20ADE030E9D49609879011F9 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 824C6CD24E30F24F5C526029 /* KeychainManager.swift */; };
+		2331630D71732927FCA9D813 /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E92D0A2067C6EDA6ED9D8608 /* AppLogger.swift */; };
+		238596931B03381C23240995 /* GoogleCalendarAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4F99004DDD55F9C7EDA43AB /* GoogleCalendarAPI.swift */; };
+		26C1CCBE76CED31658D48E78 /* LiveAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837DDA4703E6CFC02D4F985B /* LiveAPITests.swift */; };
+		33351665E4F76CC8465834A7 /* MealPlanningSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 343A25A118057423FC3DFDF0 /* MealPlanningSkill.swift */; };
+		3466DA48CCDC96456EBFF88C /* ElderCareSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76D03C09C97119C52C53868 /* ElderCareSkill.swift */; };
+		3EFC357678BAE870A75FFFC0 /* SkillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62C703309A2C070CB749EBAF /* SkillTests.swift */; };
+		45406AE863C6944164998B15 /* SkillsDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F35B5316F9A92808053E06D /* SkillsDashboardView.swift */; };
+		4C89280808A0296739F3494D /* FamilyCoordinationSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECE7DDAF9F9813204D77476 /* FamilyCoordinationSkill.swift */; };
+		5119FF2E03941DBEA5950954 /* RealWorldSimulationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DD3A31C8EEA98FE130924D5 /* RealWorldSimulationTests.swift */; };
+		59577FFEFD96D339F7D55D41 /* CoreModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14398D9E1351223E85332436 /* CoreModels.swift */; };
+		638840FC97804AE8C4FC2B79 /* APITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE675FF23125A5A37EE873B2 /* APITests.swift */; };
+		6F7509931DBA4596C45417CA /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33C397E75BBBB55D41D141CD /* OnboardingView.swift */; };
+		714A6A23678CEAA750554F71 /* TwilioAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7469DAE572DD04D7683ADAE /* TwilioAPI.swift */; };
+		723610DF7D4F39987D459FF9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8B5378F666C246E0F3EAF6 /* SettingsView.swift */; };
+		75880F9C45254A2CF370B505 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 518BEE3632FA3EAEDBEC3A02 /* APIClient.swift */; };
+		76DC3B68C9922D4CB31A6B75 /* EducationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9058F54444D5E058D2F51B2 /* EducationModels.swift */; };
+		7818FD319CD7A42C13456B4C /* CalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 992E6024DBBB6C1706659434 /* CalendarView.swift */; };
+		788DA1E537E06094F09B0C87 /* GoogleClassroomAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94535CEE19C04386FD20D90B /* GoogleClassroomAPI.swift */; };
+		8546255B91DBE7A374CE8C4B /* HomeMaintenanceSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C969456A0F8438B758ED035 /* HomeMaintenanceSkill.swift */; };
+		94F45E4DE4C0CC43FB423540 /* OnboardingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65B3CFDFC127806B29F3F05 /* OnboardingViewModel.swift */; };
+		9B2BFCF36A14EEEC0B311D01 /* OpenClawTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0FB4C9A1B9302949C030BAC /* OpenClawTests.swift */; };
+		9E96163B63EA78697CFCABC2 /* ModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E0D18D23812C714A57A994 /* ModelManager.swift */; };
+		9EAA203D94930CF661A291EF /* EducationSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152465805FEB3512C14EBBF1 /* EducationSkill.swift */; };
+		9EDB7BA98B3EDF3B19020E77 /* IntentClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA42141D3845EBAA92F91F7 /* IntentClassifierTests.swift */; };
+		A5E697EB3FD6EF8F37C6A8EE /* OpenClawApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E2B757311CD1138DA2C284 /* OpenClawApp.swift */; };
+		A77B54F2046598EA04806BAE /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039125B98FC35F368AD02057 /* PersistenceController.swift */; };
+		A784C08422CCF22FE0AD37A3 /* SpoonacularAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D15295E2407196E2AB67FB /* SpoonacularAPI.swift */; };
+		A92BD53CB7624C74BC4D1F8B /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418A65CB22514E5C2FAB149F /* MainTabView.swift */; };
+		AA78D2F277A380BDA1EE9361 /* MentalLoadSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA078E400B08F242B645617F /* MentalLoadSkill.swift */; };
+		AD5148755795C17B541C7665 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4722BD2B468D9AB2B4AD00 /* Extensions.swift */; };
+		B21FB0F4F595569389582F49 /* MealPlanningModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63D21DDAB367A38C71D7EEFD /* MealPlanningModels.swift */; };
+		B8DED653E90CF3763BD05340 /* USDAFoodDataAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 231E28D4394878BF0AC89E73 /* USDAFoodDataAPI.swift */; };
+		BA940CE57AE4F88A79D600F2 /* ElderCareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DF38ABAE871907D4BE26216 /* ElderCareModels.swift */; };
+		C1E52FCC1D0049C64B584E33 /* HealthcareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F511C49C34D43DE0C49ED85 /* HealthcareModels.swift */; };
+		C358585E21B80A643B652DBE /* HealthcareSkill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CFBE7106CE8EF1817981E0 /* HealthcareSkill.swift */; };
+		C5E155202C84C5B1EFAE0F81 /* StubData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BE47886CF68B4968F69B8D /* StubData.swift */; };
+		C850EAEC807413DB93728908 /* StubResponseGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2FEB2A0FEA955870CE1DAF /* StubResponseGenerator.swift */; };
+		C8EDEFF544FB2CA35274FB8B /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD197A82C30C689B8BCC2308 /* RootView.swift */; };
+		D67E516CFCB561DA764074E4 /* FamilyCoordinationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFFA8EFDCF5FCF3F136753C /* FamilyCoordinationModels.swift */; };
+		DC5236AA512798088DCBD8FF /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 037E41E99AD9AA0F15EC2EAE /* SettingsViewModel.swift */; };
+		E188DD4AB8BAE2071CF84445 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E45B68E5319360290D6F062 /* ChatView.swift */; };
+		EDE41F57027852B8C1FE1617 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BB26699AEA006B2391A1240 /* AppState.swift */; };
+		F7375EC9354A9346102E906B /* HomeMaintenanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62DF2589073F518E09F3EA3 /* HomeMaintenanceModels.swift */; };
+		F9E2604CF00BE5A91A26141B /* SkillOrchestrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D76C7F935F706AE2A0C5AE /* SkillOrchestrator.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		64530F578EA629FF5012C939 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A8EFE64C337C902FDC43CDF0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E13D7CA665CB2C7715BB112F;
+			remoteInfo = OpenClaw;
+		};
+		EA2EA7D092F862149191D475 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A8EFE64C337C902FDC43CDF0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E13D7CA665CB2C7715BB112F;
+			remoteInfo = OpenClaw;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0079FE2FF68C3B728C7313DD /* OpenClaw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenClaw.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		037E41E99AD9AA0F15EC2EAE /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		039125B98FC35F368AD02057 /* PersistenceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceController.swift; sourceTree = "<group>"; };
+		0C969456A0F8438B758ED035 /* HomeMaintenanceSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMaintenanceSkill.swift; sourceTree = "<group>"; };
+		0DD3A31C8EEA98FE130924D5 /* RealWorldSimulationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealWorldSimulationTests.swift; sourceTree = "<group>"; };
+		0E45B68E5319360290D6F062 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		14398D9E1351223E85332436 /* CoreModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreModels.swift; sourceTree = "<group>"; };
+		152465805FEB3512C14EBBF1 /* EducationSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EducationSkill.swift; sourceTree = "<group>"; };
+		17CFBE7106CE8EF1817981E0 /* HealthcareSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthcareSkill.swift; sourceTree = "<group>"; };
+		185E59980CA6A5C8B00ED1E2 /* ChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModel.swift; sourceTree = "<group>"; };
+		1D8B5378F666C246E0F3EAF6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		1ECE7DDAF9F9813204D77476 /* FamilyCoordinationSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCoordinationSkill.swift; sourceTree = "<group>"; };
+		231E28D4394878BF0AC89E73 /* USDAFoodDataAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = USDAFoodDataAPI.swift; sourceTree = "<group>"; };
+		2F35B5316F9A92808053E06D /* SkillsDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillsDashboardView.swift; sourceTree = "<group>"; };
+		30E0D18D23812C714A57A994 /* ModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelManager.swift; sourceTree = "<group>"; };
+		33C397E75BBBB55D41D141CD /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		343A25A118057423FC3DFDF0 /* MealPlanningSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanningSkill.swift; sourceTree = "<group>"; };
+		372368D9CD9236EC68A0C4C2 /* SimulationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulationTests.swift; sourceTree = "<group>"; };
+		3C618379D7183D8EA84D29C3 /* OpenClawTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenClawTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		418A65CB22514E5C2FAB149F /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		42D76C7F935F706AE2A0C5AE /* SkillOrchestrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillOrchestrator.swift; sourceTree = "<group>"; };
+		44D15295E2407196E2AB67FB /* SpoonacularAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpoonacularAPI.swift; sourceTree = "<group>"; };
+		518BEE3632FA3EAEDBEC3A02 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		52E2B757311CD1138DA2C284 /* OpenClawApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawApp.swift; sourceTree = "<group>"; };
+		62C703309A2C070CB749EBAF /* SkillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillTests.swift; sourceTree = "<group>"; };
+		63D21DDAB367A38C71D7EEFD /* MealPlanningModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanningModels.swift; sourceTree = "<group>"; };
+		65FF50C653F884879B125848 /* OpenClawUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = OpenClawUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A2FEB2A0FEA955870CE1DAF /* StubResponseGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubResponseGenerator.swift; sourceTree = "<group>"; };
+		7BB26699AEA006B2391A1240 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		7DF38ABAE871907D4BE26216 /* ElderCareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElderCareModels.swift; sourceTree = "<group>"; };
+		7F4722BD2B468D9AB2B4AD00 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		7F511C49C34D43DE0C49ED85 /* HealthcareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthcareModels.swift; sourceTree = "<group>"; };
+		815456ACEDA82FCD84DDD362 /* GooglePlacesAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GooglePlacesAPI.swift; sourceTree = "<group>"; };
+		824C6CD24E30F24F5C526029 /* KeychainManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManager.swift; sourceTree = "<group>"; };
+		837DDA4703E6CFC02D4F985B /* LiveAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveAPITests.swift; sourceTree = "<group>"; };
+		84F1B1C88458FE4816A125E6 /* OpenClawUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawUITests.swift; sourceTree = "<group>"; };
+		9407A5DB4B9AC513ECCF8DA4 /* OpenFDAAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenFDAAPI.swift; sourceTree = "<group>"; };
+		94535CEE19C04386FD20D90B /* GoogleClassroomAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleClassroomAPI.swift; sourceTree = "<group>"; };
+		992E6024DBBB6C1706659434 /* CalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarView.swift; sourceTree = "<group>"; };
+		9AA42141D3845EBAA92F91F7 /* IntentClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntentClassifierTests.swift; sourceTree = "<group>"; };
+		A0FB4C9A1B9302949C030BAC /* OpenClawTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenClawTests.swift; sourceTree = "<group>"; };
+		AD197A82C30C689B8BCC2308 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		B4F99004DDD55F9C7EDA43AB /* GoogleCalendarAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCalendarAPI.swift; sourceTree = "<group>"; };
+		B5BE47886CF68B4968F69B8D /* StubData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubData.swift; sourceTree = "<group>"; };
+		B76D03C09C97119C52C53868 /* ElderCareSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElderCareSkill.swift; sourceTree = "<group>"; };
+		B9058F54444D5E058D2F51B2 /* EducationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EducationModels.swift; sourceTree = "<group>"; };
+		CA078E400B08F242B645617F /* MentalLoadSkill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalLoadSkill.swift; sourceTree = "<group>"; };
+		D7DA889D39D40F0A735568B5 /* StubIntentClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StubIntentClassifier.swift; sourceTree = "<group>"; };
+		DE675FF23125A5A37EE873B2 /* APITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APITests.swift; sourceTree = "<group>"; };
+		E62DF2589073F518E09F3EA3 /* HomeMaintenanceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeMaintenanceModels.swift; sourceTree = "<group>"; };
+		E7469DAE572DD04D7683ADAE /* TwilioAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwilioAPI.swift; sourceTree = "<group>"; };
+		E92D0A2067C6EDA6ED9D8608 /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
+		EB416A1C04D09285CB5E01F9 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		F65B3CFDFC127806B29F3F05 /* OnboardingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModel.swift; sourceTree = "<group>"; };
+		FD4D1C4F8CC34EF1E64968C0 /* WeatherAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherAPI.swift; sourceTree = "<group>"; };
+		FFFFA8EFDCF5FCF3F136753C /* FamilyCoordinationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyCoordinationModels.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0703DE7D41E44424B6511484 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				039125B98FC35F368AD02057 /* PersistenceController.swift */,
+				5DD95BE7A47F910015A81BEC /* {CoreData} */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		0D0546AE35AD3F4D24C3979F /* MentalLoad */ = {
+			isa = PBXGroup;
+			children = (
+				CA078E400B08F242B645617F /* MentalLoadSkill.swift */,
+			);
+			path = MentalLoad;
+			sourceTree = "<group>";
+		};
+		0D7F1EDF13F8D8D02F97884A /* OpenClawTests */ = {
+			isa = PBXGroup;
+			children = (
+				DE675FF23125A5A37EE873B2 /* APITests.swift */,
+				9AA42141D3845EBAA92F91F7 /* IntentClassifierTests.swift */,
+				837DDA4703E6CFC02D4F985B /* LiveAPITests.swift */,
+				A0FB4C9A1B9302949C030BAC /* OpenClawTests.swift */,
+				0DD3A31C8EEA98FE130924D5 /* RealWorldSimulationTests.swift */,
+				372368D9CD9236EC68A0C4C2 /* SimulationTests.swift */,
+				62C703309A2C070CB749EBAF /* SkillTests.swift */,
+			);
+			path = OpenClawTests;
+			sourceTree = "<group>";
+		};
+		10398375D0B6F4B7C900CF5D /* Chat */ = {
+			isa = PBXGroup;
+			children = (
+				0E45B68E5319360290D6F062 /* ChatView.swift */,
+			);
+			path = Chat;
+			sourceTree = "<group>";
+		};
+		1D321ECF8865436C3A3C2754 /* OpenClaw */ = {
+			isa = PBXGroup;
+			children = (
+				753EE986F163CB30BF47D9D0 /* AI */,
+				8049EEF688248D29AB3E9926 /* App */,
+				71EEA64EBB0A116D80AD197A /* Models */,
+				C621E10AC3DD2A927746D3A7 /* Networking */,
+				0703DE7D41E44424B6511484 /* Persistence */,
+				7A74B818CFFD0628CD8100C5 /* Services */,
+				BEFED32EDDC961DEC2C3F885 /* Skills */,
+				37D5C3F1C781AD61934D2196 /* Utilities */,
+				51BED2FEDEBE8472282DE8ED /* ViewModels */,
+				99952616552540B0CEB0AD9C /* Views */,
+			);
+			path = OpenClaw;
+			sourceTree = "<group>";
+		};
+		37D5C3F1C781AD61934D2196 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				E92D0A2067C6EDA6ED9D8608 /* AppLogger.swift */,
+				7F4722BD2B468D9AB2B4AD00 /* Extensions.swift */,
+				824C6CD24E30F24F5C526029 /* KeychainManager.swift */,
+				EB416A1C04D09285CB5E01F9 /* NetworkMonitor.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		51BED2FEDEBE8472282DE8ED /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				185E59980CA6A5C8B00ED1E2 /* ChatViewModel.swift */,
+				F65B3CFDFC127806B29F3F05 /* OnboardingViewModel.swift */,
+				037E41E99AD9AA0F15EC2EAE /* SettingsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		5B4397F97A01A59FB18D4CE6 /* Healthcare */ = {
+			isa = PBXGroup;
+			children = (
+				17CFBE7106CE8EF1817981E0 /* HealthcareSkill.swift */,
+			);
+			path = Healthcare;
+			sourceTree = "<group>";
+		};
+		5DD95BE7A47F910015A81BEC /* {CoreData} */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "{CoreData}";
+			sourceTree = "<group>";
+		};
+		6125B8AC9227345511D0244C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0079FE2FF68C3B728C7313DD /* OpenClaw.app */,
+				3C618379D7183D8EA84D29C3 /* OpenClawTests.xctest */,
+				65FF50C653F884879B125848 /* OpenClawUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		6853B5EA59D165A83434BEB1 = {
+			isa = PBXGroup;
+			children = (
+				1D321ECF8865436C3A3C2754 /* OpenClaw */,
+				0D7F1EDF13F8D8D02F97884A /* OpenClawTests */,
+				CB60C9924DDCFA612BCE1D82 /* OpenClawUITests */,
+				6125B8AC9227345511D0244C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		71EEA64EBB0A116D80AD197A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				14398D9E1351223E85332436 /* CoreModels.swift */,
+				B9058F54444D5E058D2F51B2 /* EducationModels.swift */,
+				7DF38ABAE871907D4BE26216 /* ElderCareModels.swift */,
+				FFFFA8EFDCF5FCF3F136753C /* FamilyCoordinationModels.swift */,
+				7F511C49C34D43DE0C49ED85 /* HealthcareModels.swift */,
+				E62DF2589073F518E09F3EA3 /* HomeMaintenanceModels.swift */,
+				63D21DDAB367A38C71D7EEFD /* MealPlanningModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		753EE986F163CB30BF47D9D0 /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				30E0D18D23812C714A57A994 /* ModelManager.swift */,
+				84AB7C9DA5B9407C393F2BDE /* {Stubs} */,
+				F20BD729F923E7A34A99AC87 /* Stubs */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
+		7A74B818CFFD0628CD8100C5 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				42D76C7F935F706AE2A0C5AE /* SkillOrchestrator.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		7E68B34327979C311DE44A4A /* APIs */ = {
+			isa = PBXGroup;
+			children = (
+				B4F99004DDD55F9C7EDA43AB /* GoogleCalendarAPI.swift */,
+				94535CEE19C04386FD20D90B /* GoogleClassroomAPI.swift */,
+				815456ACEDA82FCD84DDD362 /* GooglePlacesAPI.swift */,
+				9407A5DB4B9AC513ECCF8DA4 /* OpenFDAAPI.swift */,
+				44D15295E2407196E2AB67FB /* SpoonacularAPI.swift */,
+				E7469DAE572DD04D7683ADAE /* TwilioAPI.swift */,
+				231E28D4394878BF0AC89E73 /* USDAFoodDataAPI.swift */,
+				FD4D1C4F8CC34EF1E64968C0 /* WeatherAPI.swift */,
+			);
+			path = APIs;
+			sourceTree = "<group>";
+		};
+		8049EEF688248D29AB3E9926 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7BB26699AEA006B2391A1240 /* AppState.swift */,
+				52E2B757311CD1138DA2C284 /* OpenClawApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		84AB7C9DA5B9407C393F2BDE /* {Stubs} */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "{Stubs}";
+			sourceTree = "<group>";
+		};
+		858FD584C97D3A17F3848A28 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				33C397E75BBBB55D41D141CD /* OnboardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		8A2E31DE20E22DBE83D0293A /* FamilyCoordination */ = {
+			isa = PBXGroup;
+			children = (
+				1ECE7DDAF9F9813204D77476 /* FamilyCoordinationSkill.swift */,
+			);
+			path = FamilyCoordination;
+			sourceTree = "<group>";
+		};
+		99952616552540B0CEB0AD9C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				992E6024DBBB6C1706659434 /* CalendarView.swift */,
+				418A65CB22514E5C2FAB149F /* MainTabView.swift */,
+				AD197A82C30C689B8BCC2308 /* RootView.swift */,
+				10398375D0B6F4B7C900CF5D /* Chat */,
+				CAF4979BF23F2164420F6C1C /* Components */,
+				858FD584C97D3A17F3848A28 /* Onboarding */,
+				D2E0EF6C014126BA7AE2A124 /* Settings */,
+				ED46A7A0F613F6EAEF147BB9 /* Skills */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A64AB8149409134600DE8FB7 /* ElderCare */ = {
+			isa = PBXGroup;
+			children = (
+				B76D03C09C97119C52C53868 /* ElderCareSkill.swift */,
+			);
+			path = ElderCare;
+			sourceTree = "<group>";
+		};
+		B6BC58878BF1E0A2F174D700 /* Education */ = {
+			isa = PBXGroup;
+			children = (
+				152465805FEB3512C14EBBF1 /* EducationSkill.swift */,
+			);
+			path = Education;
+			sourceTree = "<group>";
+		};
+		BEFED32EDDC961DEC2C3F885 /* Skills */ = {
+			isa = PBXGroup;
+			children = (
+				B6BC58878BF1E0A2F174D700 /* Education */,
+				A64AB8149409134600DE8FB7 /* ElderCare */,
+				8A2E31DE20E22DBE83D0293A /* FamilyCoordination */,
+				5B4397F97A01A59FB18D4CE6 /* Healthcare */,
+				F3ADDA0AE67CFD3C1FD2275D /* HomeMaintenance */,
+				D859D27659776C58B59B144C /* MealPlanning */,
+				0D0546AE35AD3F4D24C3979F /* MentalLoad */,
+			);
+			path = Skills;
+			sourceTree = "<group>";
+		};
+		C621E10AC3DD2A927746D3A7 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				518BEE3632FA3EAEDBEC3A02 /* APIClient.swift */,
+				B5BE47886CF68B4968F69B8D /* StubData.swift */,
+				7E68B34327979C311DE44A4A /* APIs */,
+				EF311CBF8C54DBE0CE9FEFA9 /* Auth */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		CAF4979BF23F2164420F6C1C /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		CB60C9924DDCFA612BCE1D82 /* OpenClawUITests */ = {
+			isa = PBXGroup;
+			children = (
+				84F1B1C88458FE4816A125E6 /* OpenClawUITests.swift */,
+			);
+			path = OpenClawUITests;
+			sourceTree = "<group>";
+		};
+		D2E0EF6C014126BA7AE2A124 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				1D8B5378F666C246E0F3EAF6 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		D859D27659776C58B59B144C /* MealPlanning */ = {
+			isa = PBXGroup;
+			children = (
+				343A25A118057423FC3DFDF0 /* MealPlanningSkill.swift */,
+			);
+			path = MealPlanning;
+			sourceTree = "<group>";
+		};
+		ED46A7A0F613F6EAEF147BB9 /* Skills */ = {
+			isa = PBXGroup;
+			children = (
+				2F35B5316F9A92808053E06D /* SkillsDashboardView.swift */,
+			);
+			path = Skills;
+			sourceTree = "<group>";
+		};
+		EF311CBF8C54DBE0CE9FEFA9 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		F20BD729F923E7A34A99AC87 /* Stubs */ = {
+			isa = PBXGroup;
+			children = (
+				D7DA889D39D40F0A735568B5 /* StubIntentClassifier.swift */,
+				7A2FEB2A0FEA955870CE1DAF /* StubResponseGenerator.swift */,
+			);
+			path = Stubs;
+			sourceTree = "<group>";
+		};
+		F3ADDA0AE67CFD3C1FD2275D /* HomeMaintenance */ = {
+			isa = PBXGroup;
+			children = (
+				0C969456A0F8438B758ED035 /* HomeMaintenanceSkill.swift */,
+			);
+			path = HomeMaintenance;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		69DDE792A2CE9DAA7B330B1B /* OpenClawUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 869CB079AE487209E3B8D6ED /* Build configuration list for PBXNativeTarget "OpenClawUITests" */;
+			buildPhases = (
+				22BDE248895A956BE98D58B9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				829F5A7E3D2E58AEEF9D7E25 /* PBXTargetDependency */,
+			);
+			name = OpenClawUITests;
+			packageProductDependencies = (
+			);
+			productName = OpenClawUITests;
+			productReference = 65FF50C653F884879B125848 /* OpenClawUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		707A318CE84A121FC0D47188 /* OpenClawTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B34C3C00D87CB88F8A3CC8A6 /* Build configuration list for PBXNativeTarget "OpenClawTests" */;
+			buildPhases = (
+				6A8C389639C16E78984700DE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E801D0AF64E18C285DBC7762 /* PBXTargetDependency */,
+			);
+			name = OpenClawTests;
+			packageProductDependencies = (
+			);
+			productName = OpenClawTests;
+			productReference = 3C618379D7183D8EA84D29C3 /* OpenClawTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		E13D7CA665CB2C7715BB112F /* OpenClaw */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39F36ECD358A83E044E7DAED /* Build configuration list for PBXNativeTarget "OpenClaw" */;
+			buildPhases = (
+				95FCF3D88427FA53812DFBF0 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenClaw;
+			packageProductDependencies = (
+			);
+			productName = OpenClaw;
+			productReference = 0079FE2FF68C3B728C7313DD /* OpenClaw.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A8EFE64C337C902FDC43CDF0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					69DDE792A2CE9DAA7B330B1B = {
+						DevelopmentTeam = "";
+						TestTargetID = E13D7CA665CB2C7715BB112F;
+					};
+					707A318CE84A121FC0D47188 = {
+						DevelopmentTeam = "";
+					};
+				};
+			};
+			buildConfigurationList = C7676D1692AEC7EBC17A16F5 /* Build configuration list for PBXProject "OpenClaw" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6853B5EA59D165A83434BEB1;
+			minimizedProjectReferenceProxies = 1;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E13D7CA665CB2C7715BB112F /* OpenClaw */,
+				707A318CE84A121FC0D47188 /* OpenClawTests */,
+				69DDE792A2CE9DAA7B330B1B /* OpenClawUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		22BDE248895A956BE98D58B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0627649051873950C61F7180 /* OpenClawUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6A8C389639C16E78984700DE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				638840FC97804AE8C4FC2B79 /* APITests.swift in Sources */,
+				9EDB7BA98B3EDF3B19020E77 /* IntentClassifierTests.swift in Sources */,
+				26C1CCBE76CED31658D48E78 /* LiveAPITests.swift in Sources */,
+				9B2BFCF36A14EEEC0B311D01 /* OpenClawTests.swift in Sources */,
+				5119FF2E03941DBEA5950954 /* RealWorldSimulationTests.swift in Sources */,
+				1D7E693E14F46929E94EEDBA /* SimulationTests.swift in Sources */,
+				3EFC357678BAE870A75FFFC0 /* SkillTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95FCF3D88427FA53812DFBF0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				75880F9C45254A2CF370B505 /* APIClient.swift in Sources */,
+				2331630D71732927FCA9D813 /* AppLogger.swift in Sources */,
+				EDE41F57027852B8C1FE1617 /* AppState.swift in Sources */,
+				7818FD319CD7A42C13456B4C /* CalendarView.swift in Sources */,
+				E188DD4AB8BAE2071CF84445 /* ChatView.swift in Sources */,
+				0C530038340002618B84AA85 /* ChatViewModel.swift in Sources */,
+				59577FFEFD96D339F7D55D41 /* CoreModels.swift in Sources */,
+				76DC3B68C9922D4CB31A6B75 /* EducationModels.swift in Sources */,
+				9EAA203D94930CF661A291EF /* EducationSkill.swift in Sources */,
+				BA940CE57AE4F88A79D600F2 /* ElderCareModels.swift in Sources */,
+				3466DA48CCDC96456EBFF88C /* ElderCareSkill.swift in Sources */,
+				AD5148755795C17B541C7665 /* Extensions.swift in Sources */,
+				D67E516CFCB561DA764074E4 /* FamilyCoordinationModels.swift in Sources */,
+				4C89280808A0296739F3494D /* FamilyCoordinationSkill.swift in Sources */,
+				238596931B03381C23240995 /* GoogleCalendarAPI.swift in Sources */,
+				788DA1E537E06094F09B0C87 /* GoogleClassroomAPI.swift in Sources */,
+				1FCF17BB7B499AD2952030EB /* GooglePlacesAPI.swift in Sources */,
+				C1E52FCC1D0049C64B584E33 /* HealthcareModels.swift in Sources */,
+				C358585E21B80A643B652DBE /* HealthcareSkill.swift in Sources */,
+				F7375EC9354A9346102E906B /* HomeMaintenanceModels.swift in Sources */,
+				8546255B91DBE7A374CE8C4B /* HomeMaintenanceSkill.swift in Sources */,
+				20ADE030E9D49609879011F9 /* KeychainManager.swift in Sources */,
+				A92BD53CB7624C74BC4D1F8B /* MainTabView.swift in Sources */,
+				B21FB0F4F595569389582F49 /* MealPlanningModels.swift in Sources */,
+				33351665E4F76CC8465834A7 /* MealPlanningSkill.swift in Sources */,
+				AA78D2F277A380BDA1EE9361 /* MentalLoadSkill.swift in Sources */,
+				9E96163B63EA78697CFCABC2 /* ModelManager.swift in Sources */,
+				1E2DB374A1AF9AC9CF4559A3 /* NetworkMonitor.swift in Sources */,
+				6F7509931DBA4596C45417CA /* OnboardingView.swift in Sources */,
+				94F45E4DE4C0CC43FB423540 /* OnboardingViewModel.swift in Sources */,
+				A5E697EB3FD6EF8F37C6A8EE /* OpenClawApp.swift in Sources */,
+				0B450B2730432EFDEFAB3AB7 /* OpenFDAAPI.swift in Sources */,
+				A77B54F2046598EA04806BAE /* PersistenceController.swift in Sources */,
+				C8EDEFF544FB2CA35274FB8B /* RootView.swift in Sources */,
+				723610DF7D4F39987D459FF9 /* SettingsView.swift in Sources */,
+				DC5236AA512798088DCBD8FF /* SettingsViewModel.swift in Sources */,
+				F9E2604CF00BE5A91A26141B /* SkillOrchestrator.swift in Sources */,
+				45406AE863C6944164998B15 /* SkillsDashboardView.swift in Sources */,
+				A784C08422CCF22FE0AD37A3 /* SpoonacularAPI.swift in Sources */,
+				C5E155202C84C5B1EFAE0F81 /* StubData.swift in Sources */,
+				187ADA950592AA71D93A1166 /* StubIntentClassifier.swift in Sources */,
+				C850EAEC807413DB93728908 /* StubResponseGenerator.swift in Sources */,
+				714A6A23678CEAA750554F71 /* TwilioAPI.swift in Sources */,
+				B8DED653E90CF3763BD05340 /* USDAFoodDataAPI.swift in Sources */,
+				16898BE487BD204C81B21C9D /* WeatherAPI.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		829F5A7E3D2E58AEEF9D7E25 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E13D7CA665CB2C7715BB112F /* OpenClaw */;
+			targetProxy = EA2EA7D092F862149191D475 /* PBXContainerItemProxy */;
+		};
+		E801D0AF64E18C285DBC7762 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E13D7CA665CB2C7715BB112F /* OpenClaw */;
+			targetProxy = 64530F578EA629FF5012C939 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4D9B2721331C3478A22F5B33 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = JUN45975FK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_GENERATION_MODE = GeneratedFile;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenClaw;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aahalife.openclaw;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		787E8B01DD366CD2F1711C43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.10;
+			};
+			name = Release;
+		};
+		A10E67F13A3E5BC42BA8260F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aahalife.openclaw.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OpenClaw;
+			};
+			name = Release;
+		};
+		A2CC737716F1F84B5BDD9709 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aahalife.openclaw.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OpenClaw;
+			};
+			name = Debug;
+		};
+		B64DCB5A87738279AADDC338 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = JUN45975FK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_GENERATION_MODE = GeneratedFile;
+				INFOPLIST_KEY_CFBundleDisplayName = OpenClaw;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aahalife.openclaw;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BCE2110542EF1E94257896DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aahalife.openclaw.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenClaw.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpenClaw";
+			};
+			name = Debug;
+		};
+		C5C9DE4586BEBE3B1C05BFD5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.aahalife.openclaw.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenClaw.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpenClaw";
+			};
+			name = Release;
+		};
+		D41ABA2870A8AFB47BFECB16 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.10;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		39F36ECD358A83E044E7DAED /* Build configuration list for PBXNativeTarget "OpenClaw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D9B2721331C3478A22F5B33 /* Debug */,
+				B64DCB5A87738279AADDC338 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		869CB079AE487209E3B8D6ED /* Build configuration list for PBXNativeTarget "OpenClawUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2CC737716F1F84B5BDD9709 /* Debug */,
+				A10E67F13A3E5BC42BA8260F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B34C3C00D87CB88F8A3CC8A6 /* Build configuration list for PBXNativeTarget "OpenClawTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BCE2110542EF1E94257896DA /* Debug */,
+				C5C9DE4586BEBE3B1C05BFD5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C7676D1692AEC7EBC17A16F5 /* Build configuration list for PBXProject "OpenClaw" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D41ABA2870A8AFB47BFECB16 /* Debug */,
+				787E8B01DD366CD2F1711C43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A8EFE64C337C902FDC43CDF0 /* Project object */;
+}

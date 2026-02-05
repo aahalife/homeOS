@@ -1,0 +1,503 @@
+{"input": "What should we have for dinner tonight?", "output": "meal-planning"}
+{"input": "I need dinner ideas", "output": "meal-planning"}
+{"input": "What's for dinner?", "output": "meal-planning"}
+{"input": "Can you suggest something to cook?", "output": "meal-planning"}
+{"input": "We need a meal plan for the week", "output": "meal-planning"}
+{"input": "Generate a grocery list", "output": "meal-planning"}
+{"input": "What ingredients do I need for tacos?", "output": "meal-planning"}
+{"input": "Plan meals for Monday through Friday", "output": "meal-planning"}
+{"input": "I'm tired of cooking the same things", "output": "meal-planning"}
+{"input": "Something quick for dinner, 30 minutes max", "output": "meal-planning"}
+{"input": "Kid-friendly dinner ideas please", "output": "meal-planning"}
+{"input": "What can I make with chicken and rice?", "output": "meal-planning"}
+{"input": "We have picky eaters, need meal suggestions", "output": "meal-planning"}
+{"input": "Vegetarian dinner options?", "output": "meal-planning"}
+{"input": "I need to use up these vegetables before they go bad", "output": "meal-planning"}
+{"input": "Meal prep ideas for Sunday", "output": "meal-planning"}
+{"input": "What should I defrost for tomorrow?", "output": "meal-planning"}
+{"input": "Low carb dinner suggestions", "output": "meal-planning"}
+{"input": "Recipe for spaghetti carbonara", "output": "meal-planning"}
+{"input": "We haven't had fish in a while", "output": "meal-planning"}
+{"input": "Lunch ideas for the kids' lunchboxes", "output": "meal-planning"}
+{"input": "Budget-friendly meals this week", "output": "meal-planning"}
+{"input": "Date night dinner I can cook at home", "output": "meal-planning"}
+{"input": "What goes well with salmon?", "output": "meal-planning"}
+{"input": "Crockpot recipe suggestions", "output": "meal-planning"}
+{"input": "Shopping list for the week", "output": "meal-planning"}
+{"input": "Emma has a fever", "output": "healthcare"}
+{"input": "I have a terrible headache", "output": "healthcare"}
+{"input": "When is my doctor appointment?", "output": "healthcare"}
+{"input": "I need to refill my prescription", "output": "healthcare"}
+{"input": "Did I take my medication this morning?", "output": "healthcare"}
+{"input": "What time do I take my blood pressure medicine?", "output": "healthcare"}
+{"input": "My throat is really sore", "output": "healthcare"}
+{"input": "The baby has been throwing up", "output": "healthcare"}
+{"input": "I think I might have the flu", "output": "healthcare"}
+{"input": "Schedule a checkup for the kids", "output": "healthcare"}
+{"input": "When is Jake's dentist appointment?", "output": "healthcare"}
+{"input": "I'm almost out of my allergy pills", "output": "healthcare"}
+{"input": "My back has been hurting for days", "output": "healthcare"}
+{"input": "Symptoms of strep throat?", "output": "healthcare"}
+{"input": "Is this rash something to worry about?", "output": "healthcare"}
+{"input": "Medication reminder for dad", "output": "healthcare"}
+{"input": "I feel nauseous", "output": "healthcare"}
+{"input": "Track my symptoms", "output": "healthcare"}
+{"input": "When was my last physical?", "output": "healthcare"}
+{"input": "Find an urgent care near me", "output": "healthcare"}
+{"input": "My ear really hurts", "output": "healthcare"}
+{"input": "Prescription pickup reminder", "output": "healthcare"}
+{"input": "What pharmacy do we use?", "output": "healthcare"}
+{"input": "Kids' vaccination records", "output": "healthcare"}
+{"input": "I've been coughing for a week", "output": "healthcare"}
+{"input": "Side effects of ibuprofen", "output": "healthcare"}
+{"input": "Book a pediatrician appointment", "output": "healthcare"}
+{"input": "How's traffic to work?", "output": "transportation"}
+{"input": "Get me an Uber", "output": "transportation"}
+{"input": "How long to get to the airport?", "output": "transportation"}
+{"input": "Set up a carpool for soccer practice", "output": "transportation"}
+{"input": "Find parking near downtown", "output": "transportation"}
+{"input": "What time should I leave for my 3pm meeting?", "output": "transportation"}
+{"input": "Book a Lyft to the restaurant", "output": "transportation"}
+{"input": "Is there traffic on I-95?", "output": "transportation"}
+{"input": "Commute time estimate", "output": "transportation"}
+{"input": "Who's driving kids to school tomorrow?", "output": "transportation"}
+{"input": "Reserve a parking spot for tonight", "output": "transportation"}
+{"input": "Best route to grandma's house?", "output": "transportation"}
+{"input": "When do I need to leave for my flight?", "output": "transportation"}
+{"input": "Carpool schedule this week", "output": "transportation"}
+{"input": "Ride to the train station", "output": "transportation"}
+{"input": "How much would an Uber cost to the mall?", "output": "transportation"}
+{"input": "Traffic alert for my route", "output": "transportation"}
+{"input": "Airport pickup at 4pm", "output": "transportation"}
+{"input": "Remind me to leave in 20 minutes", "output": "transportation"}
+{"input": "Alternative routes to avoid construction", "output": "transportation"}
+{"input": "Gas prices nearby", "output": "transportation"}
+{"input": "Where's the nearest charging station?", "output": "transportation"}
+{"input": "Directions to the pediatrician", "output": "transportation"}
+{"input": "Organize the school pickup rotation", "output": "transportation"}
+{"input": "Who can pick up Emma from ballet?", "output": "transportation"}
+{"input": "Book a table for 4 on Saturday", "output": "restaurant-reservation"}
+{"input": "Make a dinner reservation", "output": "restaurant-reservation"}
+{"input": "Find an Italian restaurant for our anniversary", "output": "restaurant-reservation"}
+{"input": "Reserve a table at 7pm", "output": "restaurant-reservation"}
+{"input": "Dinner out this Friday", "output": "restaurant-reservation"}
+{"input": "Restaurant recommendations for date night", "output": "restaurant-reservation"}
+{"input": "Book brunch for Sunday", "output": "restaurant-reservation"}
+{"input": "Family-friendly restaurant for birthday dinner", "output": "restaurant-reservation"}
+{"input": "Make reservations for 6 people", "output": "restaurant-reservation"}
+{"input": "Find a steakhouse with availability tonight", "output": "restaurant-reservation"}
+{"input": "Best sushi place that takes reservations", "output": "restaurant-reservation"}
+{"input": "Restaurant with outdoor seating", "output": "restaurant-reservation"}
+{"input": "Book a table for the rehearsal dinner", "output": "restaurant-reservation"}
+{"input": "Somewhere nice for mom's birthday", "output": "restaurant-reservation"}
+{"input": "Thai food reservation", "output": "restaurant-reservation"}
+{"input": "Table for 2 at 8pm", "output": "restaurant-reservation"}
+{"input": "Cancel our restaurant reservation", "output": "restaurant-reservation"}
+{"input": "Change our reservation to 7:30", "output": "restaurant-reservation"}
+{"input": "Confirm our booking at Olive Garden", "output": "restaurant-reservation"}
+{"input": "Lunch reservation near the office", "output": "restaurant-reservation"}
+{"input": "Private dining room for a party of 12", "output": "restaurant-reservation"}
+{"input": "Restaurant with good vegetarian options", "output": "restaurant-reservation"}
+{"input": "Somewhere casual for the whole family", "output": "restaurant-reservation"}
+{"input": "Book that Mexican place we liked", "output": "restaurant-reservation"}
+{"input": "Romantic restaurant for our anniversary", "output": "restaurant-reservation"}
+{"input": "How's mom doing?", "output": "elder-care"}
+{"input": "Check on dad", "output": "elder-care"}
+{"input": "Has grandma taken her medication?", "output": "elder-care"}
+{"input": "Call mom for her daily check-in", "output": "elder-care"}
+{"input": "Play some music for grandpa", "output": "elder-care"}
+{"input": "What's dad's medication schedule?", "output": "elder-care"}
+{"input": "Send a wellness update to the family about mom", "output": "elder-care"}
+{"input": "Set up check-ins for my elderly parent", "output": "elder-care"}
+{"input": "How has mom been sleeping?", "output": "elder-care"}
+{"input": "Weekly report on dad's health", "output": "elder-care"}
+{"input": "Remind grandma about her pills", "output": "elder-care"}
+{"input": "Dad fell yesterday, how is he today?", "output": "elder-care"}
+{"input": "Music playlist for mom - 1960s", "output": "elder-care"}
+{"input": "When was dad's last check-in?", "output": "elder-care"}
+{"input": "Mom's mood has been low lately", "output": "elder-care"}
+{"input": "Alert the family about grandpa", "output": "elder-care"}
+{"input": "Track mom's blood pressure readings", "output": "elder-care"}
+{"input": "Story time with grandma about her childhood", "output": "elder-care"}
+{"input": "How many times did dad eat today?", "output": "elder-care"}
+{"input": "Check if mom took her morning medication", "output": "elder-care"}
+{"input": "Schedule a video call with grandpa", "output": "elder-care"}
+{"input": "Dad's medication refill is due", "output": "elder-care"}
+{"input": "Update on how my parents are doing", "output": "elder-care"}
+{"input": "Mom hasn't responded today", "output": "elder-care"}
+{"input": "Play grandma's favorite songs", "output": "elder-care"}
+{"input": "I'm so overwhelmed right now", "output": "mental-load"}
+{"input": "There's too much going on", "output": "mental-load"}
+{"input": "What's on for today?", "output": "mental-load"}
+{"input": "Morning briefing please", "output": "mental-load"}
+{"input": "Evening wind-down summary", "output": "mental-load"}
+{"input": "Help me plan this week", "output": "mental-load"}
+{"input": "I can't keep track of everything", "output": "mental-load"}
+{"input": "What should I prioritize?", "output": "mental-load"}
+{"input": "I'm stressed about the week ahead", "output": "mental-load"}
+{"input": "Give me a rundown of tomorrow", "output": "mental-load"}
+{"input": "Weekly planning session", "output": "mental-load"}
+{"input": "I need help organizing my day", "output": "mental-load"}
+{"input": "What's the most important thing right now?", "output": "mental-load"}
+{"input": "Help me delegate some tasks", "output": "mental-load"}
+{"input": "I feel like I'm drowning", "output": "mental-load"}
+{"input": "Simplify my to-do list", "output": "mental-load"}
+{"input": "What can wait until next week?", "output": "mental-load"}
+{"input": "Daily briefing", "output": "mental-load"}
+{"input": "Wrap up what happened today", "output": "mental-load"}
+{"input": "I don't know where to start", "output": "mental-load"}
+{"input": "What's left to do?", "output": "mental-load"}
+{"input": "Break down what I need to do", "output": "mental-load"}
+{"input": "Evening summary for the family", "output": "mental-load"}
+{"input": "Prepare me for tomorrow", "output": "mental-load"}
+{"input": "Too many balls in the air", "output": "mental-load"}
+{"input": "Set a reminder for 3pm", "output": "tools"}
+{"input": "Add dentist to my calendar", "output": "tools"}
+{"input": "What's on my schedule tomorrow?", "output": "tools"}
+{"input": "Remind me to call mom", "output": "tools"}
+{"input": "What's the weather like?", "output": "tools"}
+{"input": "Delete the meeting at 2pm", "output": "tools"}
+{"input": "Reschedule my haircut to next week", "output": "tools"}
+{"input": "Note: buy milk tomorrow", "output": "tools"}
+{"input": "Save this for later", "output": "tools"}
+{"input": "Calendar for next week", "output": "tools"}
+{"input": "Cancel my 4 o'clock", "output": "tools"}
+{"input": "When is my next free day?", "output": "tools"}
+{"input": "Do I have anything on Friday?", "output": "tools"}
+{"input": "Move my meeting to Tuesday", "output": "tools"}
+{"input": "Search for vegan lasagna recipes", "output": "tools"}
+{"input": "Remind me in 20 minutes", "output": "tools"}
+{"input": "Weather forecast for the weekend", "output": "tools"}
+{"input": "Schedule family dinner for Sunday", "output": "tools"}
+{"input": "Block off Saturday morning", "output": "tools"}
+{"input": "Find a time when everyone is free", "output": "tools"}
+{"input": "Don't let me forget to water the plants", "output": "tools"}
+{"input": "What appointments do the kids have?", "output": "tools"}
+{"input": "Is it going to rain tomorrow?", "output": "tools"}
+{"input": "Jot this down for me", "output": "tools"}
+{"input": "Look up hours for the DMV", "output": "tools"}
+{"input": "I want to build a meditation habit", "output": "habits"}
+{"input": "Did I do my pushups today?", "output": "habits"}
+{"input": "Track my reading habit", "output": "habits"}
+{"input": "I keep forgetting to floss", "output": "habits"}
+{"input": "How's my exercise streak?", "output": "habits"}
+{"input": "I missed my habit yesterday", "output": "habits"}
+{"input": "Start a new morning routine", "output": "habits"}
+{"input": "Help me stick to my habits", "output": "habits"}
+{"input": "Mark my workout as done", "output": "habits"}
+{"input": "Habit check-in", "output": "habits"}
+{"input": "I've been consistent with journaling", "output": "habits"}
+{"input": "How do I make this a habit?", "output": "habits"}
+{"input": "I want to drink more water daily", "output": "habits"}
+{"input": "My habit progress this week", "output": "habits"}
+{"input": "I keep breaking my streak", "output": "habits"}
+{"input": "Atomic habits for exercise", "output": "habits"}
+{"input": "Daily habit reminder", "output": "habits"}
+{"input": "What habits am I tracking?", "output": "habits"}
+{"input": "Create a bedtime routine habit", "output": "habits"}
+{"input": "I did my meditation today", "output": "habits"}
+{"input": "Habit motivation needed", "output": "habits"}
+{"input": "Make walking a daily habit", "output": "habits"}
+{"input": "Log my healthy eating for today", "output": "habits"}
+{"input": "Build a habit of reading before bed", "output": "habits"}
+{"input": "Two minute rule for new habits", "output": "habits"}
+{"input": "What should we do this weekend?", "output": "family-bonding"}
+{"input": "Family activity ideas", "output": "family-bonding"}
+{"input": "The kids are bored", "output": "family-bonding"}
+{"input": "Date night ideas", "output": "family-bonding"}
+{"input": "Indoor activities for a rainy day", "output": "family-bonding"}
+{"input": "Plan a family outing", "output": "family-bonding"}
+{"input": "Fun things to do with toddlers", "output": "family-bonding"}
+{"input": "We need quality family time", "output": "family-bonding"}
+{"input": "Suggest something adventurous", "output": "family-bonding"}
+{"input": "Free activities nearby", "output": "family-bonding"}
+{"input": "What can we do together as a family?", "output": "family-bonding"}
+{"input": "Outdoor activities for Saturday", "output": "family-bonding"}
+{"input": "Movie night suggestions", "output": "family-bonding"}
+{"input": "Game night ideas", "output": "family-bonding"}
+{"input": "Day trip ideas near us", "output": "family-bonding"}
+{"input": "Things to do with teenagers", "output": "family-bonding"}
+{"input": "Backyard activity ideas", "output": "family-bonding"}
+{"input": "Plan something special for the kids", "output": "family-bonding"}
+{"input": "Family fun on a budget", "output": "family-bonding"}
+{"input": "What's happening in town this weekend?", "output": "family-bonding"}
+{"input": "Activities for all ages", "output": "family-bonding"}
+{"input": "Make Saturday memorable", "output": "family-bonding"}
+{"input": "Kids need to burn off energy", "output": "family-bonding"}
+{"input": "Educational but fun activities", "output": "family-bonding"}
+{"input": "Parents night out ideas", "output": "family-bonding"}
+{"input": "Tell everyone dinner is ready", "output": "family-comms"}
+{"input": "Announce family meeting at 7pm", "output": "family-comms"}
+{"input": "Who's picking up Emma today?", "output": "family-comms"}
+{"input": "Assign chores for the week", "output": "family-comms"}
+{"input": "Whose turn is it to do dishes?", "output": "family-comms"}
+{"input": "Family calendar for this week", "output": "family-comms"}
+{"input": "Check in with the kids", "output": "family-comms"}
+{"input": "Emergency contact list", "output": "family-comms"}
+{"input": "Let everyone know practice is canceled", "output": "family-comms"}
+{"input": "Coordinate school pickup today", "output": "family-comms"}
+{"input": "Send a message to the whole family", "output": "family-comms"}
+{"input": "Rotate chore assignments", "output": "family-comms"}
+{"input": "Who has Jake after school?", "output": "family-comms"}
+{"input": "Family schedule conflicts", "output": "family-comms"}
+{"input": "Permission slip reminder to everyone", "output": "family-comms"}
+{"input": "Where is everyone right now?", "output": "family-comms"}
+{"input": "Urgent family announcement", "output": "family-comms"}
+{"input": "Check if the kids are home", "output": "family-comms"}
+{"input": "Carpool coordination", "output": "family-comms"}
+{"input": "Who's responsible for trash this week?", "output": "family-comms"}
+{"input": "Family dinner time reminder", "output": "family-comms"}
+{"input": "Let dad know I'm running late", "output": "family-comms"}
+{"input": "What's everyone's schedule like tomorrow?", "output": "family-comms"}
+{"input": "Chore completion status", "output": "family-comms"}
+{"input": "Message the kids about homework", "output": "family-comms"}
+{"input": "How are the kids doing in school?", "output": "school"}
+{"input": "Weekly school report", "output": "school"}
+{"input": "Set up school monitoring", "output": "school"}
+{"input": "Both kids' grades summary", "output": "school"}
+{"input": "What's the school week looking like?", "output": "school"}
+{"input": "Parent-teacher conference email", "output": "school"}
+{"input": "School overview for all children", "output": "school"}
+{"input": "Coordinate school activities", "output": "school"}
+{"input": "Track all kids' homework", "output": "school"}
+{"input": "School schedule conflicts", "output": "school"}
+{"input": "Enable daily school updates", "output": "school"}
+{"input": "Sunday school prep", "output": "school"}
+{"input": "What tests do the kids have this week?", "output": "school"}
+{"input": "School monitoring dashboard", "output": "school"}
+{"input": "Multi-child school summary", "output": "school"}
+{"input": "Draft email to teacher about both kids", "output": "school"}
+{"input": "School coordination between the children", "output": "school"}
+{"input": "Upcoming school events for the family", "output": "school"}
+{"input": "School week ahead preview", "output": "school"}
+{"input": "Configure automated school alerts", "output": "school"}
+{"input": "All kids' assignment status", "output": "school"}
+{"input": "School progress for the semester", "output": "school"}
+{"input": "What's happening at school this week?", "output": "school"}
+{"input": "Kids' extracurricular schedule", "output": "school"}
+{"input": "Permission slips due this week", "output": "school"}
+{"input": "Help Emma with her math homework", "output": "education"}
+{"input": "What assignments does Jake have?", "output": "education"}
+{"input": "Check Sophie's grades", "output": "education"}
+{"input": "Create a study plan for the test", "output": "education"}
+{"input": "Emma has missing homework", "output": "education"}
+{"input": "Set homework reminder for Jake", "output": "education"}
+{"input": "Help prepare for the science exam", "output": "education"}
+{"input": "Track Sophie's assignment progress", "output": "education"}
+{"input": "What's Emma's GPA?", "output": "education"}
+{"input": "Study schedule for finals", "output": "education"}
+{"input": "Jake's teacher wants to talk about grades", "output": "education"}
+{"input": "Homework help for algebra", "output": "education"}
+{"input": "Sophie's reading log update", "output": "education"}
+{"input": "Check if Emma finished her project", "output": "education"}
+{"input": "Grade drop alert for Jake", "output": "education"}
+{"input": "Tutoring help needed", "output": "education"}
+{"input": "Mark Jake's homework as done", "output": "education"}
+{"input": "What's due tomorrow for Emma?", "output": "education"}
+{"input": "Create flashcards for vocabulary", "output": "education"}
+{"input": "Sophie needs help with essay", "output": "education"}
+{"input": "Test prep schedule", "output": "education"}
+{"input": "Homework check for tonight", "output": "education"}
+{"input": "How can I help Emma improve her grades?", "output": "education"}
+{"input": "Jake's report card just came", "output": "education"}
+{"input": "Draft late assignment email for teacher", "output": "education"}
+{"input": "How much water have I had today?", "output": "wellness"}
+{"input": "Track my steps", "output": "wellness"}
+{"input": "How did I sleep last night?", "output": "wellness"}
+{"input": "Kids' screen time today", "output": "wellness"}
+{"input": "Time for a posture break", "output": "wellness"}
+{"input": "Hydration reminder", "output": "wellness"}
+{"input": "I've been sitting too long", "output": "wellness"}
+{"input": "Sleep quality this week", "output": "wellness"}
+{"input": "Emma's screen time limit", "output": "wellness"}
+{"input": "Wellness dashboard", "output": "wellness"}
+{"input": "Eye break reminder", "output": "wellness"}
+{"input": "I feel tired today", "output": "wellness"}
+{"input": "How many steps has Jake gotten?", "output": "wellness"}
+{"input": "Log 8 glasses of water", "output": "wellness"}
+{"input": "Stretch break needed", "output": "wellness"}
+{"input": "Extend screen time for Sophie", "output": "wellness"}
+{"input": "Family wellness check", "output": "wellness"}
+{"input": "Bedtime reminder for the kids", "output": "wellness"}
+{"input": "I need more movement today", "output": "wellness"}
+{"input": "Track my energy levels", "output": "wellness"}
+{"input": "Wind-down time for the family", "output": "wellness"}
+{"input": "20-20-20 eye break", "output": "wellness"}
+{"input": "How's everyone's sleep been?", "output": "wellness"}
+{"input": "Log my afternoon walk", "output": "wellness"}
+{"input": "Wellness goals progress", "output": "wellness"}
+{"input": "The dishwasher won't drain", "output": "home-maintenance"}
+{"input": "There's a leak under the sink", "output": "home-maintenance"}
+{"input": "I smell gas", "output": "home-maintenance"}
+{"input": "The AC stopped working", "output": "home-maintenance"}
+{"input": "When should I change the furnace filter?", "output": "home-maintenance"}
+{"input": "Find a plumber", "output": "home-maintenance"}
+{"input": "The toilet keeps running", "output": "home-maintenance"}
+{"input": "Schedule HVAC maintenance", "output": "home-maintenance"}
+{"input": "The garage door won't close", "output": "home-maintenance"}
+{"input": "How do I fix a squeaky door?", "output": "home-maintenance"}
+{"input": "There's no hot water", "output": "home-maintenance"}
+{"input": "Find an electrician", "output": "home-maintenance"}
+{"input": "My dryer isn't heating", "output": "home-maintenance"}
+{"input": "Gutter cleaning reminder", "output": "home-maintenance"}
+{"input": "The ceiling is leaking", "output": "home-maintenance"}
+{"input": "Water heater maintenance", "output": "home-maintenance"}
+{"input": "Clogged drain in the bathroom", "output": "home-maintenance"}
+{"input": "Preventive maintenance checklist", "output": "home-maintenance"}
+{"input": "The stove burner won't light", "output": "home-maintenance"}
+{"input": "Where's the main water shutoff?", "output": "home-maintenance"}
+{"input": "Smoke detector battery replacement", "output": "home-maintenance"}
+{"input": "Roof inspection needed", "output": "home-maintenance"}
+{"input": "The fridge is making a weird noise", "output": "home-maintenance"}
+{"input": "HVAC tune-up for spring", "output": "home-maintenance"}
+{"input": "Light switch isn't working", "output": "home-maintenance"}
+{"input": "Find a babysitter for Saturday", "output": "hire-helper"}
+{"input": "We need a housekeeper", "output": "hire-helper"}
+{"input": "Hire a tutor for Emma", "output": "hire-helper"}
+{"input": "Looking for a dog walker", "output": "hire-helper"}
+{"input": "Need a nanny for the summer", "output": "hire-helper"}
+{"input": "Find someone to clean the house", "output": "hire-helper"}
+{"input": "Pet sitter while we're on vacation", "output": "hire-helper"}
+{"input": "Caregiver for my mom", "output": "hire-helper"}
+{"input": "Interview questions for a babysitter", "output": "hire-helper"}
+{"input": "How much should I pay a housekeeper?", "output": "hire-helper"}
+{"input": "Background check for the nanny", "output": "hire-helper"}
+{"input": "Recommend a good tutor", "output": "hire-helper"}
+{"input": "Sitter cancellation, need backup", "output": "hire-helper"}
+{"input": "Post a job for childcare", "output": "hire-helper"}
+{"input": "Rate our housekeeper", "output": "hire-helper"}
+{"input": "Find help with elder care", "output": "hire-helper"}
+{"input": "Onboarding checklist for the new nanny", "output": "hire-helper"}
+{"input": "Babysitter rates in our area", "output": "hire-helper"}
+{"input": "Someone to help with yard work", "output": "hire-helper"}
+{"input": "Music teacher for piano lessons", "output": "hire-helper"}
+{"input": "House cleaner once a week", "output": "hire-helper"}
+{"input": "Finding reliable childcare", "output": "hire-helper"}
+{"input": "Au pair options", "output": "hire-helper"}
+{"input": "Personal assistant needed", "output": "hire-helper"}
+{"input": "Senior companion for grandpa", "output": "hire-helper"}
+{"input": "Sell my old couch", "output": "marketplace-sell"}
+{"input": "List the bike on Facebook Marketplace", "output": "marketplace-sell"}
+{"input": "How much is my TV worth?", "output": "marketplace-sell"}
+{"input": "Create a listing for the stroller", "output": "marketplace-sell"}
+{"input": "Price check on vintage furniture", "output": "marketplace-sell"}
+{"input": "Post the car seat for sale", "output": "marketplace-sell"}
+{"input": "Is this buyer legit?", "output": "marketplace-sell"}
+{"input": "Someone offered too much, seems sketchy", "output": "marketplace-sell"}
+{"input": "Help me sell baby clothes", "output": "marketplace-sell"}
+{"input": "Declutter and sell stuff", "output": "marketplace-sell"}
+{"input": "List on eBay", "output": "marketplace-sell"}
+{"input": "Photo tips for selling furniture", "output": "marketplace-sell"}
+{"input": "Write a listing description", "output": "marketplace-sell"}
+{"input": "Safe meetup for a sale", "output": "marketplace-sell"}
+{"input": "Buyer wants to pay with check, is that safe?", "output": "marketplace-sell"}
+{"input": "Pricing strategy for used items", "output": "marketplace-sell"}
+{"input": "Relist something that didn't sell", "output": "marketplace-sell"}
+{"input": "Scam warning signs", "output": "marketplace-sell"}
+{"input": "Get rid of the old elliptical", "output": "marketplace-sell"}
+{"input": "What's my phone worth as a trade-in?", "output": "marketplace-sell"}
+{"input": "Sell the kids' outgrown toys", "output": "marketplace-sell"}
+{"input": "Antique appraisal needed", "output": "marketplace-sell"}
+{"input": "Garage sale vs online listing?", "output": "marketplace-sell"}
+{"input": "Best platform to sell furniture", "output": "marketplace-sell"}
+{"input": "Respond to a lowball offer", "output": "marketplace-sell"}
+{"input": "Call the dentist to make an appointment", "output": "telephony"}
+{"input": "Phone the restaurant to change our reservation", "output": "telephony"}
+{"input": "Make a call to the doctor's office", "output": "telephony"}
+{"input": "Call the school about Emma's absence", "output": "telephony"}
+{"input": "Ring the plumber for an estimate", "output": "telephony"}
+{"input": "Phone the insurance company", "output": "telephony"}
+{"input": "Call ahead to the pharmacy", "output": "telephony"}
+{"input": "Make a phone call for me", "output": "telephony"}
+{"input": "Call customer service about the order", "output": "telephony"}
+{"input": "Dial the vet clinic", "output": "telephony"}
+{"input": "Call to schedule a haircut", "output": "telephony"}
+{"input": "Phone the airline about our flight", "output": "telephony"}
+{"input": "Call the cable company to cancel", "output": "telephony"}
+{"input": "Ring the mechanic about the car", "output": "telephony"}
+{"input": "Make a reservation call", "output": "telephony"}
+{"input": "Call the bank about a charge", "output": "telephony"}
+{"input": "Phone the landlord about the repair", "output": "telephony"}
+{"input": "Dial the number for appointments", "output": "telephony"}
+{"input": "Call to confirm the delivery time", "output": "telephony"}
+{"input": "Phone the orthodontist", "output": "telephony"}
+{"input": "Call the hotel to extend our stay", "output": "telephony"}
+{"input": "Ring the pizza place for an order", "output": "telephony"}
+{"input": "Call to RSVP for the party", "output": "telephony"}
+{"input": "Phone the utility company", "output": "telephony"}
+{"input": "Make a call to the salon", "output": "telephony"}
+{"input": "I read this article about morning routines", "output": "note-to-actions"}
+{"input": "Turn this YouTube video into action items", "output": "note-to-actions"}
+{"input": "How do I actually apply what I learned?", "output": "note-to-actions"}
+{"input": "Convert these notes into habits", "output": "note-to-actions"}
+{"input": "I watched a podcast about productivity", "output": "note-to-actions"}
+{"input": "Make this book summary actionable", "output": "note-to-actions"}
+{"input": "Turn these ideas into something concrete", "output": "note-to-actions"}
+{"input": "I learned about the 5am club, now what?", "output": "note-to-actions"}
+{"input": "Apply the concepts from this TED talk", "output": "note-to-actions"}
+{"input": "Convert inspiration into habits", "output": "note-to-actions"}
+{"input": "How do I start doing this?", "output": "note-to-actions"}
+{"input": "Make this article practical", "output": "note-to-actions"}
+{"input": "Turn this health tip into a daily habit", "output": "note-to-actions"}
+{"input": "Extract action items from this video", "output": "note-to-actions"}
+{"input": "I read about intermittent fasting, help me start", "output": "note-to-actions"}
+{"input": "Convert this parenting advice into practice", "output": "note-to-actions"}
+{"input": "This blog post had great ideas, now what?", "output": "note-to-actions"}
+{"input": "Apply the 4 laws of behavior change", "output": "note-to-actions"}
+{"input": "Turn this into an atomic habit", "output": "note-to-actions"}
+{"input": "Make these productivity tips stick", "output": "note-to-actions"}
+{"input": "I want to implement what I learned", "output": "note-to-actions"}
+{"input": "From theory to practice", "output": "note-to-actions"}
+{"input": "How do I actually do this daily?", "output": "note-to-actions"}
+{"input": "Turn this wellness article into routine", "output": "note-to-actions"}
+{"input": "Build habits from this book", "output": "note-to-actions"}
+{"input": "We need something meaningful to do", "output": "psy-rich"}
+{"input": "Life feels routine, suggest something enriching", "output": "psy-rich"}
+{"input": "We're in a rut as a family", "output": "psy-rich"}
+{"input": "Something novel and interesting to try", "output": "psy-rich"}
+{"input": "Experiences that bring perspective", "output": "psy-rich"}
+{"input": "We want more memorable experiences", "output": "psy-rich"}
+{"input": "Psychologically rich activities", "output": "psy-rich"}
+{"input": "Break out of our comfort zone", "output": "psy-rich"}
+{"input": "Meaningful family experience ideas", "output": "psy-rich"}
+{"input": "Something that expands our worldview", "output": "psy-rich"}
+{"input": "Activities that create lasting memories", "output": "psy-rich"}
+{"input": "Try something we've never done", "output": "psy-rich"}
+{"input": "Enrich our weekend", "output": "psy-rich"}
+{"input": "Perspective-building experiences", "output": "psy-rich"}
+{"input": "We need more complexity in our life", "output": "psy-rich"}
+{"input": "Aesthetic experiences to try", "output": "psy-rich"}
+{"input": "Get out of our bubble", "output": "psy-rich"}
+{"input": "Life feels stale, change it up", "output": "psy-rich"}
+{"input": "Something intellectually stimulating", "output": "psy-rich"}
+{"input": "Novel experience for the family", "output": "psy-rich"}
+{"input": "Make this weekend special and different", "output": "psy-rich"}
+{"input": "Unique activity suggestions", "output": "psy-rich"}
+{"input": "Experience something beautiful together", "output": "psy-rich"}
+{"input": "Deepen our family connections", "output": "psy-rich"}
+{"input": "Cultural experience ideas", "output": "psy-rich"}
+{"input": "I need to book a flight", "output": "tools"}
+{"input": "What time zone is Tokyo in?", "output": "tools"}
+{"input": "Convert 100 dollars to euros", "output": "tools"}
+{"input": "Timer for 15 minutes", "output": "tools"}
+{"input": "Calculate the tip for dinner", "output": "tools"}
+{"input": "Research summer camp options", "output": "tools"}
+{"input": "Find reviews for that restaurant", "output": "tools"}
+{"input": "What's 20% of 85?", "output": "tools"}
+{"input": "Translate this to Spanish", "output": "tools"}
+{"input": "How many cups in a gallon?", "output": "tools"}
+{"input": "Should I bring an umbrella today?", "output": "tools"}
+{"input": "When does daylight saving start?", "output": "tools"}
+{"input": "Random number between 1 and 100", "output": "tools"}
+{"input": "Distance from here to grandma's house", "output": "tools"}
+{"input": "Unit conversion for baking", "output": "tools"}
+{"input": "What does RSVP stand for?", "output": "tools"}
+{"input": "Quick fact check on this", "output": "tools"}
+{"input": "Countdown to Christmas", "output": "tools"}
+{"input": "What day is Thanksgiving this year?", "output": "tools"}
+{"input": "Time right now in London", "output": "tools"}
+{"input": "Sunrise time tomorrow", "output": "tools"}
+{"input": "How old is the Empire State Building?", "output": "tools"}
+{"input": "What's the capital of Australia?", "output": "tools"}
+{"input": "Spell check this word for me", "output": "tools"}
+{"input": "Define serendipity", "output": "tools"}

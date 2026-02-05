@@ -1,0 +1,225 @@
+{"input": "Add dentist appointment on March 15th at 2pm", "function": "calendar_create", "arguments": {"title": "Dentist appointment", "date": "2024-03-15", "time": "14:00", "duration": 60, "type": "medical"}}
+{"input": "Schedule team meeting for tomorrow at 10am", "function": "calendar_create", "arguments": {"title": "Team meeting", "date": "tomorrow", "time": "10:00", "duration": 60, "type": "work"}}
+{"input": "Put Emma's recital on the calendar for June 5th at 6pm", "function": "calendar_create", "arguments": {"title": "Emma's recital", "date": "2024-06-05", "time": "18:00", "participants": ["emma"], "type": "family"}}
+{"input": "Block off Saturday morning for meal prep", "function": "calendar_create", "arguments": {"title": "Meal prep", "date": "Saturday", "time": "09:00", "duration": 180, "type": "household"}}
+{"input": "Add Jake's birthday party to the calendar, April 10th 3pm at the park", "function": "calendar_create", "arguments": {"title": "Jake's birthday party", "date": "2024-04-10", "time": "15:00", "location": "the park", "participants": ["jake"], "type": "family"}}
+{"input": "Schedule parent-teacher conference next Tuesday at 4:30", "function": "calendar_create", "arguments": {"title": "Parent-teacher conference", "date": "next Tuesday", "time": "16:30", "duration": 30, "type": "school"}}
+{"input": "Add anniversary dinner to calendar, May 20th at 7pm at Olive Garden", "function": "calendar_create", "arguments": {"title": "Anniversary dinner", "date": "2024-05-20", "time": "19:00", "location": "Olive Garden", "type": "family"}}
+{"input": "Put the plumber visit on the calendar for Thursday between 1 and 3", "function": "calendar_create", "arguments": {"title": "Plumber visit", "date": "Thursday", "time": "13:00", "duration": 120, "type": "maintenance"}}
+{"input": "Schedule yoga class every Tuesday and Thursday at 6am", "function": "calendar_create", "arguments": {"title": "Yoga class", "time": "06:00", "recurring": "weekly", "days": ["Tuesday", "Thursday"], "type": "wellness"}}
+{"input": "Add car inspection reminder for next month", "function": "calendar_create", "arguments": {"title": "Car inspection", "date": "next month", "type": "reminder"}}
+{"input": "What's on my calendar tomorrow?", "function": "calendar_read", "arguments": {"date": "tomorrow"}}
+{"input": "Show me this week's schedule", "function": "calendar_read", "arguments": {"range": "this week"}}
+{"input": "What appointments do I have on Friday?", "function": "calendar_read", "arguments": {"date": "Friday"}}
+{"input": "Calendar for March", "function": "calendar_read", "arguments": {"month": "March"}}
+{"input": "What's happening next weekend?", "function": "calendar_read", "arguments": {"date": "next weekend", "range": "2 days"}}
+{"input": "Show all medical appointments this month", "function": "calendar_read", "arguments": {"filter": "medical", "range": "this month"}}
+{"input": "What school events are coming up?", "function": "calendar_read", "arguments": {"filter": "school", "range": "2 weeks"}}
+{"input": "Am I free on Saturday afternoon?", "function": "calendar_read", "arguments": {"date": "Saturday", "time_range": "12:00-18:00"}}
+{"input": "When is Jake's next soccer game?", "function": "calendar_read", "arguments": {"search": "soccer", "participant": "jake"}}
+{"input": "Show family events for next month", "function": "calendar_read", "arguments": {"filter": "family", "range": "next month"}}
+{"input": "Delete the meeting at 2pm tomorrow", "function": "calendar_delete", "arguments": {"date": "tomorrow", "time": "14:00", "requires_confirmation": true}}
+{"input": "Cancel my haircut appointment", "function": "calendar_delete", "arguments": {"search": "haircut", "requires_confirmation": true}}
+{"input": "Remove the dentist appointment on March 15", "function": "calendar_delete", "arguments": {"date": "2024-03-15", "search": "dentist", "requires_confirmation": true}}
+{"input": "Clear my calendar for Friday afternoon", "function": "calendar_delete", "arguments": {"date": "Friday", "time_range": "12:00-18:00", "requires_confirmation": true}}
+{"input": "Cancel all recurring team meetings", "function": "calendar_delete", "arguments": {"search": "team meeting", "recurring": true, "requires_confirmation": true}}
+{"input": "Remind me to pick up dry cleaning at 5pm", "function": "reminder_create", "arguments": {"task": "Pick up dry cleaning", "time": "17:00", "type": "errand"}}
+{"input": "Set a reminder to call mom tomorrow morning", "function": "reminder_create", "arguments": {"task": "Call mom", "date": "tomorrow", "time": "09:00", "type": "personal"}}
+{"input": "Don't let me forget to water the plants every Sunday", "function": "reminder_create", "arguments": {"task": "Water the plants", "recurring": "weekly", "day": "Sunday", "type": "household"}}
+{"input": "Remind me in 20 minutes to check the oven", "function": "reminder_create", "arguments": {"task": "Check the oven", "delay": "20 minutes", "type": "timer"}}
+{"input": "Set a reminder for Jake's permission slip due Friday", "function": "reminder_create", "arguments": {"task": "Jake's permission slip", "date": "Friday", "for": "jake", "type": "school"}}
+{"input": "Remind the family about dinner at 6pm", "function": "reminder_create", "arguments": {"task": "Dinner time", "time": "18:00", "recipients": "all", "type": "family"}}
+{"input": "Remind me to refill my prescription when it's down to 5 days", "function": "reminder_create", "arguments": {"task": "Refill prescription", "trigger": "medication_low", "threshold": "5 days", "type": "medical"}}
+{"input": "Set a daily reminder to take vitamins at 8am", "function": "reminder_create", "arguments": {"task": "Take vitamins", "time": "08:00", "recurring": "daily", "type": "health"}}
+{"input": "Remind me to pay rent on the 1st of every month", "function": "reminder_create", "arguments": {"task": "Pay rent", "recurring": "monthly", "day": 1, "type": "financial"}}
+{"input": "Don't forget: buy milk tomorrow", "function": "reminder_create", "arguments": {"task": "Buy milk", "date": "tomorrow", "type": "errand"}}
+{"input": "Did dad take his blood pressure medicine this morning?", "function": "medication_reminder", "arguments": {"member": "dad", "medication": "blood pressure medicine", "time_check": "morning", "action": "check_status"}}
+{"input": "Remind mom to take her evening pills", "function": "medication_reminder", "arguments": {"member": "mom", "time": "evening", "action": "send_reminder"}}
+{"input": "What medications is grandma supposed to take today?", "function": "medication_reminder", "arguments": {"member": "grandma", "action": "list_schedule"}}
+{"input": "Mark dad's medication as taken", "function": "medication_reminder", "arguments": {"member": "dad", "action": "mark_taken"}}
+{"input": "Set up medication reminders for mom's new prescription", "function": "medication_reminder", "arguments": {"member": "mom", "action": "configure", "requires_details": true}}
+{"input": "Dad missed his afternoon dose", "function": "medication_reminder", "arguments": {"member": "dad", "time": "afternoon", "action": "log_missed"}}
+{"input": "Show medication adherence for grandpa this week", "function": "medication_reminder", "arguments": {"member": "grandpa", "action": "show_adherence", "range": "this week"}}
+{"input": "Time for Jake's allergy medicine", "function": "medication_reminder", "arguments": {"member": "jake", "medication": "allergy medicine", "action": "notify"}}
+{"input": "What time does grandma take her heart medication?", "function": "medication_reminder", "arguments": {"member": "grandma", "medication": "heart medication", "action": "get_schedule"}}
+{"input": "Pause mom's medication reminders while she's in the hospital", "function": "medication_reminder", "arguments": {"member": "mom", "action": "pause", "reason": "hospitalization"}}
+{"input": "I need to refill my blood pressure medication", "function": "medication_refill", "arguments": {"medication": "blood pressure medication", "action": "request_refill"}}
+{"input": "Call the pharmacy about dad's prescription", "function": "medication_refill", "arguments": {"member": "dad", "action": "contact_pharmacy", "requires_approval": true}}
+{"input": "Check if mom's prescription is ready", "function": "medication_refill", "arguments": {"member": "mom", "action": "check_status"}}
+{"input": "How many refills do I have left on my medication?", "function": "medication_refill", "arguments": {"action": "check_refills_remaining"}}
+{"input": "Transfer prescription to a new pharmacy", "function": "medication_refill", "arguments": {"action": "transfer", "requires_details": true}}
+{"input": "Set up auto-refill for grandma's medication", "function": "medication_refill", "arguments": {"member": "grandma", "action": "setup_auto_refill"}}
+{"input": "Dad's medication runs out in 3 days", "function": "medication_refill", "arguments": {"member": "dad", "action": "urgent_refill", "days_remaining": 3}}
+{"input": "Order prescription through mail-order pharmacy", "function": "medication_refill", "arguments": {"action": "mail_order", "requires_approval": true}}
+{"input": "Suggest something quick for dinner tonight", "function": "meal_suggest", "arguments": {"time_constraint": "quick", "meal": "dinner", "servings": "family"}}
+{"input": "What can I make with chicken and vegetables?", "function": "meal_suggest", "arguments": {"ingredients": ["chicken", "vegetables"], "action": "suggest_from_ingredients"}}
+{"input": "Kid-friendly dinner that's not pasta", "function": "meal_suggest", "arguments": {"preference": "kid-friendly", "exclude": ["pasta"], "meal": "dinner"}}
+{"input": "Vegetarian lunch ideas for the week", "function": "meal_suggest", "arguments": {"dietary": "vegetarian", "meal": "lunch", "range": "week"}}
+{"input": "Something healthy but the kids will actually eat", "function": "meal_suggest", "arguments": {"preference": ["healthy", "kid-friendly"], "meal": "dinner"}}
+{"input": "Date night dinner I can cook at home", "function": "meal_suggest", "arguments": {"occasion": "date_night", "location": "home", "meal": "dinner"}}
+{"input": "Low-carb meal options", "function": "meal_suggest", "arguments": {"dietary": "low-carb"}}
+{"input": "What should we have for Sunday brunch?", "function": "meal_suggest", "arguments": {"meal": "brunch", "day": "Sunday"}}
+{"input": "Crockpot recipe for busy weeknight", "function": "meal_suggest", "arguments": {"method": "slow_cooker", "time_constraint": "weeknight"}}
+{"input": "Meals that use up the chicken in the fridge", "function": "meal_suggest", "arguments": {"use_up": ["chicken"], "priority": "expiring"}}
+{"input": "Generate the grocery list for this week's meals", "function": "grocery_list", "arguments": {"source": "meal_plan", "range": "this week"}}
+{"input": "What do I need to buy for tacos?", "function": "grocery_list", "arguments": {"recipe": "tacos", "check_pantry": true}}
+{"input": "Add milk and bread to the shopping list", "function": "grocery_list", "arguments": {"items": ["milk", "bread"], "action": "add"}}
+{"input": "Grocery list organized by store section", "function": "grocery_list", "arguments": {"organize_by": "section"}}
+{"input": "What's on our shopping list?", "function": "grocery_list", "arguments": {"action": "view"}}
+{"input": "Remove eggs from the list, we have some", "function": "grocery_list", "arguments": {"items": ["eggs"], "action": "remove"}}
+{"input": "Budget grocery list under $100", "function": "grocery_list", "arguments": {"budget": 100, "action": "generate"}}
+{"input": "Send the grocery list to my phone", "function": "grocery_list", "arguments": {"action": "share", "destination": "phone"}}
+{"input": "Clear the shopping list", "function": "grocery_list", "arguments": {"action": "clear"}}
+{"input": "Check what we already have before making the list", "function": "grocery_list", "arguments": {"action": "check_pantry_first"}}
+{"input": "I have a terrible headache and nausea", "function": "symptom_triage", "arguments": {"symptoms": ["headache", "nausea"], "severity": "moderate", "action": "assess"}}
+{"input": "Emma woke up with a fever of 102", "function": "symptom_triage", "arguments": {"member": "emma", "symptoms": ["fever"], "temperature": 102, "action": "assess"}}
+{"input": "Jake scraped his knee pretty badly", "function": "symptom_triage", "arguments": {"member": "jake", "symptoms": ["scrape", "wound"], "location": "knee", "action": "assess"}}
+{"input": "I've been coughing for a week now", "function": "symptom_triage", "arguments": {"symptoms": ["cough"], "duration": "1 week", "action": "assess"}}
+{"input": "My chest feels tight and I'm short of breath", "function": "symptom_triage", "arguments": {"symptoms": ["chest tightness", "shortness of breath"], "severity": "urgent", "action": "emergency_assess"}}
+{"input": "The baby has been fussy and pulling at her ears", "function": "symptom_triage", "arguments": {"member": "baby", "symptoms": ["fussy", "ear pulling"], "action": "assess"}}
+{"input": "Is this rash something to worry about?", "function": "symptom_triage", "arguments": {"symptoms": ["rash"], "action": "assess", "needs_more_info": true}}
+{"input": "Stomach pain that comes and goes", "function": "symptom_triage", "arguments": {"symptoms": ["stomach pain"], "pattern": "intermittent", "action": "assess"}}
+{"input": "I think I have food poisoning", "function": "symptom_triage", "arguments": {"suspected_condition": "food poisoning", "action": "assess"}}
+{"input": "My ankle is swollen after the fall", "function": "symptom_triage", "arguments": {"symptoms": ["swelling"], "location": "ankle", "cause": "fall", "action": "assess"}}
+{"input": "Call the restaurant to confirm our reservation", "function": "phone_call", "arguments": {"business": "restaurant", "purpose": "confirm_reservation", "requires_approval": true}}
+{"input": "Make an appointment call to the dentist", "function": "phone_call", "arguments": {"business": "dentist office", "purpose": "schedule_appointment", "requires_approval": true}}
+{"input": "Phone the doctor's office about my test results", "function": "phone_call", "arguments": {"business": "doctor's office", "purpose": "inquiry", "topic": "test results", "requires_approval": true}}
+{"input": "Call the school about Emma's absence", "function": "phone_call", "arguments": {"business": "school", "purpose": "report_absence", "about": "emma", "requires_approval": true}}
+{"input": "Ring the plumber to schedule a visit", "function": "phone_call", "arguments": {"business": "plumber", "purpose": "schedule_service", "requires_approval": true}}
+{"input": "Call customer service about my order", "function": "phone_call", "arguments": {"business": "customer service", "purpose": "order_inquiry", "requires_approval": true}}
+{"input": "Phone the pharmacy to check if my prescription is ready", "function": "phone_call", "arguments": {"business": "pharmacy", "purpose": "prescription_status", "requires_approval": true}}
+{"input": "Call to cancel our cable subscription", "function": "phone_call", "arguments": {"business": "cable company", "purpose": "cancel_service", "requires_approval": true}}
+{"input": "Make a reservation call for dinner Saturday at 7", "function": "phone_call", "arguments": {"business": "restaurant", "purpose": "make_reservation", "date": "Saturday", "time": "19:00", "requires_approval": true}}
+{"input": "Call the airline about changing our flight", "function": "phone_call", "arguments": {"business": "airline", "purpose": "flight_change", "requires_approval": true}}
+{"input": "Tell everyone dinner is in 10 minutes", "function": "family_announcement", "arguments": {"message": "Dinner in 10 minutes!", "recipients": "all", "priority": "normal"}}
+{"input": "Urgent family announcement about grandpa", "function": "family_announcement", "arguments": {"message": null, "recipients": "all", "priority": "urgent", "requires_content": true}}
+{"input": "Let the kids know practice is canceled", "function": "family_announcement", "arguments": {"message": "Practice is canceled", "recipients": "children", "priority": "normal"}}
+{"input": "Announce family meeting at 7pm tonight", "function": "family_announcement", "arguments": {"message": "Family meeting tonight at 7pm", "recipients": "all", "priority": "important"}}
+{"input": "Send a reminder about the trip packing", "function": "family_announcement", "arguments": {"message": "Remember to pack for the trip!", "recipients": "all", "priority": "normal"}}
+{"input": "Alert everyone that I'm running 30 minutes late", "function": "family_announcement", "arguments": {"message": "Running 30 minutes late", "recipients": "all", "priority": "important"}}
+{"input": "Quiet announcement - don't wake the baby", "function": "family_announcement", "arguments": {"message": null, "recipients": "adults", "mode": "silent", "requires_content": true}}
+{"input": "Emergency alert to the whole family", "function": "family_announcement", "arguments": {"message": null, "recipients": "all", "priority": "emergency", "requires_content": true, "requires_approval": true}}
+{"input": "Tell dad dinner is ready", "function": "family_announcement", "arguments": {"message": "Dinner is ready", "recipients": ["dad"], "priority": "normal"}}
+{"input": "Broadcast: Movie night starts in 15 minutes", "function": "family_announcement", "arguments": {"message": "Movie night starts in 15 minutes!", "recipients": "all", "priority": "normal"}}
+{"input": "What should we do this weekend?", "function": "activity_suggest", "arguments": {"when": "weekend", "participants": "family", "type": "any"}}
+{"input": "Indoor activities for a rainy day", "function": "activity_suggest", "arguments": {"indoor": true, "weather": "rainy", "participants": "family"}}
+{"input": "Free things to do with the kids", "function": "activity_suggest", "arguments": {"budget": "free", "participants": "children"}}
+{"input": "Date night ideas that aren't dinner", "function": "activity_suggest", "arguments": {"type": "date_night", "exclude": ["dinner"], "participants": 2}}
+{"input": "Activities for a 5 year old", "function": "activity_suggest", "arguments": {"age_appropriate": 5, "participants": ["child"]}}
+{"input": "Something adventurous for the whole family", "function": "activity_suggest", "arguments": {"vibe": "adventurous", "participants": "family"}}
+{"input": "Quick activity for this afternoon", "function": "activity_suggest", "arguments": {"duration": "short", "when": "this afternoon"}}
+{"input": "Educational but fun activities", "function": "activity_suggest", "arguments": {"type": "educational", "vibe": "fun", "participants": "children"}}
+{"input": "Outdoor activities near us", "function": "activity_suggest", "arguments": {"indoor": false, "location": "nearby"}}
+{"input": "Something the teens would actually enjoy", "function": "activity_suggest", "arguments": {"age_appropriate": "teen", "vibe": "cool"}}
+{"input": "Did I do my meditation habit today?", "function": "habit_checkin", "arguments": {"habit": "meditation", "action": "check_status"}}
+{"input": "Mark my workout as complete", "function": "habit_checkin", "arguments": {"habit": "workout", "action": "mark_complete"}}
+{"input": "I missed my reading habit yesterday", "function": "habit_checkin", "arguments": {"habit": "reading", "action": "mark_missed", "date": "yesterday"}}
+{"input": "What's my exercise streak?", "function": "habit_checkin", "arguments": {"habit": "exercise", "action": "get_streak"}}
+{"input": "Show all my habits", "function": "habit_checkin", "arguments": {"action": "list_all"}}
+{"input": "Start tracking a new habit", "function": "habit_checkin", "arguments": {"action": "create", "requires_details": true}}
+{"input": "Habit progress this week", "function": "habit_checkin", "arguments": {"action": "show_progress", "range": "this week"}}
+{"input": "Partial credit for my habit today", "function": "habit_checkin", "arguments": {"action": "mark_partial"}}
+{"input": "Why did my streak break?", "function": "habit_checkin", "arguments": {"action": "explain_streak_break"}}
+{"input": "Reset my habit streak", "function": "habit_checkin", "arguments": {"action": "reset_streak", "requires_confirmation": true}}
+{"input": "How are the kids doing in school?", "function": "school_check", "arguments": {"scope": "all_children", "type": "overview"}}
+{"input": "Check Emma's grades", "function": "school_check", "arguments": {"child": "emma", "type": "grades"}}
+{"input": "What homework does Jake have?", "function": "school_check", "arguments": {"child": "jake", "type": "homework"}}
+{"input": "Any missing assignments for the kids?", "function": "school_check", "arguments": {"scope": "all_children", "type": "missing_work"}}
+{"input": "Weekly school report", "function": "school_check", "arguments": {"scope": "all_children", "type": "weekly_summary"}}
+{"input": "When is Sophie's next test?", "function": "school_check", "arguments": {"child": "sophie", "type": "upcoming_tests"}}
+{"input": "Set up school monitoring", "function": "school_check", "arguments": {"action": "configure_monitoring"}}
+{"input": "Grade alerts for all kids", "function": "school_check", "arguments": {"scope": "all_children", "type": "grade_alerts"}}
+{"input": "School schedule for next week", "function": "school_check", "arguments": {"scope": "all_children", "type": "schedule", "range": "next week"}}
+{"input": "Parent-teacher notes for Emma", "function": "school_check", "arguments": {"child": "emma", "type": "teacher_communications"}}
+{"input": "Do a check-in with mom", "function": "elder_checkin", "arguments": {"parent": "mom", "type": "wellness_check"}}
+{"input": "How's dad doing today?", "function": "elder_checkin", "arguments": {"parent": "dad", "type": "status_check"}}
+{"input": "Play music for grandma", "function": "elder_checkin", "arguments": {"parent": "grandma", "type": "music_therapy"}}
+{"input": "Weekly report on mom's health", "function": "elder_checkin", "arguments": {"parent": "mom", "type": "weekly_report"}}
+{"input": "Send family update to grandpa", "function": "elder_checkin", "arguments": {"parent": "grandpa", "type": "family_update"}}
+{"input": "Check if dad took his morning medication", "function": "elder_checkin", "arguments": {"parent": "dad", "type": "medication_check", "time": "morning"}}
+{"input": "Start a memory conversation with grandma", "function": "elder_checkin", "arguments": {"parent": "grandma", "type": "memory_conversation"}}
+{"input": "Alert family about mom's condition", "function": "elder_checkin", "arguments": {"parent": "mom", "type": "alert", "requires_approval": true}}
+{"input": "Set up daily check-ins for dad", "function": "elder_checkin", "arguments": {"parent": "dad", "action": "configure", "frequency": "daily"}}
+{"input": "Mom hasn't responded to check-ins today", "function": "elder_checkin", "arguments": {"parent": "mom", "type": "escalation_check"}}
+{"input": "Sell my old couch on Facebook Marketplace", "function": "listing_create", "arguments": {"item": "couch", "platform": "facebook_marketplace", "condition": "used"}}
+{"input": "How much should I list the bike for?", "function": "listing_create", "arguments": {"item": "bike", "action": "price_check"}}
+{"input": "Create a listing for the baby stroller", "function": "listing_create", "arguments": {"item": "baby stroller", "action": "draft_listing"}}
+{"input": "Post the TV for sale", "function": "listing_create", "arguments": {"item": "TV", "action": "create_listing"}}
+{"input": "Is this buyer a scam?", "function": "listing_create", "arguments": {"action": "scam_check", "requires_details": true}}
+{"input": "Best platform to sell furniture", "function": "listing_create", "arguments": {"item_type": "furniture", "action": "platform_recommendation"}}
+{"input": "Write a description for selling kids clothes", "function": "listing_create", "arguments": {"item": "kids clothes", "action": "write_description"}}
+{"input": "Respond to a lowball offer", "function": "listing_create", "arguments": {"action": "respond_to_offer", "offer_type": "low"}}
+{"input": "Mark the table as sold", "function": "listing_create", "arguments": {"item": "table", "action": "mark_sold"}}
+{"input": "Relist the item that didn't sell", "function": "listing_create", "arguments": {"action": "relist", "requires_item": true}}
+{"input": "Search for vegan pasta recipes", "function": "web_search", "arguments": {"query": "vegan pasta recipes"}}
+{"input": "Look up symptoms of strep throat", "function": "web_search", "arguments": {"query": "strep throat symptoms"}}
+{"input": "Find reviews for the new Italian restaurant", "function": "web_search", "arguments": {"query": "new Italian restaurant reviews", "local": true}}
+{"input": "Research summer camps in our area", "function": "web_search", "arguments": {"query": "summer camps", "local": true}}
+{"input": "What time does Target close?", "function": "web_search", "arguments": {"query": "Target store hours", "local": true}}
+{"input": "Look up the conversion rate from dollars to euros", "function": "web_search", "arguments": {"query": "USD to EUR conversion rate"}}
+{"input": "Find kid-friendly trails nearby", "function": "web_search", "arguments": {"query": "kid-friendly hiking trails", "local": true}}
+{"input": "Search for plumber reviews", "function": "web_search", "arguments": {"query": "plumber reviews", "local": true}}
+{"input": "What are the symptoms of RSV in babies?", "function": "web_search", "arguments": {"query": "RSV symptoms in babies"}}
+{"input": "Research the best car seats for toddlers", "function": "web_search", "arguments": {"query": "best car seats for toddlers 2024"}}
+{"input": "What's the weather like today?", "function": "weather_check", "arguments": {"location": "current", "timeframe": "today"}}
+{"input": "Will it rain this weekend?", "function": "weather_check", "arguments": {"location": "current", "timeframe": "weekend"}}
+{"input": "Weather forecast for our trip to Chicago", "function": "weather_check", "arguments": {"location": "Chicago", "timeframe": "trip_dates"}}
+{"input": "Do I need an umbrella tomorrow?", "function": "weather_check", "arguments": {"location": "current", "timeframe": "tomorrow", "check": "precipitation"}}
+{"input": "Is it going to be hot on Saturday?", "function": "weather_check", "arguments": {"location": "current", "timeframe": "Saturday", "check": "temperature"}}
+{"input": "Weather for the soccer game", "function": "weather_check", "arguments": {"event": "soccer game", "check": "conditions"}}
+{"input": "Sunrise time tomorrow", "function": "weather_check", "arguments": {"location": "current", "timeframe": "tomorrow", "check": "sunrise"}}
+{"input": "Current temperature outside", "function": "weather_check", "arguments": {"location": "current", "timeframe": "now"}}
+{"input": "Air quality index today", "function": "weather_check", "arguments": {"location": "current", "timeframe": "today", "check": "air_quality"}}
+{"input": "Snow forecast for tonight", "function": "weather_check", "arguments": {"location": "current", "timeframe": "tonight", "check": "snow"}}
+{"input": "Assign dishes to Jake this week", "function": "chore_assign", "arguments": {"chore": "dishes", "assignee": "jake", "duration": "this week"}}
+{"input": "Rotate chore assignments", "function": "chore_assign", "arguments": {"action": "rotate"}}
+{"input": "Who's responsible for trash?", "function": "chore_assign", "arguments": {"chore": "trash", "action": "check_assignment"}}
+{"input": "Mark Emma's room cleaning as done", "function": "chore_assign", "arguments": {"chore": "room cleaning", "assignee": "emma", "action": "mark_complete"}}
+{"input": "Show chore chart for the week", "function": "chore_assign", "arguments": {"action": "show_chart", "range": "this week"}}
+{"input": "Add vacuuming to Sophie's chores", "function": "chore_assign", "arguments": {"chore": "vacuuming", "assignee": "sophie", "action": "add"}}
+{"input": "Fair chore distribution for the kids", "function": "chore_assign", "arguments": {"action": "distribute_fairly", "assignees": "children"}}
+{"input": "Chore completion status", "function": "chore_assign", "arguments": {"action": "status_check"}}
+{"input": "Remind Jake about his chores", "function": "chore_assign", "arguments": {"assignee": "jake", "action": "send_reminder"}}
+{"input": "Set up chore points system", "function": "chore_assign", "arguments": {"action": "configure_rewards"}}
+{"input": "How much water have I had today?", "function": "wellness_track", "arguments": {"metric": "hydration", "action": "check_status"}}
+{"input": "Log 16 ounces of water", "function": "wellness_track", "arguments": {"metric": "hydration", "amount": 16, "unit": "oz", "action": "log"}}
+{"input": "How many steps today?", "function": "wellness_track", "arguments": {"metric": "steps", "action": "check_status"}}
+{"input": "I slept 7 hours last night", "function": "wellness_track", "arguments": {"metric": "sleep", "amount": 7, "unit": "hours", "action": "log"}}
+{"input": "Kids' screen time today", "function": "wellness_track", "arguments": {"metric": "screen_time", "who": "children", "action": "check_status"}}
+{"input": "Extend Emma's screen time by 30 minutes", "function": "wellness_track", "arguments": {"metric": "screen_time", "who": "emma", "adjust": 30, "action": "extend", "requires_approval": true}}
+{"input": "Eye break reminder", "function": "wellness_track", "arguments": {"type": "break", "subtype": "eye_break", "action": "trigger"}}
+{"input": "Posture check", "function": "wellness_track", "arguments": {"type": "break", "subtype": "posture", "action": "trigger"}}
+{"input": "Family wellness dashboard", "function": "wellness_track", "arguments": {"scope": "family", "action": "show_dashboard"}}
+{"input": "Set up bedtime reminders for the kids", "function": "wellness_track", "arguments": {"metric": "sleep", "who": "children", "action": "configure_reminders"}}
+{"input": "Get an Uber to the airport", "function": "ride_request", "arguments": {"service": "uber", "destination": "airport", "requires_approval": true}}
+{"input": "How much is a Lyft to downtown?", "function": "ride_request", "arguments": {"service": "lyft", "destination": "downtown", "action": "estimate"}}
+{"input": "Book a ride for 6pm pickup", "function": "ride_request", "arguments": {"time": "18:00", "action": "book", "requires_approval": true}}
+{"input": "Cancel my Uber", "function": "ride_request", "arguments": {"action": "cancel"}}
+{"input": "Track my ride", "function": "ride_request", "arguments": {"action": "track"}}
+{"input": "Compare Uber vs Lyft prices", "function": "ride_request", "arguments": {"action": "compare", "services": ["uber", "lyft"]}}
+{"input": "Schedule airport pickup for tomorrow at 4pm", "function": "ride_request", "arguments": {"destination": "airport", "date": "tomorrow", "time": "16:00", "action": "schedule", "requires_approval": true}}
+{"input": "How long until my ride arrives?", "function": "ride_request", "arguments": {"action": "eta"}}
+{"input": "Book a table at an Italian restaurant for Saturday 7pm, 4 people", "function": "restaurant_search", "arguments": {"cuisine": "italian", "date": "Saturday", "time": "19:00", "party_size": 4}}
+{"input": "Find a kid-friendly restaurant near us", "function": "restaurant_search", "arguments": {"preference": "kid-friendly", "location": "nearby", "action": "search"}}
+{"input": "Romantic restaurant for our anniversary", "function": "restaurant_search", "arguments": {"vibe": "romantic", "occasion": "anniversary", "action": "search"}}
+{"input": "Restaurant with outdoor seating", "function": "restaurant_search", "arguments": {"requirement": "outdoor_seating", "action": "search"}}
+{"input": "Best sushi in the area", "function": "restaurant_search", "arguments": {"cuisine": "sushi", "sort_by": "rating", "action": "search"}}
+{"input": "Change reservation to 8pm", "function": "restaurant_search", "arguments": {"action": "modify", "new_time": "20:00"}}
+{"input": "Cancel our restaurant reservation", "function": "restaurant_search", "arguments": {"action": "cancel"}}
+{"input": "Restaurant that can accommodate 10 people", "function": "restaurant_search", "arguments": {"party_size": 10, "action": "search"}}
+{"input": "Book brunch for Sunday at 11", "function": "restaurant_search", "arguments": {"meal": "brunch", "date": "Sunday", "time": "11:00", "action": "book"}}
+{"input": "Find a restaurant with vegetarian options", "function": "restaurant_search", "arguments": {"dietary": "vegetarian", "action": "search"}}
+{"input": "How's traffic to work?", "function": "commute_check", "arguments": {"destination": "work", "action": "check_traffic"}}
+{"input": "What time should I leave for my 3pm meeting downtown?", "function": "commute_check", "arguments": {"destination": "downtown", "arrival_time": "15:00", "action": "calculate_departure"}}
+{"input": "Commute estimate to the airport", "function": "commute_check", "arguments": {"destination": "airport", "action": "estimate"}}
+{"input": "Any accidents on my route?", "function": "commute_check", "arguments": {"action": "check_incidents"}}
+{"input": "Alternative routes avoiding the highway", "function": "commute_check", "arguments": {"avoid": "highway", "action": "find_alternatives"}}
+{"input": "Set departure alert for my doctor appointment", "function": "commute_check", "arguments": {"event": "doctor appointment", "action": "set_departure_alert"}}
+{"input": "How long to grandma's house?", "function": "commute_check", "arguments": {"destination": "grandma's house", "action": "estimate"}}
+{"input": "Traffic update for the school run", "function": "commute_check", "arguments": {"destination": "school", "action": "check_traffic"}}
+{"input": "Find parking near the stadium", "function": "parking_search", "arguments": {"location": "stadium", "action": "search"}}
+{"input": "Reserve a parking spot for tonight", "function": "parking_search", "arguments": {"timeframe": "tonight", "action": "reserve", "requires_approval": true}}
+{"input": "Parking rates downtown", "function": "parking_search", "arguments": {"location": "downtown", "action": "check_rates"}}
+{"input": "Free parking options near the mall", "function": "parking_search", "arguments": {"location": "mall", "price": "free", "action": "search"}}
+{"input": "Airport long-term parking options", "function": "parking_search", "arguments": {"location": "airport", "type": "long_term", "action": "search"}}
+{"input": "Is there parking at the restaurant?", "function": "parking_search", "arguments": {"location": "restaurant", "action": "check_availability"}}
